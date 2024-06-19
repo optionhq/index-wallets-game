@@ -4,6 +4,7 @@ import {
   gameAtom,
   gameIdAtom,
   maybeCurrentPlayerAtom,
+  maybeGameAtom,
   updateProvisionalValuationsEffect,
 } from "@/components/Game.state";
 import { CausesTab } from "@/components/tabs/Causes/CausesTab";
@@ -13,10 +14,9 @@ import { WalletTab } from "@/components/tabs/Wallet/WalletTab";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { gameConverter } from "@/lib/firebase/gameConverter";
+import { bn } from "@/lib/bnMath";
 import { useFirestore } from "@/lib/firebase/useFirestore";
-import { arrayUnion, doc, updateDoc } from "firebase/firestore";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   HandHeartIcon,
   HomeIcon,
@@ -33,20 +33,26 @@ export const Game = () => {
   const [playerName, setPlayerName] = useState<string>("");
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
 
-  const game = useAtomValue(gameAtom);
+  const game = useAtomValue(maybeGameAtom);
   useAtomValue(updateProvisionalValuationsEffect);
   const currentPlayer = useAtomValue(maybeCurrentPlayerAtom);
+  const updateGame = useSetAtom(gameAtom);
 
   const setName = useCallback(() => {
-    updateDoc(doc(firestore, "games", gameId).withConverter(gameConverter), {
-      players: arrayUnion({
+    updateGame((game) => {
+      game.players.push({
         deviceId,
         name: playerName,
-        balances: ["100", "100", "100", "100"],
-        valuations: ["1", "1.8", "1.2", "-0.2"],
-      }),
+        balances: [bn("100"), bn("0"), bn("0"), bn("20")],
+        valuations: [bn("1"), bn("0"), bn("0"), bn("1")],
+        cause: "PARK",
+      });
+
+      game.currencies
+        .find((currency) => currency.symbol === "PARK")!
+        .totalSupply.add(bn("20"));
     });
-  }, [playerName, firestore, gameId, deviceId]);
+  }, [playerName, updateGame, deviceId]);
 
   if (!game) {
     return (

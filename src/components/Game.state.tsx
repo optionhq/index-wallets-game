@@ -1,3 +1,4 @@
+import { bn } from "@/lib/bnMath";
 import { gameConverter } from "@/lib/firebase/gameConverter";
 import { getFirestore } from "@/lib/firebase/getFirestore";
 import { portfolioValue } from "@/lib/game/portfolioValue";
@@ -46,7 +47,20 @@ const asyncGameAtom = atomWithObservable((get) => {
   });
 });
 
-export const gameAtom = unwrap(asyncGameAtom);
+export const maybeGameAtom = unwrap(asyncGameAtom);
+
+export const gameAtom = withImmer(
+  atom(
+    (get) => get(defined(maybeGameAtom)),
+    async (get, _set, gameData: GameData) => {
+      const gameId = get(gameIdAtom);
+      await setDoc(
+        doc(getFirestore(), "games", gameId).withConverter(gameConverter),
+        gameData,
+      );
+    },
+  ),
+);
 
 export const deviceIdAtom = atom(() => {
   const deviceId = localStorage.getItem("deviceId");
@@ -61,7 +75,7 @@ export const deviceIdAtom = atom(() => {
 
 export const maybeCurrentPlayerAtom = atom((get) => {
   const deviceId = get(deviceIdAtom);
-  const game = get(gameAtom);
+  const game = get(maybeGameAtom);
 
   return game?.players.find((player) => player.deviceId === deviceId);
 });
@@ -93,7 +107,7 @@ export const defined: <T>(innerAtom: Atom<T | undefined>) => Atom<T> = (
   });
 
 export const playersAtom = atom((get) => {
-  const game = get(gameAtom);
+  const game = get(maybeGameAtom);
 
   if (!game?.players)
     throw new Error(
@@ -104,7 +118,7 @@ export const playersAtom = atom((get) => {
 
 export const otherPlayersAtom = atom((get) => {
   const deviceId = get(deviceIdAtom);
-  const game = get(gameAtom);
+  const game = get(maybeGameAtom);
 
   if (!game?.players)
     throw new Error(
@@ -114,9 +128,13 @@ export const otherPlayersAtom = atom((get) => {
 });
 
 export const currenciesAtom = atom<Currency[]>((get) => {
-  const game = get(gameAtom);
-  return game?.currencies ?? [];
+  const game = get(defined(maybeGameAtom));
+  return game.currencies;
 });
+
+export const causesAtom = atom<Currency[]>((get) =>
+  get(currenciesAtom).filter((currency) => currency.symbol !== "USD"),
+);
 
 export const playerProvisionalValuationsAtom = atom<BigNumber[]>([]);
 
@@ -127,7 +145,7 @@ export const playerValuationsAtom = atom(
     const deviceId = get(deviceIdAtom);
     await setDoc(
       doc(getFirestore(), "games", gameId).withConverter(gameConverter),
-      produce(get(gameAtom), (draft) => {
+      produce(get(maybeGameAtom), (draft) => {
         draft!.players.find(
           (player) => player.deviceId === deviceId,
         )!.valuations = newValuations;
@@ -162,20 +180,13 @@ export const purchaseRelativePriceIndexesAtom = atom((get) => {
   );
 });
 
+// Charities only value USD
+export const charityValuationsAtom = atom((get) => [
+  bn(1),
+  ...new Array(get(currenciesAtom).length - 1).fill(0).map(bn),
+]);
+
 export const playerPortfolioValueAtom = atom((get) => {
   const currentPlayer = get(currentPlayerAtom);
   return portfolioValue(currentPlayer);
 });
-
-export const updateGameAtom = withImmer(
-  atom(
-    (get) => get(defined(gameAtom)),
-    async (get, _set, gameData: GameData) => {
-      const gameId = get(gameIdAtom);
-      await setDoc(
-        doc(getFirestore(), "games", gameId).withConverter(gameConverter),
-        gameData,
-      );
-    },
-  ),
-);

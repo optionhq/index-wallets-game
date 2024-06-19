@@ -13,6 +13,10 @@ export const gameConverter: FirestoreDataConverter<GameData, DbGameData> = {
         balances: dbPlayer.balances.map((balance) => bn(balance)),
         valuations: dbPlayer.valuations.map((valuation) => bn(valuation)),
       })),
+      currencies: dbGame.currencies.map((currency) => ({
+        ...currency,
+        totalSupply: bn(currency.totalSupply),
+      })),
     };
   },
   toFirestore: (game: GameData) => {
@@ -22,6 +26,10 @@ export const gameConverter: FirestoreDataConverter<GameData, DbGameData> = {
         ...player,
         balances: player.balances.map((balance) => balance.toString()),
         valuations: player.valuations.map((valuation) => valuation.toString()),
+      })),
+      currencies: game.currencies.map((currency) => ({
+        ...currency,
+        totalSupply: currency.totalSupply.toString(),
       })),
     };
   },

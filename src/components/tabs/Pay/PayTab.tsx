@@ -1,9 +1,9 @@
 import {
   currentPlayerAtom,
+  gameAtom,
   otherPlayersAtom,
   playerPortfolioValueAtom,
   purchaseRelativePriceIndexesAtom,
-  updateGameAtom,
 } from "@/components/Game.state";
 import { PlayerToken } from "@/components/PlayerToken";
 import { Button } from "@/components/ui/button";
@@ -61,14 +61,11 @@ export const PayTab = () => {
     return portfolioValue.sub(buyerPrice);
   }, [buyerPrice, portfolioValue]);
 
-  const updateGame = useSetAtom(updateGameAtom);
+  const updateGame = useSetAtom(gameAtom);
 
   const makePayment = useCallback(async () => {
-    console.log("Paying");
     if (!selectedPlayer || !vendorPrice || !buyerPrice || !hasEnoughFunds)
       return;
-
-    console.log("Paying", buyerPrice, "to", selectedPlayer.name);
 
     const price = compositePrice({
       vendorPrice,
