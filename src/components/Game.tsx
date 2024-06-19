@@ -2,7 +2,6 @@ import {
   activeTabAtom,
   deviceIdAtom,
   gameAtom,
-  gameIdAtom,
   maybeCurrentPlayerAtom,
   maybeGameAtom,
   updateProvisionalValuationsEffect,
@@ -15,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { bn } from "@/lib/bnMath";
-import { useFirestore } from "@/lib/firebase/useFirestore";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   HandHeartIcon,
@@ -26,10 +24,8 @@ import {
 import { useCallback, useState } from "react";
 
 export const Game = () => {
-  const gameId = useAtomValue(gameIdAtom);
   const deviceId = useAtomValue(deviceIdAtom);
 
-  const firestore = useFirestore();
   const [playerName, setPlayerName] = useState<string>("");
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
 
