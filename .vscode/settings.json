@@ -1,0 +1,6 @@
+{
+  "css.customData": [".vscode/tailwind.json"],
+  "explorer.fileNesting.patterns": {
+    "*.tsx": "${capture}.ts, ${capture}.module.css, ${capture}.stories.ts, ${capture}.stories.tsx, ${capture}.state.tsx"
+  }
+}
