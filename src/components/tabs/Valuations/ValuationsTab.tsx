@@ -99,7 +99,7 @@ export const ValuationsTab = () => {
         Price multiplier when purchasing from them
       </h3>
       <div className="bg-green-50 h-4 w-full relative rounded-t-sm mt-4">
-        {[...otherPlayers, currentPlayer].map((player, i) => (
+        {[...otherPlayers, currentPlayer].map((player) => (
           <span
             key={`${player.deviceId}-relative-purchase`}
             className={cn(

@@ -58,7 +58,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
       >
         <span className="absolute bg-black/20 w-[2px] h-6 ml-[1px] left-1/2" />
         {playersGroupedByValuation.map(([playerValuation, players]) =>
-          players.map((player, i) => (
+          players.map((player) => (
             <span
               key={`${player.deviceId}-marker`}
               className={cn(
