@@ -138,9 +138,11 @@ export const ValuationsTab = () => {
               )}
             </span>
           ))}
-          <span className="absolute text-xs -right-3 my-1 bottom-2">
-            x{maxRelativePurchasePriceIndex.toFixed(2)}
-          </span>
+          {maxRelativePurchasePriceIndex > 1.1 && (
+            <span className="absolute text-xs -right-3 my-1 bottom-2">
+              x{maxRelativePurchasePriceIndex.toFixed(2)}
+            </span>
+          )}
         </div>
 
         <div className="bg-purple-50 h-4 w-full relative rounded-b-sm mt-[1px] shrink-0">
@@ -165,9 +167,11 @@ export const ValuationsTab = () => {
             </span>
           ))}
 
-          <span className="absolute text-xs -right-3 my-1 top-2">
-            x{maxRelativeSalePriceIndex.toFixed(2)}
-          </span>
+          {maxRelativeSalePriceIndex > 1.1 && (
+            <span className="absolute text-xs -right-3 my-1 top-2">
+              x{maxRelativeSalePriceIndex.toFixed(2)}
+            </span>
+          )}
         </div>
         <h3 className="text-sm text-muted-foreground leading-none mt-4">
           When others purchase from you
