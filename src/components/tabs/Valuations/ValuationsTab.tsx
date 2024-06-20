@@ -114,10 +114,10 @@ export const ValuationsTab = () => {
             Update
           </Button>
         </div>
-        <h3 className="text-sm text-muted-foreground leading-none mt-4">
+        <h3 className="text-xs text-muted-foreground leading-none mt-4">
           When purchasing from others
         </h3>
-        <div className="bg-green-50 h-4 w-full relative rounded-t-sm mt-4 shrink-0">
+        <div className="bg-green-50 h-4 w-full relative rounded-t-sm mt-2 shrink-0">
           {[...otherPlayers, currentPlayer].map((player) => (
             <span
               key={`${player.deviceId}-relative-purchase`}
@@ -145,7 +145,7 @@ export const ValuationsTab = () => {
           )}
         </div>
 
-        <div className="bg-purple-50 h-4 w-full relative rounded-b-sm mt-[1px] shrink-0">
+        <div className="bg-blue-50 h-4 w-full relative rounded-b-sm mt-[1px] shrink-0">
           {[...otherPlayers, currentPlayer].map((player, i) => (
             <span
               key={`${player.deviceId}-relative-sale`}
@@ -173,7 +173,7 @@ export const ValuationsTab = () => {
             </span>
           )}
         </div>
-        <h3 className="text-sm text-muted-foreground leading-none mt-4">
+        <h3 className="text-xs text-muted-foreground leading-none mt-2">
           When others purchase from you
         </h3>
       </div>
