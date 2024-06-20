@@ -63,10 +63,10 @@ export const gameAtom = withImmer(
 );
 
 export const deviceIdAtom = atom(() => {
-  const deviceId = localStorage.getItem("deviceId");
+  const deviceId = sessionStorage.getItem("deviceId");
   if (!deviceId) {
     const newId = generateUUID();
-    localStorage.setItem("deviceId", newId);
+    sessionStorage.setItem("deviceId", newId);
     return newId;
   }
 
