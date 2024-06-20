@@ -103,13 +103,10 @@ export const PayTab = () => {
   ]);
 
   return (
-    <TabsContent value="pay" className="p-2 h-full">
+    <TabsContent value="pay">
       {!selectedPlayer && (
         <>
-          <h2 className="text-lg font-bold text-muted-foreground leading-none">
-            Pay
-          </h2>
-          <div className="flex flex-col gap-2 mt-4">
+          <div className="flex flex-col gap-2">
             {(currentPlayer.isDealer
               ? otherPlayers
               : [dealer, ...otherPlayers]
@@ -143,7 +140,7 @@ export const PayTab = () => {
             <Undo2Icon />
           </Button>
 
-          <p className="font-bold text-xl text-muted-foreground absolute top-4 left-0 right-0 mx-auto w-fit">
+          <p className="font-bold text-md text-muted-foreground text-center">
             Paying
           </p>
 

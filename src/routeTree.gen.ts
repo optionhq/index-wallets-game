@@ -13,8 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as GameLayoutImport } from './routes/_game-layout'
-import { Route as GameLayoutGameGameIdImport } from './routes/_game-layout/game/$gameId'
+import { Route as GameGameIdImport } from './routes/game/$gameId'
 
 // Create Virtual Routes
 
@@ -22,19 +21,14 @@ const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
 
-const GameLayoutRoute = GameLayoutImport.update({
-  id: '/_game-layout',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
 
-const GameLayoutGameGameIdRoute = GameLayoutGameGameIdImport.update({
+const GameGameIdRoute = GameGameIdImport.update({
   path: '/game/$gameId',
-  getParentRoute: () => GameLayoutRoute,
+  getParentRoute: () => rootRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -48,19 +42,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/_game-layout': {
-      id: '/_game-layout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof GameLayoutImport
-      parentRoute: typeof rootRoute
-    }
-    '/_game-layout/game/$gameId': {
-      id: '/_game-layout/game/$gameId'
+    '/game/$gameId': {
+      id: '/game/$gameId'
       path: '/game/$gameId'
       fullPath: '/game/$gameId'
-      preLoaderRoute: typeof GameLayoutGameGameIdImport
-      parentRoute: typeof GameLayoutImport
+      preLoaderRoute: typeof GameGameIdImport
+      parentRoute: typeof rootRoute
     }
   }
 }
@@ -69,7 +56,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
-  GameLayoutRoute: GameLayoutRoute.addChildren({ GameLayoutGameGameIdRoute }),
+  GameGameIdRoute,
 })
 
 /* prettier-ignore-end */
@@ -81,21 +68,14 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_game-layout"
+        "/game/$gameId"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
-    "/_game-layout": {
-      "filePath": "_game-layout.tsx",
-      "children": [
-        "/_game-layout/game/$gameId"
-      ]
-    },
-    "/_game-layout/game/$gameId": {
-      "filePath": "_game-layout/game/$gameId.tsx",
-      "parent": "/_game-layout"
+    "/game/$gameId": {
+      "filePath": "game/$gameId.tsx"
     }
   }
 }

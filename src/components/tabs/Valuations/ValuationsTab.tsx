@@ -68,13 +68,7 @@ export const ValuationsTab = () => {
   );
 
   return (
-    <TabsContent
-      value="valuations"
-      className="flex flex-col flex-grow  py-1 px-4 overflow-auto"
-    >
-      <h2 className="text-lg font-bold text-muted-foreground leading-none">
-        Valuations
-      </h2>
+    <TabsContent value="valuations">
       <div className="grid grid-cols-[auto_1fr_auto] gap-2  divide-y-2">
         {currencies.map((currency, currencyIndex) => {
           if (currency.symbol === "USD") return;
@@ -92,86 +86,93 @@ export const ValuationsTab = () => {
           );
         })}
       </div>
-      <h2 className="text-lg font-bold text-muted-foreground leading-none mt-10">
-        Relative purchase power
-      </h2>
-      <h3 className="text-sm text-muted-foreground leading-none mt-4">
-        Price multiplier when purchasing from them
-      </h3>
-      <div className="bg-green-50 h-4 w-full relative rounded-t-sm mt-4">
-        {[...otherPlayers, currentPlayer].map((player) => (
-          <span
-            key={`${player.deviceId}-relative-purchase`}
-            className={cn(
-              player.deviceId === currentPlayer.deviceId
-                ? "bg-primary"
-                : "bg-muted-foreground",
-              "absolute size-2 mx-[-4px] rounded-full my-1 transition-[left]",
-            )}
-            style={{
-              left: `${(100 * purchaseRelativePriceIndexes[player.deviceId].toNumber()) / maxRelativePurchasePriceIndex}%`,
-            }}
-          >
-            {player.deviceId === currentPlayer.deviceId && (
-              <span className="absolute text-xs left-0 bottom-2 mx-[-2px]">
-                x1
-              </span>
-            )}
-          </span>
-        ))}
-        <span className="absolute text-xs -right-3 my-1 bottom-2">
-          x{maxRelativePurchasePriceIndex.toFixed(2)}
-        </span>
-      </div>
+      <div className="sticky -bottom-4 bg-background -m-4 mt-6 px-4 py-2 z-10 border-t transition-[height]">
+        <div className="flex justify-between items-center h-8">
+          <h2 className="text-lg font-bold text-muted-foreground ">
+            Price multipliers
+          </h2>
 
-      <div className="bg-purple-50 h-4 w-full relative rounded-b-sm mt-[1px]">
-        {[...otherPlayers, currentPlayer].map((player, i) => (
-          <span
-            key={`${player.deviceId}-relative-sale`}
-            className={cn(
-              player.deviceId === currentPlayer.deviceId
-                ? "bg-primary"
-                : "bg-muted-foreground",
-              "absolute size-2 mx-[-4px] rounded-full my-1 transition-[left]",
-            )}
-            style={{
-              left: `${(100 * saleRelativePriceIndexes[i].toNumber()) / maxRelativeSalePriceIndex}%`,
-            }}
-          >
-            {player.deviceId === currentPlayer.deviceId && (
-              <span className="absolute text-xs left-0 top-2 mx-[-2px]">
-                x1
-              </span>
-            )}
-          </span>
-        ))}
-
-        <span className="absolute text-xs -right-3 my-1 top-2">
-          x{maxRelativeSalePriceIndex.toFixed(2)}
-        </span>
-      </div>
-      <h3 className="text-sm text-muted-foreground leading-none mt-4">
-        Price multiplier when they purchase from you
-      </h3>
-      {valuationsHaveChanged && (
-        <div className="flex justify-end bottom-0 mt-8">
           <Button
+            disabled={!valuationsHaveChanged}
+            className="h-fit p-0 transition-opacity disabled:opacity-0"
             variant="link"
             onClick={() => setProvisionalValuations(valuations)}
           >
             Reset
           </Button>
+
           <Button
+            disabled={!valuationsHaveChanged}
+            size={"sm"}
+            className="transition-opacity disabled:opacity-0"
             onClick={async () => {
               setValuations(provisionalValuations).then(() =>
                 toast.success("Valuations updated"),
               );
             }}
           >
-            Update valuations
+            Update
           </Button>
         </div>
-      )}
+        <h3 className="text-sm text-muted-foreground leading-none mt-4">
+          When purchasing from others
+        </h3>
+        <div className="bg-green-50 h-4 w-full relative rounded-t-sm mt-4 shrink-0">
+          {[...otherPlayers, currentPlayer].map((player) => (
+            <span
+              key={`${player.deviceId}-relative-purchase`}
+              className={cn(
+                player.deviceId === currentPlayer.deviceId
+                  ? "bg-primary"
+                  : "bg-muted-foreground",
+                "absolute size-2 mx-[-4px] rounded-full my-1 transition-[left]",
+              )}
+              style={{
+                left: `${(100 * purchaseRelativePriceIndexes[player.deviceId].toNumber()) / maxRelativePurchasePriceIndex}%`,
+              }}
+            >
+              {player.deviceId === currentPlayer.deviceId && (
+                <span className="absolute text-xs left-0 bottom-2 mx-[-2px]">
+                  x1
+                </span>
+              )}
+            </span>
+          ))}
+          <span className="absolute text-xs -right-3 my-1 bottom-2">
+            x{maxRelativePurchasePriceIndex.toFixed(2)}
+          </span>
+        </div>
+
+        <div className="bg-purple-50 h-4 w-full relative rounded-b-sm mt-[1px] shrink-0">
+          {[...otherPlayers, currentPlayer].map((player, i) => (
+            <span
+              key={`${player.deviceId}-relative-sale`}
+              className={cn(
+                player.deviceId === currentPlayer.deviceId
+                  ? "bg-primary"
+                  : "bg-muted-foreground",
+                "absolute size-2 mx-[-4px] rounded-full my-1 transition-[left]",
+              )}
+              style={{
+                left: `${(100 * saleRelativePriceIndexes[i].toNumber()) / maxRelativeSalePriceIndex}%`,
+              }}
+            >
+              {player.deviceId === currentPlayer.deviceId && (
+                <span className="absolute text-xs left-0 top-2 mx-[-2px]">
+                  x1
+                </span>
+              )}
+            </span>
+          ))}
+
+          <span className="absolute text-xs -right-3 my-1 top-2">
+            x{maxRelativeSalePriceIndex.toFixed(2)}
+          </span>
+        </div>
+        <h3 className="text-sm text-muted-foreground leading-none mt-4">
+          When others purchase from you
+        </h3>
+      </div>
     </TabsContent>
   );
 };

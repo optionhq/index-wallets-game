@@ -6,9 +6,9 @@ import {
   gameAtom,
 } from "@/components/Game.state";
 import { Button } from "@/components/ui/button";
+import { TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/cn";
 import { Currency } from "@/types/Currency";
-import { TabsContent } from "@radix-ui/react-tabs";
 import { useAtomValue, useSetAtom } from "jotai";
 import { HeartHandshakeIcon, Undo2Icon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
@@ -63,10 +63,7 @@ export const CausesTab = () => {
     <TabsContent value="causes">
       {!selectedCause && (
         <>
-          <h2 className="text-lg font-bold text-muted-foreground leading-none">
-            Donate to a cause
-          </h2>
-          <div className="flex flex-col gap-2 mt-4">
+          <div className="flex flex-col gap-2">
             {causes.map((cause) => {
               const isPlayerCause = currentPlayer.cause === cause.symbol;
               return (
@@ -107,7 +104,7 @@ export const CausesTab = () => {
             <Undo2Icon />
           </Button>
 
-          <p className="font-bold text-xl text-muted-foreground absolute top-4 left-0 right-0 mx-auto w-fit">
+          <p className="font-bold text-md text-muted-foreground text-center">
             Donating to
           </p>
 
@@ -118,63 +115,8 @@ export const CausesTab = () => {
             </div>
           </div>
 
-          {/* <div className="flex flex-col items-center justify-center mt-6">
-            <Label
-              htmlFor="vendor-price"
-              className="text-center text-muted-foreground"
-            >
-              Paying
-            </Label>
-            <div className="relative inline-block">
-              <span className="absolute left-3 top-1/2  -my-3 text-gray-500 text-lg">
-                $
-              </span>
-              <Input
-                maxLength={6}
-                max={100}
-                value={vendorPriceInput}
-                onChange={(event) => setVendorPriceInput(event.target.value)}
-                type="number"
-                step={0.01}
-                pattern="^\d+(\.\d{1,2})?$"
-                id="vendor-price"
-                inputMode="decimal"
-                className="place-self-center w-32 h-12 mt-1 text-center  text-lg"
-              />
-            </div>
+          <div className="flex-grow" />
 
-            {balanceAfterPurchase && (
-              <div className="grid grid-cols-3 mt-4">
-                <div className="flex items-center flex-col text-muted-foreground/60">
-                  <Label className="mt-4 ">Initial balance</Label>
-                  <p className="mt-2 text-lg font-bold ">
-                    {"$" + portfolioValue.toFixed(2)}
-                  </p>
-                </div>
-                <div className="flex items-center flex-col">
-                  <Label className="mt-4 text-md text-muted-foreground">
-                    You pay
-                  </Label>
-                  <p className="mt-2 text-xl font-bold text-muted-foreground">
-                    {!buyerPrice ? "---" : "$" + buyerPrice.toFixed(2)}
-                  </p>
-                </div>
-                <div className="flex items-center flex-col text-muted-foreground/60">
-                  <Label className="mt-4 ">You'll have</Label>
-                  <p
-                    className={cn(
-                      "mt-2 text-lg font-bold",
-                      balanceAfterPurchase.isNegative() && "text-destructive",
-                    )}
-                  >
-                    {formatValue(balanceAfterPurchase, {
-                      withDollarSign: true,
-                    })}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div> */}
           <div className="mt-14 flex flex-col items-center">
             {hasEnoughFunds === false && (
               <p className="text-destructive">Not enough funds</p>

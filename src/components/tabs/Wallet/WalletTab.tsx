@@ -26,7 +26,7 @@ export const WalletTab = () => {
   const totalBalance = formatValue(portfolioValue);
   const setActiveTab = useSetAtom(activeTabAtom);
   return (
-    <TabsContent value="wallet" className="flex flex-col gap-10">
+    <TabsContent value="wallet" className="gap-10">
       <div className="flex items-center gap-2">
         <PlayerToken className="size-16" />
         <div className="flex flex-col gap-0">
