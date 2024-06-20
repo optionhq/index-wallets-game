@@ -6,8 +6,9 @@ export interface FormatValueOptions {
 
 export const formatValue: (
   value: BigNumber,
-  options?: FormatValueOptions
+  options?: FormatValueOptions,
 ) => string = (value, options) => {
+  if (value.greaterThan(9999999)) return "∞";
   return options?.withDollarSign
     ? `${value.isNegative() ? "-$" : "$"}${value.abs().toFixed(2)}`
     : value.toFixed(2);

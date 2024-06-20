@@ -1,5 +1,7 @@
 import {
+  PlayerOrDealer,
   currentPlayerAtom,
+  dealerAtom,
   gameAtom,
   otherPlayersAtom,
   playerPortfolioValueAtom,
@@ -14,7 +16,6 @@ import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
-import { Player } from "@/types/Player";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ReceiptIcon, Undo2Icon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
@@ -26,11 +27,12 @@ export const PayTab = () => {
     purchaseRelativePriceIndexesAtom,
   );
 
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | undefined>(
-    undefined,
-  );
+  const [selectedPlayer, setSelectedPlayer] = useState<
+    PlayerOrDealer | undefined
+  >(undefined);
 
   const currentPlayer = useAtomValue(currentPlayerAtom);
+  const dealer = useAtomValue(dealerAtom);
 
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
 
@@ -73,7 +75,7 @@ export const PayTab = () => {
       vendorValuations: selectedPlayer.valuations,
     });
 
-    await updateGame((game) => {
+    updateGame((game) => {
       game.players.find(
         (player) => player.deviceId === currentPlayer.deviceId,
       )!.balances = currentPlayer.balances.map((balance, i) =>
@@ -84,13 +86,13 @@ export const PayTab = () => {
       )!.balances = selectedPlayer.balances.map((balance, i) =>
         balance.add(price[i]),
       );
+    }).then(() => {
+      toast.success(
+        `Paid ${formatValue(buyerPrice, { withDollarSign: true })} to ${selectedPlayer.name}`,
+      );
     });
 
     setSelectedPlayer(undefined);
-
-    toast.success(
-      `Paid ${formatValue(buyerPrice, { withDollarSign: true })} to ${selectedPlayer.name}`,
-    );
   }, [
     vendorPrice,
     selectedPlayer,
@@ -108,7 +110,10 @@ export const PayTab = () => {
             Pay
           </h2>
           <div className="flex flex-col gap-2 mt-4">
-            {otherPlayers.map((player) => (
+            {(currentPlayer.isDealer
+              ? otherPlayers
+              : [dealer, ...otherPlayers]
+            ).map((player) => (
               <div
                 onClick={() => setSelectedPlayer(player)}
                 key={player.deviceId}
@@ -171,7 +176,6 @@ export const PayTab = () => {
                 max={100}
                 value={vendorPriceInput}
                 onChange={(event) => setVendorPriceInput(event.target.value)}
-                type="number"
                 step={0.01}
                 pattern="^\d+(\.\d{1,2})?$"
                 id="vendor-price"
@@ -185,7 +189,9 @@ export const PayTab = () => {
                 <div className="flex items-center flex-col text-muted-foreground/60">
                   <Label className="mt-4 ">Initial balance</Label>
                   <p className="mt-2 text-lg font-bold ">
-                    {"$" + portfolioValue.toFixed(2)}
+                    {formatValue(portfolioValue, {
+                      withDollarSign: true,
+                    })}
                   </p>
                 </div>
                 <div className="flex items-center flex-col">

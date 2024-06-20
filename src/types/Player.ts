@@ -1,3 +1,4 @@
+import { CauseSymbol } from "@/types/Cause";
 import { DocumentData } from "firebase/firestore";
 import { BigNumber } from "mathjs";
 
@@ -6,7 +7,7 @@ export interface Player {
   name: string;
   balances: BigNumber[];
   valuations: BigNumber[];
-  cause: string;
+  cause?: CauseSymbol;
 }
 
 export interface DbPlayer extends DocumentData {
@@ -14,5 +15,5 @@ export interface DbPlayer extends DocumentData {
   name: string;
   balances: string[];
   valuations: string[];
-  cause: string;
+  cause?: CauseSymbol;
 }

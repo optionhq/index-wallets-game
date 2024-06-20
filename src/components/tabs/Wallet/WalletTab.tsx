@@ -41,13 +41,15 @@ export const WalletTab = () => {
           <h2 className="text-lg font-bold text-muted-foreground leading-none">
             Balances
           </h2>
-          <Button
-            variant="link"
-            className="p-0 h-fit mt-6 text-xs"
-            onClick={() => setActiveTab("valuations")}
-          >
-            Change valuations
-          </Button>
+          {!currentPlayer.isDealer && (
+            <Button
+              variant="link"
+              className="p-0 h-fit mt-6 text-xs"
+              onClick={() => setActiveTab("valuations")}
+            >
+              Change valuations
+            </Button>
+          )}
         </div>
         <Table>
           <TableHeader>
