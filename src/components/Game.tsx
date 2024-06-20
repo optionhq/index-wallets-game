@@ -200,7 +200,6 @@ export const Game = () => {
               >
                 Join game
               </Button>
-              x
             </div>
           </div>
         )}
