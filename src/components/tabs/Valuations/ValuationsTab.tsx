@@ -69,7 +69,7 @@ export const ValuationsTab = () => {
 
   return (
     <TabsContent value="valuations">
-      <div className="flex flex-col gap-2  divide-y-2">
+      <div className="flex flex-col gap-2 ">
         {currencies.map((currency, currencyIndex) => {
           if (currency.symbol === "USD") return;
           return (
