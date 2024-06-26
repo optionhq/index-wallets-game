@@ -1,4 +1,5 @@
 import { bn } from "@/lib/bnMath";
+import { eventConverter } from "@/lib/firebase/eventConverter";
 import { gameConverter } from "@/lib/firebase/gameConverter";
 import { getFirestore } from "@/lib/firebase/getFirestore";
 import { portfolioValue } from "@/lib/game/portfolioValue";
@@ -6,14 +7,19 @@ import { generateId } from "@/lib/generateId";
 import { generateUUID } from "@/lib/generateUUID";
 import { relativePriceIndex } from "@/lib/indexWallets/relativePriceIndex";
 import { Currency } from "@/types/Currency";
-import { DbGameData, GameData } from "@/types/Game";
+import { Event } from "@/types/Events";
+import { DbGameData, GameData } from "@/types/GameData";
 import { Player } from "@/types/Player";
 import {
-  WithFieldValue,
+  Timestamp,
+  addDoc,
+  collection,
   doc,
   onSnapshot,
+  query,
   serverTimestamp,
   setDoc,
+  where,
 } from "firebase/firestore";
 import { produce } from "immer";
 import { Atom, Getter, atom } from "jotai";
@@ -56,46 +62,6 @@ const asyncGameAtom = atomWithObservable((get) => {
 });
 
 export const maybeGameAtom = unwrap(asyncGameAtom);
-
-const demoData: () => WithFieldValue<DbGameData> = () => ({
-  createdAt: serverTimestamp(),
-  players: [
-    {
-      deviceId: "9ddba007-a4a4-40c1-90a6-3ba7c2ca8cfd",
-      name: "Connor",
-      balances: ["100", "20", "0", "0"],
-      valuations: ["1", "1", "0", "0"],
-      cause: "RIVER",
-    },
-    {
-      deviceId: "519dddc1-a3dc-4bb7-86de-7c01a2f5e69a",
-      name: "Will",
-      balances: ["100", "20", "0", "0"],
-      valuations: ["1", "1", "0", "0"],
-      cause: "RIVER",
-    },
-    {
-      deviceId: "6e6ac296-44c8-434f-9533-5fea9f59c577",
-      name: "Lauren",
-      balances: ["100", "0", "20", "0"],
-      valuations: ["1", "0", "1", "0"],
-      cause: "POLLI",
-    },
-    {
-      deviceId: "069788d9-efa7-43c3-afd2-73fc2e7a1294",
-      name: "Julian",
-      balances: ["100", "0", "0", "20"],
-      valuations: ["1", "0", "0", "1"],
-      cause: "PARK",
-    },
-  ],
-  currencies: [
-    { name: "US Dollars", symbol: "USD", totalSupply: "0" },
-    { name: "River Cleanup", symbol: "RIVER", totalSupply: "40" },
-    { name: "Save Pollinators", symbol: "POLLI", totalSupply: "20" },
-    { name: "Parks & Trails", symbol: "PARK", totalSupply: "20" },
-  ],
-});
 
 export const initializeGameAtom = atom(
   null,
@@ -286,3 +252,56 @@ export const playerPortfolioValueAtom = atom((get) => {
   const currentPlayer = get(currentPlayerAtom);
   return portfolioValue(currentPlayer);
 });
+
+export const eventsObservableAtom = atom((get) => {
+  const gameId = get(gameIdAtom);
+
+  if (!gameId) {
+    return new Observable<Event>((subscriber) => {
+      subscriber.complete();
+    });
+  }
+
+  return new Observable<Event>((subscriber) => {
+    const unsubscribe = onSnapshot(
+      query(
+        collection(getFirestore(), "games", gameId, "events").withConverter(
+          eventConverter,
+        ),
+        where("timestamp", ">", Timestamp.now()),
+      ),
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type !== "added") return;
+
+          subscriber.next(change.doc.data());
+        });
+      },
+    );
+
+    return unsubscribe;
+  });
+});
+
+// Workaround for Omit breaking Discriminated Unions
+type OmitEventProp<T, K extends keyof Event> = T extends Event
+  ? Omit<T, K>
+  : never;
+
+export const emitEventAtom = atom(
+  null,
+  async (get, _set, event: OmitEventProp<Event, "timestamp">) => {
+    const gameId = get(gameIdAtom);
+
+    Object.assign(event, { timestamp: serverTimestamp() });
+
+    return (
+      await addDoc(
+        collection(getFirestore(), "games", gameId, "events").withConverter(
+          eventConverter,
+        ),
+        event as Event,
+      )
+    ).id;
+  },
+);

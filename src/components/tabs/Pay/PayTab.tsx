@@ -2,6 +2,7 @@ import {
   PlayerOrDealer,
   currentPlayerAtom,
   dealerAtom,
+  emitEventAtom,
   gameAtom,
   otherPlayersAtom,
   playerPortfolioValueAtom,
@@ -19,7 +20,6 @@ import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ReceiptIcon, Undo2Icon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { toast } from "sonner";
 
 export const PayTab = () => {
   const otherPlayers = useAtomValue(otherPlayersAtom);
@@ -64,6 +64,7 @@ export const PayTab = () => {
   }, [buyerPrice, portfolioValue]);
 
   const updateGame = useSetAtom(gameAtom);
+  const emitEvent = useSetAtom(emitEventAtom);
 
   const makePayment = useCallback(async () => {
     if (!selectedPlayer || !vendorPrice || !buyerPrice || !hasEnoughFunds)
@@ -87,9 +88,12 @@ export const PayTab = () => {
         balance.add(price[i]),
       );
     }).then(() => {
-      toast.success(
-        `Paid ${formatValue(buyerPrice, { withDollarSign: true })} to ${selectedPlayer.name}`,
-      );
+      emitEvent({
+        type: "PAYMENT_MADE",
+        from: currentPlayer.deviceId,
+        to: selectedPlayer.deviceId,
+        payment: price,
+      });
     });
 
     setSelectedPlayer(undefined);
@@ -100,6 +104,7 @@ export const PayTab = () => {
     hasEnoughFunds,
     currentPlayer,
     updateGame,
+    emitEvent,
   ]);
 
   return (

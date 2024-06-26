@@ -1,5 +1,5 @@
-import { Game } from "@/components/Game";
 import { gameIdAtom } from "@/components/Game.state";
+import { GameRoom } from "@/components/GameRoom";
 import { createFileRoute } from "@tanstack/react-router";
 import { getDefaultStore } from "jotai";
 
@@ -11,5 +11,5 @@ export const Route = createFileRoute("/game/$gameId")({
 });
 
 function GameRoute() {
-  return <Game />;
+  return <GameRoom />;
 }

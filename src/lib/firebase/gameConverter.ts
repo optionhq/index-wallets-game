@@ -1,5 +1,6 @@
 import { bn } from "@/lib/bnMath";
-import { DbGameData, GameData } from "@/types/Game";
+import { playerConverter } from "@/lib/firebase/playerConverter";
+import { DbGameData, GameData } from "@/types/GameData";
 import { FirestoreDataConverter } from "firebase/firestore";
 
 export const gameConverter: FirestoreDataConverter<GameData, DbGameData> = {
@@ -8,11 +9,7 @@ export const gameConverter: FirestoreDataConverter<GameData, DbGameData> = {
 
     return {
       ...dbGame,
-      players: dbGame.players.map((dbPlayer) => ({
-        ...dbPlayer,
-        balances: dbPlayer.balances.map((balance) => bn(balance)),
-        valuations: dbPlayer.valuations.map((valuation) => bn(valuation)),
-      })),
+      players: dbGame.players.map(playerConverter.fromFirestore),
       currencies: dbGame.currencies.map((currency) => ({
         ...currency,
         totalSupply: bn(currency.totalSupply),
@@ -22,11 +19,7 @@ export const gameConverter: FirestoreDataConverter<GameData, DbGameData> = {
   toFirestore: (game: GameData) => {
     return {
       ...game,
-      players: game.players.map((player) => ({
-        ...player,
-        balances: player.balances.map((balance) => balance.toString()),
-        valuations: player.valuations.map((valuation) => valuation.toString()),
-      })),
+      players: game.players.map(playerConverter.toFirestore),
       currencies: game.currencies.map((currency) => ({
         ...currency,
         totalSupply: currency.totalSupply.toString(),
