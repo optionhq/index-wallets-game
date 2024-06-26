@@ -1,4 +1,3 @@
-import { CauseToken } from "@/components/CauseToken";
 import { Game } from "@/components/Game";
 import {
   deviceIdAtom,
@@ -7,6 +6,7 @@ import {
   maybeGameAtom,
   updateProvisionalValuationsEffect,
 } from "@/components/Game.state";
+import { TokenBadge } from "@/components/TokenBadge";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,7 +81,7 @@ export const GameRoom = () => {
                   className="flex flex-col justify-between gap-1 w-full text-wrap h-40"
                 >
                   <p className="flex-grow">{cause.name}</p>
-                  <CauseToken className="size-16" />
+                  <TokenBadge className="size-16" token={cause.symbol} />
                   <p className="font-bold text-muted-foreground">
                     ${cause.symbol}
                   </p>
@@ -106,7 +106,7 @@ export const GameRoom = () => {
               <p>You've decided to support</p>
               <div className="flex flex-col justify-between items-center gap-3 border rounded-lg p-4 text-wrap">
                 <p className="text-lg">{cause[playerCause].name}</p>
-                <CauseToken className="size-32" />
+                <TokenBadge className="size-32" token={playerCause} />
                 <p className="font-bold text-muted-foreground">
                   ${cause[playerCause].symbol}
                 </p>

@@ -1,13 +1,14 @@
-import { CauseToken } from "@/components/CauseToken";
 import {
   activeTabAtom,
   causesAtom,
   currentPlayerAtom,
   gameAtom,
 } from "@/components/Game.state";
+import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/cn";
+import { CauseSymbol } from "@/types/Cause";
 import { Currency } from "@/types/Currency";
 import { useAtomValue, useSetAtom } from "jotai";
 import { HeartHandshakeIcon, Undo2Icon } from "lucide-react";
@@ -74,7 +75,10 @@ export const CausesTab = () => {
                     "relative flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary",
                   )}
                 >
-                  <CauseToken className="size-16" />
+                  <TokenBadge
+                    className="size-16"
+                    token={cause.symbol as CauseSymbol}
+                  />
                   <div className="flex flex-col gap-0">
                     <p className="font-bold text-lg">{cause.name}</p>
                     <p className="text-sm text-muted-foreground">
@@ -109,7 +113,10 @@ export const CausesTab = () => {
           </p>
 
           <div className="flex flex-col items-center border-2 mt-4 p-6 shadow-sm rounded-lg">
-            <CauseToken className="size-32" />
+            <TokenBadge
+              className="size-32"
+              token={selectedCause.symbol as CauseSymbol}
+            />
             <div className="flex flex-col gap-0">
               <p className="font-bold text-xl">{selectedCause.name}</p>
             </div>

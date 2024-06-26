@@ -1,9 +1,18 @@
 export interface Cause {
   name: string;
-  symbol: string;
+  symbol: CauseSymbol;
 }
 
-export type CauseSymbol = (typeof allCauses)[number]["symbol"];
+export type CauseSymbol =
+  | "RIVER"
+  | "FOOD"
+  | "PET"
+  | "ELDER"
+  | "SOCIAL"
+  | "PARK"
+  | "HOME"
+  | "POLLEN"
+  | "GARDEN";
 
 export const allCauses: Cause[] = [
   { name: "River Cleanup", symbol: "RIVER" },

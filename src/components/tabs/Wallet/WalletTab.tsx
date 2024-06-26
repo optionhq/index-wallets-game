@@ -5,6 +5,7 @@ import {
   playerPortfolioValueAtom,
 } from "@/components/Game.state";
 import { PlayerToken } from "@/components/PlayerToken";
+import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -16,8 +17,8 @@ import {
 } from "@/components/ui/table";
 import { TabsContent } from "@/components/ui/tabs";
 import { formatValue } from "@/lib/game/formatValue";
+import { CauseSymbol } from "@/types/Cause";
 import { useAtomValue, useSetAtom } from "jotai";
-import {} from "lucide-react";
 
 export const WalletTab = () => {
   const currencies = useAtomValue(currenciesAtom);
@@ -67,7 +68,14 @@ export const WalletTab = () => {
           <TableBody>
             {currencies.map((currency, i) => (
               <TableRow key={currency.symbol}>
-                <TableCell className="font-medium">{currency.symbol}</TableCell>
+                <TableCell className="flex items-center gap-1.5 font-medium">
+                  <TokenBadge
+                    withoutIcon
+                    token={currency.symbol as CauseSymbol}
+                    className={`size-1.5 rounded-none rotate-45`}
+                  />
+                  {currency.symbol}
+                </TableCell>
                 <TableCell className="font-mono">
                   {formatValue(currentPlayer.balances[i])}
                 </TableCell>
