@@ -9,18 +9,22 @@ import { PaymentMadeEvent } from "@/types/Events";
 import { GameData } from "@/types/GameData";
 import { Player } from "@/types/Player";
 import { useAtomValue } from "jotai";
-import { useEffect } from "react";
+import { useAtomCallback } from "jotai/utils";
+import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
 export const useNotifications = () => {
   const eventsObservable = useAtomValue(eventsObservableAtom);
-  const player = useAtomValue(currentPlayerAtom);
-  const game = useAtomValue(gameAtom);
+  const getCurrentPlayer = useAtomCallback(
+    useCallback((get) => get(currentPlayerAtom), []),
+  );
+  const getGame = useAtomCallback(useCallback((get) => get(gameAtom), []));
+
   useEffect(() => {
     const subscription = eventsObservable.subscribe((event) => {
       switch (event.type) {
         case "PAYMENT_MADE":
-          handlePayments(event, player, game);
+          handlePayments(event, getCurrentPlayer(), getGame());
           break;
       }
     });
@@ -28,7 +32,7 @@ export const useNotifications = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [eventsObservable, player, game]);
+  }, [eventsObservable, getCurrentPlayer, getGame]);
 };
 
 const handlePayments = (

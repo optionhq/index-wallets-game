@@ -27,7 +27,8 @@ import { atomEffect } from "jotai-effect";
 import { withImmer } from "jotai-immer";
 import { atomWithObservable, unwrap } from "jotai/utils";
 import { BigNumber } from "mathjs";
-import { Observable } from "rxjs";
+import memoizeOne from "memoize-one";
+import { Observable, share } from "rxjs";
 
 export const gameIdAtom = atom<string>("");
 
@@ -253,6 +254,30 @@ export const playerPortfolioValueAtom = atom((get) => {
   return portfolioValue(currentPlayer);
 });
 
+const gameEventsObservableAtom = memoizeOne((gameId: string) =>
+  atom(
+    new Observable<Event>((subscriber) => {
+      const unsubscribe = onSnapshot(
+        query(
+          collection(getFirestore(), "games", gameId, "events").withConverter(
+            eventConverter,
+          ),
+          where("timestamp", ">", Timestamp.now()),
+        ),
+        (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type !== "added") return;
+
+            subscriber.next(change.doc.data());
+          });
+        },
+      );
+
+      return unsubscribe;
+    }).pipe(share({ resetOnRefCountZero: false })),
+  ),
+);
+
 export const eventsObservableAtom = atom((get) => {
   const gameId = get(gameIdAtom);
 
@@ -262,25 +287,9 @@ export const eventsObservableAtom = atom((get) => {
     });
   }
 
-  return new Observable<Event>((subscriber) => {
-    const unsubscribe = onSnapshot(
-      query(
-        collection(getFirestore(), "games", gameId, "events").withConverter(
-          eventConverter,
-        ),
-        where("timestamp", ">", Timestamp.now()),
-      ),
-      (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type !== "added") return;
+  const gameEventsObservable = get(gameEventsObservableAtom(gameId));
 
-          subscriber.next(change.doc.data());
-        });
-      },
-    );
-
-    return unsubscribe;
-  });
+  return gameEventsObservable;
 });
 
 // Workaround for Omit breaking Discriminated Unions
