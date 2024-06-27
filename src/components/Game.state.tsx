@@ -315,4 +315,7 @@ export const emitEventAtom = atom(
   },
 );
 
-export const vendorPriceAtom = memoize((_vendorId?: string) => atom(""));
+export const vendorPriceAtom = memoize(
+  (_gameId: string, _vendorId?: string) => atom(""),
+  { cacheKey: ([vendorId, gameId]) => `vendor-price-${gameId}-${vendorId}` },
+);

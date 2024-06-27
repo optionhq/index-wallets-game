@@ -4,6 +4,7 @@ import {
   dealerAtom,
   emitEventAtom,
   gameAtom,
+  gameIdAtom,
   otherPlayersAtom,
   playerPortfolioValueAtom,
   purchaseRelativePriceIndexesAtom,
@@ -34,11 +35,12 @@ export const PayTab = () => {
 
   const currentPlayer = useAtomValue(currentPlayerAtom);
   const dealer = useAtomValue(dealerAtom);
+  const gameId = useAtomValue(gameIdAtom);
 
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
 
   const [vendorPriceInput, setVendorPriceInput] = useAtom(
-    vendorPriceAtom(selectedPlayer?.deviceId),
+    vendorPriceAtom(gameId, selectedPlayer?.deviceId),
   );
   const vendorPrice = useMemo(() => {
     try {
