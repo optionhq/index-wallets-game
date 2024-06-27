@@ -27,7 +27,19 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-        <Toaster position="bottom-right" style={{ bottom: "80px" }} />
+        <Toaster
+          position="bottom-right"
+          style={{ bottom: "80px" }}
+          closeButton
+          duration={100000000} // do not auto-hide
+          gap={8}
+          toastOptions={{
+            classNames: {
+              closeButton:
+                "absolute right-0 top-0 bg-background border rounded-full left-auto -mx-4 shadow-sm",
+            },
+          }}
+        />
       </QueryClientProvider>
     </StrictMode>,
   );
