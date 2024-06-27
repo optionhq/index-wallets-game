@@ -1,5 +1,4 @@
 import {
-  PlayerOrDealer,
   currentPlayerAtom,
   dealerAtom,
   emitEventAtom,
@@ -8,6 +7,7 @@ import {
   otherPlayersAtom,
   playerPortfolioValueAtom,
   purchaseRelativePriceIndexesAtom,
+  selectedPayeeAtom,
   vendorPriceAtom,
 } from "@/components/Game.state";
 import { PlayerToken } from "@/components/PlayerToken";
@@ -19,9 +19,10 @@ import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ReceiptIcon, Undo2Icon } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 export const PayTab = () => {
   const otherPlayers = useAtomValue(otherPlayersAtom);
@@ -29,9 +30,7 @@ export const PayTab = () => {
     purchaseRelativePriceIndexesAtom,
   );
 
-  const [selectedPlayer, setSelectedPlayer] = useState<
-    PlayerOrDealer | undefined
-  >(undefined);
+  const [selectedPayee, setSelectedPayee] = useAtom(selectedPayeeAtom);
 
   const currentPlayer = useAtomValue(currentPlayerAtom);
   const dealer = useAtomValue(dealerAtom);
@@ -40,7 +39,7 @@ export const PayTab = () => {
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
 
   const [vendorPriceInput, setVendorPriceInput] = useAtom(
-    vendorPriceAtom(gameId, selectedPlayer?.deviceId),
+    vendorPriceAtom(gameId, selectedPayee?.deviceId),
   );
   const vendorPrice = useMemo(() => {
     try {
@@ -51,12 +50,12 @@ export const PayTab = () => {
   }, [vendorPriceInput]);
 
   const buyerPrice = useMemo(() => {
-    if (!selectedPlayer || !vendorPrice) return undefined;
+    if (!selectedPayee || !vendorPrice) return undefined;
 
     return vendorPrice.mul(
-      purchaseRelativePriceIndexes[selectedPlayer.deviceId],
+      purchaseRelativePriceIndexes[selectedPayee.deviceId],
     );
-  }, [selectedPlayer, vendorPrice, purchaseRelativePriceIndexes]);
+  }, [selectedPayee, vendorPrice, purchaseRelativePriceIndexes]);
 
   const hasEnoughFunds = useMemo(() => {
     if (!buyerPrice) return undefined;
@@ -72,13 +71,13 @@ export const PayTab = () => {
   const emitEvent = useSetAtom(emitEventAtom);
 
   const makePayment = useCallback(async () => {
-    if (!selectedPlayer || !vendorPrice || !buyerPrice || !hasEnoughFunds)
+    if (!selectedPayee || !vendorPrice || !buyerPrice || !hasEnoughFunds)
       return;
 
     const price = compositePrice({
       vendorPrice,
       buyerBalances: currentPlayer.balances,
-      vendorValuations: selectedPlayer.valuations,
+      vendorValuations: selectedPayee.valuations,
     });
 
     updateGame((game) => {
@@ -88,33 +87,34 @@ export const PayTab = () => {
         balance.sub(price[i]),
       );
       game.players.find(
-        (player) => player.deviceId === selectedPlayer.deviceId,
-      )!.balances = selectedPlayer.balances.map((balance, i) =>
+        (player) => player.deviceId === selectedPayee.deviceId,
+      )!.balances = selectedPayee.balances.map((balance, i) =>
         balance.add(price[i]),
       );
     }).then(() => {
       emitEvent({
         type: "PAYMENT_MADE",
         from: currentPlayer.deviceId,
-        to: selectedPlayer.deviceId,
+        to: selectedPayee.deviceId,
         payment: price,
       });
     });
 
-    setSelectedPlayer(undefined);
+    setSelectedPayee(undefined);
   }, [
     vendorPrice,
-    selectedPlayer,
+    selectedPayee,
     buyerPrice,
     hasEnoughFunds,
     currentPlayer,
     updateGame,
     emitEvent,
+    setSelectedPayee,
   ]);
 
   return (
-    <TabsContent value="pay">
-      {!selectedPlayer && (
+    <TabsContent value="pay" className="justify-between xs:pt-10 overflow-clip">
+      {!selectedPayee && (
         <>
           <div className="flex flex-col gap-2">
             {(currentPlayer.isDealer
@@ -122,7 +122,7 @@ export const PayTab = () => {
               : [dealer, ...otherPlayers]
             ).map((player) => (
               <div
-                onClick={() => setSelectedPlayer(player)}
+                onClick={() => setSelectedPayee(player)}
                 key={player.deviceId}
                 className="flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary"
               >
@@ -139,35 +139,29 @@ export const PayTab = () => {
           </div>
         </>
       )}
-      {selectedPlayer && (
+      {selectedPayee && (
         <>
           <Button
             variant="ghost"
             size="icon"
-            className="absolute left-2 top-2"
-            onClick={() => setSelectedPlayer(undefined)}
+            className="absolute left-2 top-0.5"
+            onClick={() => setSelectedPayee(undefined)}
           >
             <Undo2Icon />
           </Button>
 
-          <p className="font-bold text-md text-muted-foreground text-center">
-            Paying
-          </p>
+          <motion.div
+            layout
+            className="flex flex-col items-center gap-1 self-center"
+          >
+            <p className="font-bold text-lg">{selectedPayee.name}</p>
+            <PlayerToken className="size-24 xs:size-28" />
+          </motion.div>
 
-          <div className="flex flex-col items-center border-2 mt-4 p-6 shadow-sm rounded-lg">
-            <PlayerToken className="size-32" />
-            <div className="flex flex-col gap-0">
-              <p className="font-bold text-xl">{selectedPlayer.name}</p>
-              <p className="font-bold text-sm text-muted-foreground">
-                <ReceiptIcon className="inline size-4 align-text-top" /> x
-                {purchaseRelativePriceIndexes[selectedPlayer.deviceId].toFixed(
-                  1,
-                )}{" "}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center justify-center mt-6">
+          <motion.div
+            layout
+            className="flex flex-col items-center justify-center"
+          >
             <Label
               htmlFor="vendor-price"
               className="text-center text-muted-foreground"
@@ -183,6 +177,9 @@ export const PayTab = () => {
                 max={100}
                 value={vendorPriceInput}
                 onChange={(event) => setVendorPriceInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") makePayment();
+                }}
                 step={0.01}
                 pattern="^\d+(\.\d{1,2})?$"
                 id="vendor-price"
@@ -190,11 +187,19 @@ export const PayTab = () => {
                 className="place-self-center w-32 h-12 mt-1 text-center  text-lg"
               />
             </div>
+          </motion.div>
 
+          <AnimatePresence mode="popLayout">
             {balanceAfterPurchase && (
-              <div className="grid grid-cols-3 mt-4">
+              <motion.div
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-3"
+              >
                 <div className="flex items-center flex-col text-muted-foreground/60">
-                  <Label className="mt-4 ">Initial balance</Label>
+                  <Label className="">You have</Label>
                   <p className="mt-2 text-lg font-bold ">
                     {formatValue(portfolioValue, {
                       withDollarSign: true,
@@ -202,15 +207,22 @@ export const PayTab = () => {
                   </p>
                 </div>
                 <div className="flex items-center flex-col">
-                  <Label className="mt-4 text-md text-muted-foreground">
-                    You pay
+                  <Label className="flex flex-col items-center mt-4 text-md text-muted-foreground">
+                    <p className="font-bold">You pay</p>
+                    <p className=" text-xs text-muted-foreground/60">
+                      <ReceiptIcon className="inline size-3.5 align-text-top" />{" "}
+                      x
+                      {purchaseRelativePriceIndexes[
+                        selectedPayee.deviceId
+                      ].toFixed(1)}{" "}
+                    </p>
                   </Label>
-                  <p className="mt-2 text-xl font-bold text-muted-foreground">
+                  <p className="text-xl font-bold text-muted-foreground">
                     {!buyerPrice ? "---" : "$" + buyerPrice.toFixed(2)}
                   </p>
                 </div>
                 <div className="flex items-center flex-col text-muted-foreground/60">
-                  <Label className="mt-4 ">You'll have</Label>
+                  <Label className=" ">You'll have</Label>
                   <p
                     className={cn(
                       "mt-2 text-lg font-bold",
@@ -222,22 +234,43 @@ export const PayTab = () => {
                     })}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             )}
-          </div>
-          <div className="mt-14 flex flex-col items-center">
+          </AnimatePresence>
+
+          <motion.div className="grid">
             {hasEnoughFunds === false && (
-              <p className="text-destructive">Not enough funds</p>
-            )}
-            {hasEnoughFunds && (
-              <Button
-                onClick={makePayment}
-                className="font-bold w-full text-lg h-14"
+              <motion.p
+                key="not-enough-funds"
+                className="overlap text-destructive w-full leading-[3.5rem] align-middle text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
               >
-                Pay
-              </Button>
+                Not enough funds
+              </motion.p>
             )}
-          </div>
+
+            <AnimatePresence mode="popLayout">
+              {hasEnoughFunds && (
+                <Button
+                  key="pay-button"
+                  asChild
+                  onClick={makePayment}
+                  className="relative overlap font-bold w-full text-lg h-14"
+                >
+                  <motion.div
+                    className="relative"
+                    initial={{ translateY: 200 }}
+                    animate={{ translateY: 0 }}
+                    exit={{ translateY: 200, zIndex: -10 }}
+                  >
+                    Pay
+                  </motion.div>
+                </Button>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </>
       )}
     </TabsContent>

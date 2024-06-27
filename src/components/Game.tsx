@@ -1,4 +1,8 @@
-import { activeTabAtom, currentPlayerAtom } from "@/components/Game.state";
+import {
+  activeTabAtom,
+  currentPlayerAtom,
+  selectedPayeeAtom,
+} from "@/components/Game.state";
 import { TripleDotMenu } from "@/components/TrippleDotMenu";
 import { CausesTab } from "@/components/tabs/Causes/CausesTab";
 import { PayTab } from "@/components/tabs/Pay/PayTab";
@@ -18,6 +22,7 @@ export const Game = () => {
   useNotifications();
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
   const currentPlayer = useAtomValue(currentPlayerAtom);
+  const selectedPayee = useAtomValue(selectedPayeeAtom);
 
   return (
     <Tabs
@@ -31,7 +36,7 @@ export const Game = () => {
       <div className="w-full grid grid-cols-[36px_1fr_36px] shrink-0 items-center shadow-sm border-b justify-between h-10 bg-muted">
         <h1 className="col-start-2 text-center font-bold text-lg text-muted-foreground">
           {activeTab === "wallet" && "Balances"}
-          {activeTab === "pay" && "Pay"}
+          {activeTab === "pay" && (selectedPayee ? "Paying" : "Pay")}
           {activeTab === "valuations" && "Valuations"}
           {activeTab === "causes" && "Donate to a Cause"}
         </h1>

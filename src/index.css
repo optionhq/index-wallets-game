@@ -10,6 +10,10 @@
     overscroll-behavior: none;
   }
 
+  html {
+    @apply text-[14px] xs:text-[16px];
+  }
+
   body {
     font-family: "Inter Variable", sans-serif;
   }
@@ -66,5 +70,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .overlap {
+    grid-area: 1/1/1/1;
   }
 }
