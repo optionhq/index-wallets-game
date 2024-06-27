@@ -27,7 +27,7 @@ import { atomEffect } from "jotai-effect";
 import { withImmer } from "jotai-immer";
 import { atomWithObservable, unwrap } from "jotai/utils";
 import { BigNumber } from "mathjs";
-import memoizeOne from "memoize-one";
+import memoize from "memoize";
 import { Observable, share } from "rxjs";
 
 export const gameIdAtom = atom<string>("");
@@ -254,7 +254,7 @@ export const playerPortfolioValueAtom = atom((get) => {
   return portfolioValue(currentPlayer);
 });
 
-const gameEventsObservableAtom = memoizeOne((gameId: string) =>
+const gameEventsObservableAtom = memoize((gameId: string) =>
   atom(
     new Observable<Event>((subscriber) => {
       const unsubscribe = onSnapshot(
@@ -314,3 +314,5 @@ export const emitEventAtom = atom(
     ).id;
   },
 );
+
+export const vendorPriceAtom = memoize((_vendorId?: string) => atom(""));

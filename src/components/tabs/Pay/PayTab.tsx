@@ -7,6 +7,7 @@ import {
   otherPlayersAtom,
   playerPortfolioValueAtom,
   purchaseRelativePriceIndexesAtom,
+  vendorPriceAtom,
 } from "@/components/Game.state";
 import { PlayerToken } from "@/components/PlayerToken";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ReceiptIcon, Undo2Icon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -36,7 +37,9 @@ export const PayTab = () => {
 
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
 
-  const [vendorPriceInput, setVendorPriceInput] = useState<string>("");
+  const [vendorPriceInput, setVendorPriceInput] = useAtom(
+    vendorPriceAtom(selectedPlayer?.deviceId),
+  );
   const vendorPrice = useMemo(() => {
     try {
       return bn(vendorPriceInput);
