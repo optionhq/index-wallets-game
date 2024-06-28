@@ -28,7 +28,7 @@ export type DonationMadeEvent = {
   timestamp: Timestamp;
   playerId: string;
   cause: CauseSymbol;
-  payment: BigNumber[];
+  payment: BigNumber;
   tokensAcquired: BigNumber;
 };
 
@@ -70,7 +70,7 @@ export type DonationMadeDbEvent = {
   timestamp: Timestamp;
   playerId: string;
   cause: CauseSymbol;
-  payment: string[];
+  payment: string;
   tokensAcquired: string;
 };
 

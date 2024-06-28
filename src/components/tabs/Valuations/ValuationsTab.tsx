@@ -1,6 +1,7 @@
 import {
   currenciesAtom,
   currentPlayerAtom,
+  emitEventAtom,
   otherPlayersAtom,
   playerProvisionalValuationsAtom,
   playerValuationsAtom,
@@ -12,15 +13,15 @@ import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/cn";
 import { relativePriceIndex } from "@/lib/indexWallets/relativePriceIndex";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useMemo } from "react";
-import { toast } from "sonner";
 
 export const ValuationsTab = () => {
   const [provisionalValuations, setProvisionalValuations] = useAtom(
     playerProvisionalValuationsAtom,
   );
   const [valuations, setValuations] = useAtom(playerValuationsAtom);
+  const emitEvent = useSetAtom(emitEventAtom);
   const otherPlayers = useAtomValue(otherPlayersAtom);
   const currencies = useAtomValue(currenciesAtom);
   const currentPlayer = useAtomValue(currentPlayerAtom);
@@ -106,9 +107,13 @@ export const ValuationsTab = () => {
             size={"sm"}
             className="transition-opacity disabled:opacity-0"
             onClick={async () => {
-              setValuations(provisionalValuations).then(() =>
-                toast.success("Valuations updated"),
-              );
+              setValuations(provisionalValuations).then(() => {
+                emitEvent({
+                  type: "VALUATIONS_UPDATED",
+                  playerId: currentPlayer.deviceId,
+                  valuations: provisionalValuations,
+                });
+              });
             }}
           >
             Update

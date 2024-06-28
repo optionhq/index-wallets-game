@@ -1,6 +1,6 @@
 import { bn } from "@/lib/bnMath";
 import { playerConverter } from "@/lib/firebase/playerConverter";
-import { DbEvent, DbEventOf, Event } from "@/types/Events";
+import { DbEvent, Event } from "@/types/Events";
 import { FirestoreDataConverter } from "firebase/firestore";
 
 export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
@@ -27,7 +27,7 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
       case "DONATION_MADE":
         return {
           ...event,
-          payment: event.payment.map((payment) => bn(payment)),
+          payment: bn(event.payment),
           tokensAcquired: bn(event.tokensAcquired),
         };
       case "GAME_CREATED":
@@ -55,7 +55,7 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
       case "DONATION_MADE":
         return {
           ...event,
-          payment: event.payment.map((payment) => payment.toString()),
+          payment: event.payment.toString(),
           tokensAcquired: event.tokensAcquired.toString(),
         };
       case "GAME_CREATED":

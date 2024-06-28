@@ -2,18 +2,19 @@ import {
   activeTabAtom,
   causesAtom,
   currentPlayerAtom,
+  emitEventAtom,
   gameAtom,
 } from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
+import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { CauseSymbol } from "@/types/Cause";
 import { Currency } from "@/types/Currency";
 import { useAtomValue, useSetAtom } from "jotai";
 import { HeartHandshakeIcon, Undo2Icon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { toast } from "sonner";
 
 export const CausesTab = () => {
   const [selectedCause, setSelectedCause] = useState<Currency | undefined>(
@@ -23,6 +24,7 @@ export const CausesTab = () => {
   const currentPlayer = useAtomValue(currentPlayerAtom);
   const setActiveTab = useSetAtom(activeTabAtom);
   const updateGame = useSetAtom(gameAtom);
+  const emitEvent = useSetAtom(emitEventAtom);
   const hasEnoughFunds = useMemo(
     () => currentPlayer.balances[0].greaterThanOrEqualTo(20),
     [currentPlayer],
@@ -54,11 +56,21 @@ export const CausesTab = () => {
         (player) => player.deviceId === currentPlayer.deviceId,
       )!.balances[currencyIndex] = causeTokenBalance.add(20);
     }).then(() => {
-      toast.success("Donation successful", {
-        description: `Donated U$20 to ${selectedCause.name} and got 20 ${selectedCause.symbol} in return.`,
+      emitEvent({
+        type: "DONATION_MADE",
+        cause: selectedCause.symbol as CauseSymbol,
+        tokensAcquired: bn(20),
+        playerId: currentPlayer.deviceId,
+        payment: bn(20),
       });
     });
-  }, [currentPlayer, selectedCause, updateGame]);
+  }, [
+    currentPlayer.deviceId,
+    emitEvent,
+    selectedCause,
+    setActiveTab,
+    updateGame,
+  ]);
 
   return (
     <TabsContent value="causes">

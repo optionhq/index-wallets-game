@@ -5,9 +5,6 @@ import {
 } from "@/components/Game.state";
 import { formatValue } from "@/lib/game/formatValue";
 import { valueOf } from "@/lib/indexWallets/valueOf";
-import { PaymentMadeEvent } from "@/types/Events";
-import { GameData } from "@/types/GameData";
-import { Player } from "@/types/Player";
 import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect } from "react";
@@ -22,9 +19,50 @@ export const useNotifications = () => {
 
   useEffect(() => {
     const subscription = eventsObservable.subscribe((event) => {
+      const currentPlayer = getCurrentPlayer();
+      const game = getGame();
       switch (event.type) {
         case "PAYMENT_MADE":
-          handlePayments(event, getCurrentPlayer(), getGame());
+          if (event.from === currentPlayer.deviceId) {
+            toast.success(
+              `Paid ${formatValue(valueOf(event.payment, currentPlayer.valuations), { withDollarSign: true })} to ${game.players.find((player) => player.deviceId === event.to)?.name}`,
+            );
+          }
+
+          if (event.to === currentPlayer.deviceId) {
+            toast(
+              `Received ${formatValue(valueOf(event.payment, currentPlayer.valuations), { withDollarSign: true })} from ${game.players.find((player) => player.deviceId === event.from)?.name}`,
+            );
+          }
+          break;
+        case "PLAYER_JOINED":
+          if (event.deviceId !== currentPlayer.deviceId) {
+            toast(`${event.name} joined the game`);
+          }
+          break;
+        case "DONATION_MADE":
+          if (event.playerId === currentPlayer.deviceId) {
+            toast.success(
+              `Donated ${formatValue(event.payment, { withDollarSign: true })} to ${event.cause}`,
+            );
+          }
+
+          if (event.playerId !== currentPlayer.deviceId) {
+            toast(
+              `${game.players.find((p) => p.deviceId === event.playerId)?.name} donated ${formatValue(event.payment, { withDollarSign: true })} to ${event.cause}`,
+            );
+          }
+          break;
+        case "VALUATIONS_UPDATED":
+          if (event.playerId === currentPlayer.deviceId) {
+            toast.success(`Valuations updated`);
+          }
+
+          if (event.playerId !== currentPlayer.deviceId) {
+            toast(
+              `${game.players.find((p) => p.deviceId === event.playerId)?.name} updated their valuations`,
+            );
+          }
           break;
       }
     });
@@ -33,22 +71,4 @@ export const useNotifications = () => {
       subscription.unsubscribe();
     };
   }, [eventsObservable, getCurrentPlayer, getGame]);
-};
-
-const handlePayments = (
-  event: PaymentMadeEvent,
-  player: Player,
-  game: GameData,
-) => {
-  if (event.from === player.deviceId) {
-    toast.success(
-      `Paid ${formatValue(valueOf(event.payment, player.valuations), { withDollarSign: true })} to ${game.players.find((player) => player.deviceId === event.to)?.name}`,
-    );
-  }
-
-  if (event.to === player.deviceId) {
-    toast.success(
-      `Received ${formatValue(valueOf(event.payment, player.valuations), { withDollarSign: true })} from ${game.players.find((player) => player.deviceId === event.from)?.name}`,
-    );
-  }
 };

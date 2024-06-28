@@ -8,7 +8,7 @@ import { generateUUID } from "@/lib/generateUUID";
 import { relativePriceIndex } from "@/lib/indexWallets/relativePriceIndex";
 import { Currency } from "@/types/Currency";
 import { Event } from "@/types/Events";
-import { DbGameData, GameData } from "@/types/GameData";
+import { GameData } from "@/types/GameData";
 import { Player } from "@/types/Player";
 import {
   Timestamp,
@@ -64,50 +64,47 @@ const asyncGameAtom = atomWithObservable((get) => {
 
 export const maybeGameAtom = unwrap(asyncGameAtom);
 
-export const initializeGameAtom = atom(
-  null,
-  async (get, _set, demoData?: DbGameData) => {
-    const gameId = generateId();
-    const deviceId = get(deviceIdAtom);
-    await setDoc(
-      doc(getFirestore(), "games", gameId),
-      demoData
-        ? produce(demoData, (draft) => {
-            draft.players.unshift({
-              deviceId,
-              name: "Dealer",
-              balances: ["1000000000000000000000000", "0", "0", "0"],
-              valuations: ["1", "0", "0", "0"],
-            });
-          })
-        : {
-            createdAt: serverTimestamp(),
-            players: [
-              {
-                deviceId,
-                name: "Dealer",
-                balances: ["1000000000"],
-                valuations: ["1"],
-              },
-            ],
-            currencies: [
-              { name: "US Dollars", symbol: "USD", totalSupply: "0" },
-            ],
-          },
-    );
-    return gameId;
-  },
-);
+export const initializeGameAtom = atom(null, async (get, _set) => {
+  const gameId = generateId();
+  const deviceId = get(deviceIdAtom);
+  const gameData = {
+    createdAt: serverTimestamp(),
+    players: [
+      {
+        deviceId,
+        name: "Dealer",
+        balances: ["1000000000"],
+        valuations: ["1"],
+      },
+    ],
+    currencies: [{ name: "US Dollars", symbol: "USD", totalSupply: "0" }],
+  };
+  await Promise.all([
+    setDoc(doc(getFirestore(), "games", gameId), gameData),
+    addDoc(collection(getFirestore(), "games", gameId, "history"), gameData),
+  ]);
+  return gameId;
+});
 
 export const gameAtom = withImmer(
   atom(
     (get) => get(defined(maybeGameAtom)),
     async (get, _set, gameData: GameData) => {
       const gameId = get(gameIdAtom);
-      await setDoc(
-        doc(getFirestore(), "games", gameId).withConverter(gameConverter),
-        gameData,
-      );
+
+      await Promise.all([
+        setDoc(
+          doc(getFirestore(), "games", gameId).withConverter(gameConverter),
+          gameData,
+        ),
+
+        addDoc(
+          collection(getFirestore(), "games", gameId, "history").withConverter(
+            gameConverter,
+          ),
+          { ...gameData, createdAt: serverTimestamp() },
+        ),
+      ]);
     },
   ),
 );
@@ -302,18 +299,25 @@ export const emitEventAtom = atom(
   async (get, _set, event: OmitEventProp<Event, "timestamp">) => {
     const gameId = get(gameIdAtom);
 
-    Object.assign(event, { timestamp: serverTimestamp() });
-
-    return (
-      await addDoc(
-        collection(getFirestore(), "games", gameId, "events").withConverter(
-          eventConverter,
-        ),
-        event as Event,
-      )
-    ).id;
+    return await emitEvent(gameId, event);
   },
 );
+
+export const emitEvent = async (
+  gameId: string,
+  event: OmitEventProp<Event, "timestamp">,
+) => {
+  Object.assign(event, { timestamp: serverTimestamp() });
+
+  return (
+    await addDoc(
+      collection(getFirestore(), "games", gameId, "events").withConverter(
+        eventConverter,
+      ),
+      event as Event,
+    )
+  ).id;
+};
 
 export const vendorPriceAtom = memoize(
   (_gameId: string, _vendorId?: string) => atom(""),

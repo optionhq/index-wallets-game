@@ -1,5 +1,9 @@
 import indexWalletsLogo from "@/assets/img/index-wallets-mono.png";
-import { initializeGameAtom } from "@/components/Game.state";
+import {
+  deviceIdAtom,
+  emitEvent,
+  initializeGameAtom,
+} from "@/components/Game.state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/cn";
@@ -7,7 +11,7 @@ import { useFirestore } from "@/lib/firebase/useFirestore";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { doc, getDoc } from "firebase/firestore";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 
 export const Lobby = () => {
@@ -15,6 +19,7 @@ export const Lobby = () => {
   const [gameId, setGameId] = useState<string>("");
   const firestore = useFirestore();
 
+  const playerId = useAtomValue(deviceIdAtom);
   const createGame = useSetAtom(initializeGameAtom);
 
   const { data: gameExists } = useQuery({
@@ -73,9 +78,10 @@ export const Lobby = () => {
         <p className="text-sm text-foreground/50">or</p>
         <Button
           onClick={() =>
-            createGame().then((gameId) =>
-              navigate({ to: `/game/${gameId}`, params: { gameId } }),
-            )
+            createGame().then((gameId) => {
+              emitEvent(gameId, { type: "GAME_CREATED", dealerId: playerId });
+              navigate({ to: `/game/${gameId}`, params: { gameId } });
+            })
           }
           variant="link"
           size="lg"
