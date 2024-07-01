@@ -7,15 +7,18 @@ import { generateId } from "@/lib/generateId";
 import { generateUUID } from "@/lib/generateUUID";
 import { relativePriceIndex } from "@/lib/indexWallets/relativePriceIndex";
 import { Currency } from "@/types/Currency";
-import { Event } from "@/types/Events";
+import { DonationMadeEvent, Event, PaymentMadeEvent } from "@/types/Events";
 import { GameData } from "@/types/GameData";
 import { Player } from "@/types/Player";
 import {
   Timestamp,
   addDoc,
+  and,
   collection,
   doc,
   onSnapshot,
+  or,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -341,3 +344,55 @@ export const vendorPriceAtom = memoize(
 );
 
 export const selectedPayeeAtom = atom<PlayerOrDealer | undefined>(undefined);
+
+export const transactionsHistoryAtom = unwrap(
+  atomWithObservable((get) => {
+    const gameId = get(gameIdAtom);
+
+    if (!gameId) {
+      return new Observable<
+        ((PaymentMadeEvent | DonationMadeEvent) & { id: string })[]
+      >((subscriber) => {
+        subscriber.complete();
+      });
+    }
+
+    const deviceId = get(deviceIdAtom);
+
+    return new Observable<
+      ((PaymentMadeEvent | DonationMadeEvent) & { id: string })[]
+    >((subscriber) => {
+      const unsubscribe = onSnapshot(
+        query(
+          collection(getFirestore(), "games", gameId, "events").withConverter(
+            eventConverter,
+          ),
+          or(
+            and(
+              where("type", "==", "PAYMENT_MADE"),
+              or(where("from", "==", deviceId), where("to", "==", deviceId)),
+            ),
+            and(
+              where("type", "==", "DONATION_MADE"),
+              where("playerId", "==", deviceId),
+            ),
+          ),
+          orderBy("timestamp", "desc"),
+        ),
+        (snapshot) => {
+          const events = snapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+          subscriber.next(
+            events as ((PaymentMadeEvent | DonationMadeEvent) & {
+              id: string;
+            })[],
+          );
+        },
+      );
+
+      return unsubscribe;
+    });
+  }),
+);

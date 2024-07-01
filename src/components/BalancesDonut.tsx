@@ -1,6 +1,6 @@
 import { currenciesAtom } from "@/components/Game.state";
 import { tokenColor } from "@/config";
-import { bnMath } from "@/lib/bnMath";
+import { bn, bnMath } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { useAtomValue } from "jotai";
 import { BigNumber } from "mathjs";
@@ -21,7 +21,8 @@ export const BalancesDonut: FC<BalancesDonutProps> = ({
       currencies.reduce(
         (data, currency, i) => {
           const start = data.length ? data[data.length - 1].stop : 0;
-          const stop = start + balances[i].div(total).mul(360).toNumber();
+          const stop =
+            start + (balances[i] ?? bn(0)).div(total).mul(360).toNumber();
           const color = tokenColor[currency.symbol];
           return [...data, { start, stop, color }];
         },
