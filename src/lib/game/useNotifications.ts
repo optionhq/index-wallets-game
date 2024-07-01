@@ -43,13 +43,13 @@ export const useNotifications = () => {
         case "DONATION_MADE":
           if (event.playerId === currentPlayer.deviceId) {
             toast.success(
-              `Donated ${formatValue(event.payment, { withIndexSign: true })} to ${event.cause}`,
+              `Donated $${event.payment.toFixed(2)} to ${event.cause}`,
             );
           }
 
           if (event.playerId !== currentPlayer.deviceId) {
             toast(
-              `${game.players.find((p) => p.deviceId === event.playerId)?.name} donated ${formatValue(event.payment, { withIndexSign: true })} to ${event.cause}`,
+              `${game.players.find((p) => p.deviceId === event.playerId)?.name} donated $${event.payment.toFixed(2)} to ${event.cause}`,
             );
           }
           break;
