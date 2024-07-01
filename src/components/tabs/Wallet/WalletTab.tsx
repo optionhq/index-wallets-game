@@ -24,7 +24,7 @@ export const WalletTab = () => {
   const currencies = useAtomValue(currenciesAtom);
   const currentPlayer = useAtomValue(currentPlayerAtom);
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
-  const totalBalance = formatValue(portfolioValue);
+  const totalBalance = formatValue(portfolioValue, { withIndexSign: true });
   const setActiveTab = useSetAtom(activeTabAtom);
   return (
     <TabsContent value="wallet" className="gap-10">
@@ -34,7 +34,7 @@ export const WalletTab = () => {
           <p className="font-bold text-lg text-muted-foreground">
             {currentPlayer.name}
           </p>
-          <p className="font-bold text-lg">${totalBalance}</p>
+          <p className="font-bold text-lg">{totalBalance}</p>
         </div>
       </div>
       <div>
@@ -85,7 +85,7 @@ export const WalletTab = () => {
                 <TableCell className="text-right font-mono">
                   {formatValue(
                     currentPlayer.balances[i].mul(currentPlayer.valuations[i]),
-                    { withDollarSign: true },
+                    { withIndexSign: true },
                   )}
                 </TableCell>
               </TableRow>

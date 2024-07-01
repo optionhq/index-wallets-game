@@ -25,13 +25,13 @@ export const useNotifications = () => {
         case "PAYMENT_MADE":
           if (event.from === currentPlayer.deviceId) {
             toast.success(
-              `Paid ${formatValue(valueOf(event.payment, currentPlayer.valuations), { withDollarSign: true })} to ${game.players.find((player) => player.deviceId === event.to)?.name}`,
+              `Paid ${formatValue(valueOf(event.payment, currentPlayer.valuations), { withIndexSign: true })} to ${game.players.find((player) => player.deviceId === event.to)?.name}`,
             );
           }
 
           if (event.to === currentPlayer.deviceId) {
             toast(
-              `Received ${formatValue(valueOf(event.payment, currentPlayer.valuations), { withDollarSign: true })} from ${game.players.find((player) => player.deviceId === event.from)?.name}`,
+              `Received ${formatValue(valueOf(event.payment, currentPlayer.valuations), { withIndexSign: true })} from ${game.players.find((player) => player.deviceId === event.from)?.name}`,
             );
           }
           break;
@@ -43,13 +43,13 @@ export const useNotifications = () => {
         case "DONATION_MADE":
           if (event.playerId === currentPlayer.deviceId) {
             toast.success(
-              `Donated ${formatValue(event.payment, { withDollarSign: true })} to ${event.cause}`,
+              `Donated ${formatValue(event.payment, { withIndexSign: true })} to ${event.cause}`,
             );
           }
 
           if (event.playerId !== currentPlayer.deviceId) {
             toast(
-              `${game.players.find((p) => p.deviceId === event.playerId)?.name} donated ${formatValue(event.payment, { withDollarSign: true })} to ${event.cause}`,
+              `${game.players.find((p) => p.deviceId === event.playerId)?.name} donated ${formatValue(event.payment, { withIndexSign: true })} to ${event.cause}`,
             );
           }
           break;

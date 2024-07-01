@@ -1,3 +1,4 @@
+import { DollarSignIcon } from "lucide-react";
 import ButterflyIcon from "./assets/img/cause-tokens/Butterfly.svg?react";
 import CouchIcon from "./assets/img/cause-tokens/Couch.svg?react";
 import DogIcon from "./assets/img/cause-tokens/Dog.svg?react";
@@ -26,7 +27,8 @@ export const tokenColor = {
   USD: "#000000",
 } as { [cause in CauseSymbol | "USD"]: string };
 
-export const causeIcon = {
+export const tokenIcon = {
+  USD: DollarSignIcon,
   RIVER: RiverIcon,
   FOOD: FoodIcon,
   PET: DogIcon,
@@ -36,4 +38,4 @@ export const causeIcon = {
   HOME: TentIcon,
   POLLEN: ButterflyIcon,
   GARDEN: SeedlingIcon,
-} as { [cause in CauseSymbol]: FC<SVGProps<SVGSVGElement>> };
+} as { [cause in CauseSymbol | "USD"]: FC<SVGProps<SVGSVGElement>> };

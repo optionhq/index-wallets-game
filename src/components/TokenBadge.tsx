@@ -1,4 +1,4 @@
-import { causeIcon, tokenColor } from "@/config";
+import { tokenColor, tokenIcon } from "@/config";
 import { cn } from "@/lib/cn";
 import { CauseSymbol } from "@/types/Cause";
 import { FC, HTMLAttributes } from "react";
@@ -18,7 +18,7 @@ export const TokenBadge: FC<CauseTokenProps> = ({
   style,
   ...props
 }) => {
-  const Icon = token === "USD" ? undefined : causeIcon[token];
+  const Icon = tokenIcon[token];
   return (
     <div
       {...props}

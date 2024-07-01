@@ -1,3 +1,4 @@
+import IndexCurrency from "@/assets/img/index-wallet-currency-symbol.svg?react";
 import {
   currentPlayerAtom,
   dealerAtom,
@@ -169,9 +170,7 @@ export const PayTab = () => {
               Their price
             </Label>
             <div className="relative inline-block">
-              <span className="absolute left-3 top-1/2  -my-3 text-gray-500 text-lg">
-                $
-              </span>
+              <IndexCurrency className="absolute left-3 top-5 h-4" />
               <Input
                 maxLength={6}
                 max={100}
@@ -202,12 +201,12 @@ export const PayTab = () => {
                   <Label className="">You have</Label>
                   <p className="mt-2 text-lg font-bold ">
                     {formatValue(portfolioValue, {
-                      withDollarSign: true,
+                      withIndexSign: true,
                     })}
                   </p>
                 </div>
                 <div className="flex items-center flex-col">
-                  <Label className="flex flex-col items-center mt-4 text-md text-muted-foreground">
+                  <Label className="flex flex-col items-center mt-2 text-md text-muted-foreground">
                     <p className="font-bold">You pay</p>
                     <p className=" text-xs text-muted-foreground/60">
                       <ReceiptIcon className="inline size-3.5 align-text-top" />{" "}
@@ -218,7 +217,9 @@ export const PayTab = () => {
                     </p>
                   </Label>
                   <p className="text-xl font-bold text-muted-foreground">
-                    {!buyerPrice ? "---" : "$" + buyerPrice.toFixed(2)}
+                    {!buyerPrice
+                      ? "---"
+                      : formatValue(buyerPrice, { withIndexSign: true })}
                   </p>
                 </div>
                 <div className="flex items-center flex-col text-muted-foreground/60">
@@ -230,7 +231,7 @@ export const PayTab = () => {
                     )}
                   >
                     {formatValue(balanceAfterPurchase, {
-                      withDollarSign: true,
+                      withIndexSign: true,
                     })}
                   </p>
                 </div>
