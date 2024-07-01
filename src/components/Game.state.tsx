@@ -138,6 +138,20 @@ export const maybeCurrentPlayerAtom = atom((get) => {
   };
 });
 
+export const playerAtom = memoize((playerId: string) =>
+  atom((get) => {
+    const players = get(playersAndDealerAtom);
+
+    const player = players.find((player) => player.deviceId === playerId);
+
+    if (!player) {
+      throw new Error(`Player with ID ${playerId} not found in game.`);
+    }
+
+    return player;
+  }),
+);
+
 export const currentPlayerAtom = atom((get) => {
   const currentPlayer = get(maybeCurrentPlayerAtom);
 
@@ -170,16 +184,18 @@ export const dealerAtom = atom((get) => {
   return { ...game.players[0], isDealer: true };
 });
 
-export const playersAtom = atom((get) => {
+export const playersAndDealerAtom = atom((get) => {
   const deviceId = get(deviceIdAtom);
   const game = get(defined(maybeGameAtom));
 
-  return game.players.slice(1).map((player) => ({
+  return game.players.map((player, i) => ({
     ...player,
     isCurrentPlayer: player.deviceId === deviceId,
-    isDealer: false,
+    isDealer: i === 0,
   }));
 });
+
+export const playersAtom = atom((get) => get(playersAndDealerAtom).slice(1));
 
 export const otherPlayersAtom = atom((get) => {
   const players = get(playersAtom);

@@ -1,5 +1,6 @@
-import IndexCurrency from "@/assets/img/index-wallet-currency-symbol.svg?react";
+import { BalancesDonut } from "@/components/BalancesDonut";
 import {
+  currenciesAtom,
   currentPlayerAtom,
   dealerAtom,
   emitEventAtom,
@@ -30,6 +31,8 @@ export const PayTab = () => {
   const purchaseRelativePriceIndexes = useAtomValue(
     purchaseRelativePriceIndexesAtom,
   );
+
+  const currencies = useAtomValue(currenciesAtom);
 
   const [selectedPayee, setSelectedPayee] = useAtom(selectedPayeeAtom);
 
@@ -127,7 +130,9 @@ export const PayTab = () => {
                 key={player.deviceId}
                 className="flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary"
               >
-                <PlayerToken className="size-16" />
+                <BalancesDonut balances={player.balances}>
+                  <PlayerToken className="size-16" playerId={player.deviceId} />
+                </BalancesDonut>
                 <div className="flex flex-col gap-0">
                   <p className="font-bold text-lg">{player.name}</p>
                   <p className="font-bold text-sm text-muted-foreground">
@@ -156,7 +161,12 @@ export const PayTab = () => {
             className="flex flex-col items-center gap-1 self-center"
           >
             <p className="font-bold text-lg">{selectedPayee.name}</p>
-            <PlayerToken className="size-24 xs:size-28" />
+            <BalancesDonut balances={selectedPayee.balances} className="p-3">
+              <PlayerToken
+                playerId={selectedPayee.deviceId}
+                className="size-24 xs:size-28"
+              />
+            </BalancesDonut>
           </motion.div>
 
           <motion.div
@@ -170,7 +180,9 @@ export const PayTab = () => {
               Their price
             </Label>
             <div className="relative inline-block">
-              <IndexCurrency className="absolute left-3 top-5 h-4" />
+              <span className="absolute text-2xl align-middle left-4  top-3 h-4">
+                ⱡ
+              </span>
               <Input
                 maxLength={6}
                 max={100}
@@ -216,11 +228,33 @@ export const PayTab = () => {
                       ].toFixed(1)}{" "}
                     </p>
                   </Label>
-                  <p className="text-xl font-bold text-muted-foreground">
-                    {!buyerPrice
-                      ? "---"
-                      : formatValue(buyerPrice, { withIndexSign: true })}
-                  </p>
+                  <div className="flex gap-1 items-center">
+                    <p className="text-xl font-bold text-muted-foreground">
+                      {!buyerPrice
+                        ? "---"
+                        : formatValue(buyerPrice, { withIndexSign: true })}
+                    </p>
+                    <BalancesDonut
+                      balances={currentPlayer.balances}
+                      className="relative"
+                    >
+                      <div className="size-1 bg-background rounded-full" />
+                    </BalancesDonut>
+                  </div>
+                  {/* <motion.div className="flex justify-evenly gap-1.5">
+                    {currencies
+                      .filter((_currency, i) =>
+                        currentPlayer.balances[i].greaterThan(0),
+                      )
+                      .map((currency) => (
+                        <TokenBadge
+                          key={currency.symbol}
+                          className="overlap size-2 rounded-none rotate-45 "
+                          withoutIcon
+                          token={currency.symbol}
+                        />
+                      ))}
+                  </motion.div> */}
                 </div>
                 <div className="flex items-center flex-col text-muted-foreground/60">
                   <Label className=" ">You'll have</Label>

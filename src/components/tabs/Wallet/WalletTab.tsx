@@ -1,3 +1,4 @@
+import { BalancesDonut } from "@/components/BalancesDonut";
 import {
   activeTabAtom,
   currenciesAtom,
@@ -29,7 +30,9 @@ export const WalletTab = () => {
   return (
     <TabsContent value="wallet" className="gap-10">
       <div className="flex items-center gap-2">
-        <PlayerToken className="size-16" />
+        <BalancesDonut balances={currentPlayer.balances}>
+          <PlayerToken playerId={currentPlayer.deviceId} className="size-16" />
+        </BalancesDonut>
         <div className="flex flex-col gap-0">
           <p className="font-bold text-lg text-muted-foreground">
             {currentPlayer.name}
