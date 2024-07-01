@@ -25,13 +25,33 @@ export const useNotifications = () => {
         case "PAYMENT_MADE":
           if (event.from === currentPlayer.deviceId) {
             toast.success(
-              `Paid ${formatValue(valueOf(event.payment, currentPlayer.valuations), { withIndexSign: true })} to ${game.players.find((player) => player.deviceId === event.to)?.name}`,
+              <>
+                Paid{" "}
+                {formatValue(valueOf(event.payment, currentPlayer.valuations), {
+                  withIndexSign: true,
+                })}{" "}
+                to{" "}
+                {
+                  game.players.find((player) => player.deviceId === event.to)
+                    ?.name
+                }
+              </>,
             );
           }
 
           if (event.to === currentPlayer.deviceId) {
             toast(
-              `Received ${formatValue(valueOf(event.payment, currentPlayer.valuations), { withIndexSign: true })} from ${game.players.find((player) => player.deviceId === event.from)?.name}`,
+              <>
+                Received{" "}
+                {formatValue(valueOf(event.payment, currentPlayer.valuations), {
+                  withIndexSign: true,
+                })}{" "}
+                from{" "}
+                {
+                  game.players.find((player) => player.deviceId === event.from)
+                    ?.name
+                }
+              </>,
             );
           }
           break;
