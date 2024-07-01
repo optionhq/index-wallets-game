@@ -1,6 +1,7 @@
 import { TanStackRouterVite } from "@tanstack/router-vite-plugin";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { visualizer } from "rollup-plugin-visualizer";
 import svgr from "vite-plugin-svgr";
 import { defineConfig } from "vitest/config";
 
@@ -12,6 +13,12 @@ export default defineConfig({
     }),
     svgr(),
     TanStackRouterVite(),
+    visualizer({
+      filename: "dist/stats.html",
+      open: true,
+      gzipSize: true,
+      brotliSize: true,
+    }),
   ],
 
   resolve: {
