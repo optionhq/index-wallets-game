@@ -28,6 +28,7 @@ if (!rootElement.innerHTML) {
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
         <Toaster
+          theme="light"
           position="bottom-right"
           style={{ bottom: "80px" }}
           closeButton
