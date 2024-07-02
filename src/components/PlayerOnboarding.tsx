@@ -1,12 +1,20 @@
-import { deviceIdAtom, emitEventAtom, gameAtom } from "@/components/Game.state";
+import { CharacterBadge } from "@/components/CharacterBadge";
+import {
+  deviceIdAtom,
+  emitEventAtom,
+  gameAtom,
+  otherPlayersAtom,
+} from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { bn } from "@/lib/bnMath";
 import { CauseSymbol, allCauses, cause } from "@/types/Cause";
+import { Character, allPlayerCharacters } from "@/types/Character";
 import { useAtomValue, useSetAtom } from "jotai";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { times } from "remeda";
+import { toast } from "sonner";
 
 export const PlayerOnboarding = () => {
   const [playerName, setPlayerName] = useState<string>("");
@@ -16,11 +24,28 @@ export const PlayerOnboarding = () => {
   const [playerCause, setPlayerCause] = useState<CauseSymbol | undefined>(
     undefined,
   );
+
+  const [playerCharacter, setPlayerCharacter] = useState<Character | undefined>(
+    undefined,
+  );
   const updateGame = useSetAtom(gameAtom);
+  const players = useAtomValue(otherPlayersAtom);
+  const chosenCharacters = useMemo(
+    () => players.map((p) => p.character),
+    [players],
+  );
+
+  useEffect(() => {
+    if (!playerCharacter) return;
+    if (!chosenCharacters.includes(playerCharacter)) return;
+
+    setPlayerCharacter(undefined);
+    toast.warning(`Someone else chose ${playerCharacter}. Pick another one.`);
+  }, [chosenCharacters, playerCharacter]);
   const deviceId = useAtomValue(deviceIdAtom);
   const emitEvent = useSetAtom(emitEventAtom);
   return (
-    <div className="h-full flex flex-col justify-evenly items-center p-4 ">
+    <div className="h-full flex flex-col justify-evenly items-center p-2 ">
       {!chosenPlayerName && (
         <div className="flex flex-col items-center gap-2 w-full max-w-64">
           <p>Enter your name</p>
@@ -44,9 +69,43 @@ export const PlayerOnboarding = () => {
           </Button>
         </div>
       )}
-      {chosenPlayerName && !playerCause && (
-        <div className="flex flex-col items-center gap-2 w-full">
+
+      {chosenPlayerName && !playerCharacter && (
+        <div className="flex flex-col items-center p-2 gap-2 w-full">
           <p>Hey {chosenPlayerName}!</p>
+          <p>Pick your character</p>
+
+          <div className="grid grid-cols-3 gap-1">
+            {allPlayerCharacters.map((character) => (
+              <Button
+                disabled={chosenCharacters.includes(character)}
+                key={character}
+                onClick={() => setPlayerCharacter(character)}
+                variant="outline"
+                className="flex flex-col gap-1 justify-around w-full text-wrap h-32"
+              >
+                <p className="flex-grow capitalize">{character}</p>
+                <CharacterBadge className="size-16" character={character} />
+              </Button>
+            ))}
+          </div>
+
+          <Button
+            variant="link"
+            className="text-muted-foreground"
+            onClick={() => setChosenPlayerName(undefined)}
+          >
+            Change name
+          </Button>
+        </div>
+      )}
+
+      {chosenPlayerName && playerCharacter && !playerCause && (
+        <div className="flex flex-col items-center gap-2 p-2 w-full">
+          <div className="flex flex-col items-center">
+            <p>{chosenPlayerName}</p>
+            <CharacterBadge className="size-16" character={playerCharacter} />
+          </div>
           <p>Pick your cause</p>
 
           <div className="grid grid-cols-3 gap-1">
@@ -69,38 +128,34 @@ export const PlayerOnboarding = () => {
           <Button
             variant="link"
             className="text-muted-foreground"
-            onClick={() => setChosenPlayerName(undefined)}
+            onClick={() => setPlayerCharacter(undefined)}
           >
-            Change name
+            Change character
           </Button>
         </div>
       )}
 
-      {chosenPlayerName && playerCause && (
-        <div className="flex flex-col items-center gap-10 w-full">
-          <p className="text-muted-foreground">Hey {chosenPlayerName}!</p>
+      {chosenPlayerName && playerCharacter && playerCause && (
+        <div className="flex flex-col items-center p-2 gap-10 w-full">
+          <div className="flex flex-col items-center">
+            <p className="text-muted-foreground">{chosenPlayerName}</p>
+            <CharacterBadge className="size-24" character={playerCharacter} />
+          </div>
           <div className="flex flex-col gap-2">
             <p>You've decided to support</p>
             <div className="flex flex-col justify-between items-center gap-3 border rounded-lg p-4 text-wrap">
               <p className="text-lg">{cause[playerCause].name}</p>
-              <TokenBadge className="size-32" token={playerCause} />
+              <TokenBadge className="size-16" token={playerCause} />
               <p className="font-bold text-muted-foreground">
                 ${cause[playerCause].symbol}
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-0 w-full px-4">
+          <div className="flex flex-col gap-2 w-full px-4">
             <Button
               variant="link"
-              className="text-muted-foreground"
-              onClick={() => setChosenPlayerName(undefined)}
-            >
-              Change name
-            </Button>
-            <Button
-              variant="link"
-              className="text-muted-foreground"
+              className="text-muted-foreground h-fit p-0"
               onClick={() => setPlayerCause(undefined)}
             >
               Pick another cause
@@ -145,6 +200,7 @@ export const PlayerOnboarding = () => {
                       ),
                     ],
                     cause: playerCause,
+                    character: playerCharacter,
                   };
 
                   game.players.push(newPlayer);

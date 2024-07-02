@@ -1,3 +1,4 @@
+import { CharacterBadge } from "@/components/CharacterBadge";
 import {
   currentPlayerAtom,
   eventsObservableAtom,
@@ -57,7 +58,14 @@ export const useNotifications = () => {
           break;
         case "PLAYER_JOINED":
           if (event.deviceId !== currentPlayer.deviceId) {
-            toast(`${event.name} joined the game`);
+            toast(
+              <div className="flex gap-2 items-center">
+                <CharacterBadge character={event.character} />
+                <p>
+                  <strong>{event.name}</strong> joined the game
+                </p>
+              </div>,
+            );
           }
           break;
         case "DONATION_MADE":

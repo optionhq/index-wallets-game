@@ -1,3 +1,4 @@
+import { CharacterBadge } from "@/components/CharacterBadge";
 import {
   currenciesAtom,
   currentPlayerAtom,
@@ -95,7 +96,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
           step={0.1}
           className="pb-8"
         >
-          <span className="absolute bg-black/20 w-[2px] h-6 ml-[1px] left-1/2" />
+          <span className="absolute bg-black/20 w-[2px] h-9 ml-[1px] left-1/2" />
           {playersGroupedByValuation.map(([playerValuation, players]) =>
             players.map((player) => (
               <span
@@ -108,13 +109,9 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
                   left: `${(100 * (Number(playerValuation) + VALUATION_AMPLITUDE)) / (2 * VALUATION_AMPLITUDE)}%`,
                 }}
               >
-                <span
-                  className={cn(
-                    player.deviceId === currentPlayer.deviceId
-                      ? "bg-primary"
-                      : "bg-muted-foreground",
-                    "absolute size-2 mx-[-2px] rounded-full ",
-                  )}
+                <CharacterBadge
+                  character={player.character}
+                  className="absolute size-6 mx-[-12px] my-[-7px] rounded-full p-0.5 "
                 />
               </span>
             )),

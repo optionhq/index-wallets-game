@@ -78,6 +78,7 @@ export const initializeGameAtom = atom(null, async (get, _set) => {
         name: "Dealer",
         balances: ["1000000000"],
         valuations: ["1"],
+        character: "Dealer",
       },
     ],
     currencies: [{ name: "US Dollars", symbol: "USD", totalSupply: "0" }],

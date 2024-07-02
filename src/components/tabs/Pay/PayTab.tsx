@@ -1,6 +1,6 @@
 import { BalancesDonut } from "@/components/BalancesDonut";
+import { CharacterBadge } from "@/components/CharacterBadge";
 import {
-  currenciesAtom,
   currentPlayerAtom,
   dealerAtom,
   emitEventAtom,
@@ -12,7 +12,6 @@ import {
   selectedPayeeAtom,
   vendorPriceAtom,
 } from "@/components/Game.state";
-import { PlayerToken } from "@/components/PlayerToken";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,8 +30,6 @@ export const PayTab = () => {
   const purchaseRelativePriceIndexes = useAtomValue(
     purchaseRelativePriceIndexesAtom,
   );
-
-  const currencies = useAtomValue(currenciesAtom);
 
   const [selectedPayee, setSelectedPayee] = useAtom(selectedPayeeAtom);
 
@@ -131,7 +128,10 @@ export const PayTab = () => {
                 className="flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary"
               >
                 <BalancesDonut balances={player.balances}>
-                  <PlayerToken className="size-16" playerId={player.deviceId} />
+                  <CharacterBadge
+                    className="size-16"
+                    character={player.character}
+                  />
                 </BalancesDonut>
                 <div className="flex flex-col gap-0">
                   <p className="font-bold text-lg">{player.name}</p>
@@ -161,9 +161,9 @@ export const PayTab = () => {
             className="flex flex-col items-center gap-1 self-center"
           >
             <p className="font-bold text-lg">{selectedPayee.name}</p>
-            <BalancesDonut balances={selectedPayee.balances} className="p-3">
-              <PlayerToken
-                playerId={selectedPayee.deviceId}
+            <BalancesDonut balances={selectedPayee.balances} className="p-1.5">
+              <CharacterBadge
+                character={selectedPayee.character}
                 className="size-24 xs:size-28"
               />
             </BalancesDonut>

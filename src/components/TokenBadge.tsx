@@ -1,4 +1,4 @@
-import { tokenColor, tokenIcon } from "@/config";
+import { causeColor, causeIcon } from "@/config";
 import { cn } from "@/lib/cn";
 import { CauseSymbol } from "@/types/Cause";
 import { FC, HTMLAttributes } from "react";
@@ -18,7 +18,7 @@ export const TokenBadge: FC<CauseTokenProps> = ({
   style,
   ...props
 }) => {
-  const Icon = tokenIcon[token];
+  const Icon = causeIcon[token];
   return (
     <div
       {...props}
@@ -26,7 +26,7 @@ export const TokenBadge: FC<CauseTokenProps> = ({
         "flex items-center justify-center size-[40px] text-white rounded-full",
         className,
       )}
-      style={{ backgroundColor: tokenColor[token], ...style }}
+      style={{ backgroundColor: causeColor[token], ...style }}
     >
       {!withoutIcon && Icon && (
         <Icon className={cn("size-8/12", classNames?.icon)} />

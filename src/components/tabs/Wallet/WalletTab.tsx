@@ -1,4 +1,5 @@
 import { BalancesDonut } from "@/components/BalancesDonut";
+import { CharacterBadge } from "@/components/CharacterBadge";
 import {
   activeTabAtom,
   currenciesAtom,
@@ -7,7 +8,6 @@ import {
   playersAndDealerAtom,
   transactionsHistoryAtom,
 } from "@/components/Game.state";
-import { PlayerToken } from "@/components/PlayerToken";
 import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +42,10 @@ export const WalletTab = () => {
     <TabsContent value="wallet" className="gap-10">
       <div className="flex items-center gap-2">
         <BalancesDonut balances={currentPlayer.balances}>
-          <PlayerToken playerId={currentPlayer.deviceId} className="size-16" />
+          <CharacterBadge
+            character={currentPlayer.character}
+            className="size-16"
+          />
         </BalancesDonut>
         <div className="flex flex-col gap-0">
           <p className="font-bold text-lg text-muted-foreground">
