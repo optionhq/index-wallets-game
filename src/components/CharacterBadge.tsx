@@ -9,6 +9,7 @@ export interface CharacterBadgeProps extends HTMLAttributes<HTMLDivElement> {
 export const CharacterBadge: FC<CharacterBadgeProps> = ({
   className,
   character,
+  style,
   ...props
 }) => {
   return (
@@ -18,7 +19,7 @@ export const CharacterBadge: FC<CharacterBadgeProps> = ({
         "relative flex p-2 items-center justify-center size-[40px] bg-muted rounded-full border border-background",
         className,
       )}
-      style={{ background: characterColor[character] }}
+      style={{ background: characterColor[character], ...style }}
     >
       <img src={characterIcon[character]} className="w-full invert" />
     </div>

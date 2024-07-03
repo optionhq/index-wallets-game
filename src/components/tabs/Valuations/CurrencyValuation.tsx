@@ -2,7 +2,7 @@ import { CharacterBadge } from "@/components/CharacterBadge";
 import {
   currenciesAtom,
   currentPlayerAtom,
-  otherPlayersAtom,
+  playersAtom,
 } from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
 import { ValuationSlider } from "@/components/ValuationSlider";
@@ -13,8 +13,7 @@ import { bn, bnMath } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { useAtomValue } from "jotai";
 import { BigNumber } from "mathjs";
-import { FC, HTMLAttributes, useMemo } from "react";
-import { groupBy, sortBy } from "remeda";
+import { FC, HTMLAttributes } from "react";
 
 export interface CurrencyValuationProps extends HTMLAttributes<HTMLDivElement> {
   currencyIndex: number;
@@ -28,24 +27,11 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
   setValuation,
   ...props
 }) => {
-  const otherPlayers = useAtomValue(otherPlayersAtom);
   const currentPlayer = useAtomValue(currentPlayerAtom);
+  const players = useAtomValue(playersAtom);
   const currencies = useAtomValue(currenciesAtom);
   const currency = currencies[currencyIndex];
-  const playersGroupedByValuation = useMemo(
-    () =>
-      sortBy(
-        Object.entries(
-          groupBy([...otherPlayers, currentPlayer], (player) =>
-            player.deviceId === currentPlayer.deviceId
-              ? valuation.toFixed(1)
-              : player.valuations[currencyIndex].toFixed(1),
-          ),
-        ),
-        ([valuation]) => Number(valuation),
-      ),
-    [otherPlayers, currentPlayer, valuation, currencyIndex],
-  );
+
   return (
     <div {...props} className="flex pt-4 gap-6">
       <div className="flex flex-col flex-grow gap-2">
@@ -96,26 +82,33 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
           step={0.1}
           className="pb-8"
         >
-          <span className="absolute bg-black/20 w-[2px] h-9 ml-[1px] left-1/2" />
-          {playersGroupedByValuation.map(([playerValuation, players]) =>
-            players.map((player) => (
-              <span
+          <span className="absolute bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
+          {players.map((player) => {
+            const SIZE = 25;
+            const MARGIN = 4;
+            const playerValuation = player.isCurrentPlayer
+              ? valuation.toNumber()
+              : player.valuations[currencyIndex].toNumber();
+            const percentage =
+              (playerValuation + VALUATION_AMPLITUDE) /
+              (2 * VALUATION_AMPLITUDE);
+            return (
+              <CharacterBadge
                 key={`${player.deviceId}-marker`}
+                character={player.character}
                 className={cn(
-                  "absolute mb-2",
-                  player.deviceId === currentPlayer.deviceId && "z-10",
+                  "absolute p-0.5",
+                  player.isCurrentPlayer && "z-10",
                 )}
                 style={{
-                  left: `${(100 * (Number(playerValuation) + VALUATION_AMPLITUDE)) / (2 * VALUATION_AMPLITUDE)}%`,
+                  width: SIZE,
+                  height: SIZE,
+                  left: `calc(${100 * percentage}% + ${(SIZE + MARGIN) / 2 - (SIZE + MARGIN) * percentage}px)`,
+                  transform: "var(--radix-slider-thumb-transform)",
                 }}
-              >
-                <CharacterBadge
-                  character={player.character}
-                  className="absolute size-6 mx-[-12px] my-[-7px] rounded-full p-0.5 "
-                />
-              </span>
-            )),
-          )}
+              />
+            );
+          })}
         </ValuationSlider>
       </div>
     </div>
