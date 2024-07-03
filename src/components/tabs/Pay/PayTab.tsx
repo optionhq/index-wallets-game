@@ -114,7 +114,7 @@ export const PayTab = () => {
   ]);
 
   return (
-    <TabsContent value="pay" className="justify-between xs:pt-10 overflow-clip">
+    <TabsContent value="pay" className="justify-between xs:pt-10">
       {!selectedPayee && (
         <>
           <div className="flex flex-col gap-2">
