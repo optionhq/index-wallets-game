@@ -32,19 +32,19 @@ import { InfoIcon, ReceiptIcon, Undo2Icon } from "lucide-react";
 import { useCallback, useMemo } from "react";
 
 export const PayTab = () => {
-  const otherPlayers = useAtomValue(otherPlayersAtom);
   const purchaseRelativePriceIndexes = useAtomValue(
     purchaseRelativePriceIndexesAtom,
   );
 
   const [selectedPayee, setSelectedPayee] = useAtom(selectedPayeeAtom);
 
+  const otherPlayers = useAtomValue(otherPlayersAtom);
   const currentPlayer = useAtomValue(currentPlayerAtom);
+  const dealer = useAtomValue(dealerAtom);
 
-  const payee = otherPlayers.find(
+  const payee = [dealer, ...otherPlayers].find(
     (player) => player.deviceId === selectedPayee,
   );
-  const dealer = useAtomValue(dealerAtom);
   const gameId = useAtomValue(gameIdAtom);
 
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
