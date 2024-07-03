@@ -87,7 +87,7 @@ export const ValuationsTab = () => {
           );
         })}
       </div>
-      <div className="sticky -bottom-4 bg-background -m-4 mt-6 px-4 py-2 z-10 border-t transition-[height]">
+      <div className="sticky -bottom-6 bg-background -m-4 mt-6 px-4 py-2 z-10 border-t transition-[height]">
         <div className="flex justify-between items-center h-8">
           <h2 className="text-lg font-bold text-muted-foreground ">
             Price multipliers
