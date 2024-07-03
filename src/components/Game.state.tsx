@@ -344,7 +344,7 @@ export const vendorPriceAtom = memoize(
   { cacheKey: ([vendorId, gameId]) => `vendor-price-${gameId}-${vendorId}` },
 );
 
-export const selectedPayeeAtom = atom<PlayerOrDealer | undefined>(undefined);
+export const selectedPayeeAtom = atom<string | undefined>(undefined);
 
 export const transactionsHistoryAtom = unwrap(
   atomWithObservable((get) => {

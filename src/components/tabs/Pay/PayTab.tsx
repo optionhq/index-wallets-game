@@ -12,9 +12,15 @@ import {
   selectedPayeeAtom,
   vendorPriceAtom,
 } from "@/components/Game.state";
+import { ValueComparison } from "@/components/ValueComparison";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { TabsContent } from "@/components/ui/tabs";
 import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
@@ -22,7 +28,7 @@ import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { ReceiptIcon, Undo2Icon } from "lucide-react";
+import { InfoIcon, ReceiptIcon, Undo2Icon } from "lucide-react";
 import { useCallback, useMemo } from "react";
 
 export const PayTab = () => {
@@ -34,13 +40,17 @@ export const PayTab = () => {
   const [selectedPayee, setSelectedPayee] = useAtom(selectedPayeeAtom);
 
   const currentPlayer = useAtomValue(currentPlayerAtom);
+
+  const payee = otherPlayers.find(
+    (player) => player.deviceId === selectedPayee,
+  );
   const dealer = useAtomValue(dealerAtom);
   const gameId = useAtomValue(gameIdAtom);
 
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
 
   const [vendorPriceInput, setVendorPriceInput] = useAtom(
-    vendorPriceAtom(gameId, selectedPayee?.deviceId),
+    vendorPriceAtom(gameId, selectedPayee),
   );
   const vendorPrice = useMemo(() => {
     try {
@@ -53,9 +63,7 @@ export const PayTab = () => {
   const buyerPrice = useMemo(() => {
     if (!selectedPayee || !vendorPrice) return undefined;
 
-    return vendorPrice.mul(
-      purchaseRelativePriceIndexes[selectedPayee.deviceId],
-    );
+    return vendorPrice.mul(purchaseRelativePriceIndexes[selectedPayee]);
   }, [selectedPayee, vendorPrice, purchaseRelativePriceIndexes]);
 
   const hasEnoughFunds = useMemo(() => {
@@ -71,15 +79,24 @@ export const PayTab = () => {
   const updateGame = useSetAtom(gameAtom);
   const emitEvent = useSetAtom(emitEventAtom);
 
-  const makePayment = useCallback(async () => {
-    if (!selectedPayee || !vendorPrice || !buyerPrice || !hasEnoughFunds)
-      return;
-
-    const price = compositePrice({
+  const price = useMemo(() => {
+    if (!payee || !vendorPrice) return undefined;
+    return compositePrice({
       vendorPrice,
       buyerBalances: currentPlayer.balances,
-      vendorValuations: selectedPayee.valuations,
+      vendorValuations: payee.valuations,
     });
+  }, [currentPlayer, payee, vendorPrice]);
+
+  const makePayment = useCallback(async () => {
+    if (
+      !selectedPayee ||
+      !vendorPrice ||
+      !buyerPrice ||
+      !price ||
+      !hasEnoughFunds
+    )
+      return;
 
     updateGame((game) => {
       game.players.find(
@@ -88,29 +105,29 @@ export const PayTab = () => {
         balance.sub(price[i]),
       );
       game.players.find(
-        (player) => player.deviceId === selectedPayee.deviceId,
-      )!.balances = selectedPayee.balances.map((balance, i) =>
-        balance.add(price[i]),
-      );
+        (player) => player.deviceId === selectedPayee,
+      )!.balances = payee!.balances.map((balance, i) => balance.add(price[i]));
     }).then(() => {
       emitEvent({
         type: "PAYMENT_MADE",
         from: currentPlayer.deviceId,
-        to: selectedPayee.deviceId,
+        to: selectedPayee,
         payment: price,
       });
     });
 
     setSelectedPayee(undefined);
   }, [
-    vendorPrice,
     selectedPayee,
+    vendorPrice,
     buyerPrice,
     hasEnoughFunds,
-    currentPlayer,
     updateGame,
-    emitEvent,
     setSelectedPayee,
+    currentPlayer.balances,
+    currentPlayer.deviceId,
+    price,
+    emitEvent,
   ]);
 
   return (
@@ -123,7 +140,7 @@ export const PayTab = () => {
               : [dealer, ...otherPlayers]
             ).map((player) => (
               <div
-                onClick={() => setSelectedPayee(player)}
+                onClick={() => setSelectedPayee(player.deviceId)}
                 key={player.deviceId}
                 className="flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary"
               >
@@ -145,7 +162,7 @@ export const PayTab = () => {
           </div>
         </>
       )}
-      {selectedPayee && (
+      {selectedPayee && payee && (
         <>
           <Button
             variant="ghost"
@@ -160,10 +177,10 @@ export const PayTab = () => {
             layout
             className="flex flex-col items-center gap-1 self-center"
           >
-            <p className="font-bold text-lg">{selectedPayee.name}</p>
-            <BalancesDonut balances={selectedPayee.balances} className="p-1.5">
+            <p className="font-bold text-lg">{payee.name}</p>
+            <BalancesDonut balances={payee.balances} className="p-1.5">
               <CharacterBadge
-                character={selectedPayee.character}
+                character={payee.character}
                 className="size-24 xs:size-28"
               />
             </BalancesDonut>
@@ -217,45 +234,48 @@ export const PayTab = () => {
                     })}
                   </p>
                 </div>
-                <div className="flex items-center flex-col">
-                  <Label className="flex flex-col items-center mt-2 text-md text-muted-foreground">
-                    <p className="font-bold">You pay</p>
-                    <p className=" text-xs text-muted-foreground/60">
-                      <ReceiptIcon className="inline size-3.5 align-text-top" />{" "}
-                      x
-                      {purchaseRelativePriceIndexes[
-                        selectedPayee.deviceId
-                      ].toFixed(1)}{" "}
-                    </p>
-                  </Label>
-                  <div className="flex gap-1 items-center">
-                    <p className="text-xl font-bold text-muted-foreground">
-                      {!buyerPrice
-                        ? "---"
-                        : formatValue(buyerPrice, { withIndexSign: true })}
-                    </p>
-                    <BalancesDonut
-                      balances={currentPlayer.balances}
-                      className="relative"
-                    >
-                      <div className="size-1 bg-background rounded-full" />
-                    </BalancesDonut>
-                  </div>
-                  {/* <motion.div className="flex justify-evenly gap-1.5">
-                    {currencies
-                      .filter((_currency, i) =>
-                        currentPlayer.balances[i].greaterThan(0),
-                      )
-                      .map((currency) => (
-                        <TokenBadge
-                          key={currency.symbol}
-                          className="overlap size-2 rounded-none rotate-45 "
-                          withoutIcon
-                          token={currency.symbol}
-                        />
-                      ))}
-                  </motion.div> */}
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <div className="flex items-center flex-col">
+                      <Label className="flex flex-col items-center mt-2 text-md text-muted-foreground">
+                        <p className="font-bold">You pay</p>
+                        <p className=" text-xs text-muted-foreground/60">
+                          x
+                          {purchaseRelativePriceIndexes[selectedPayee].toFixed(
+                            1,
+                          )}{" "}
+                          <InfoIcon className="inline size-3.5 align-text-top" />
+                        </p>
+                      </Label>
+                      <div className="flex gap-1 items-center">
+                        <p className="text-xl font-bold text-muted-foreground">
+                          {!buyerPrice
+                            ? "---"
+                            : formatValue(buyerPrice, { withIndexSign: true })}
+                        </p>
+                        <BalancesDonut
+                          balances={currentPlayer.balances}
+                          className="relative"
+                        >
+                          <div className="size-1 bg-background rounded-full" />
+                        </BalancesDonut>
+                      </div>
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    side="top"
+                    className="max-h-64 w-72 overflow-auto p-1"
+                  >
+                    <ValueComparison
+                      vendorName={payee.name}
+                      className="w-full rounded-sm overflow-clip"
+                      compositePayment={price!}
+                      buyerValuations={currentPlayer.valuations}
+                      vendorValuations={payee.valuations}
+                    />
+                  </PopoverContent>
+                </Popover>
+
                 <div className="flex items-center flex-col text-muted-foreground/60">
                   <Label className=" ">You'll have</Label>
                   <p
