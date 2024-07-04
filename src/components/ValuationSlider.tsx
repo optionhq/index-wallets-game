@@ -11,21 +11,18 @@ export const ValuationSlider = React.forwardRef<
   return (
     <SliderPrimitive.Root
       ref={ref}
-      className={cn(
-        "relative flex w-full touch-none select-none items-center",
-        className,
-      )}
+      className={cn("relative flex w-full touch-none select-none ", className)}
       value={value}
       min={min}
       max={max}
       {...props}
     >
-      <SliderPrimitive.Track className="h-[28px] w-full grow overflow-hidden rounded-full bg-secondary" />
+      <SliderPrimitive.Track className="h-[27px] w-full grow overflow-hidden rounded-full bg-secondary" />
       {children}
 
       <SliderPrimitive.Thumb
         className={cn(
-          ` flex items-center justify-center h-[31px] w-[31px] mt-[64px]  rounded-sm  bg-primary ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`,
+          ` flex items-center justify-center h-[31px] w-[31px] mt-[32px]  rounded-sm  bg-primary ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`,
         )}
       >
         <GripVerticalIcon className="size-4  text-white" />

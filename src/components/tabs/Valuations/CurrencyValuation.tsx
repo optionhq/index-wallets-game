@@ -85,7 +85,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
           <span className="absolute bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
           {players.map((player) => {
             const SIZE = 25;
-            const MARGIN = 4;
+            const MARGIN = 3;
             const playerValuation = player.isCurrentPlayer
               ? valuation.toNumber()
               : player.valuations[currencyIndex].toNumber();
@@ -97,7 +97,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
                 key={`${player.deviceId}-marker`}
                 character={player.character}
                 className={cn(
-                  "absolute p-0.5",
+                  "absolute p-0.5 mt-px",
                   player.isCurrentPlayer && "z-10",
                 )}
                 style={{
