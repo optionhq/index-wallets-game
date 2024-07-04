@@ -5,6 +5,7 @@ import {
 } from "@/components/Game.state";
 import { TripleDotMenu } from "@/components/TrippleDotMenu";
 import { CausesTab } from "@/components/tabs/Causes/CausesTab";
+import { MarketTab } from "@/components/tabs/Market/MarketTab";
 import { PayTab } from "@/components/tabs/Pay/PayTab";
 import { ValuationsTab } from "@/components/tabs/Valuations/ValuationsTab";
 import { WalletTab } from "@/components/tabs/Wallet/WalletTab";
@@ -13,6 +14,7 @@ import { useNotifications } from "@/lib/game/useNotifications";
 import useWakeLock from "@/lib/game/useWakeLock";
 import { useAtom, useAtomValue } from "jotai";
 import {
+  AreaChartIcon,
   HandHeartIcon,
   HomeIcon,
   SlidersHorizontalIcon,
@@ -30,7 +32,9 @@ export const Game = () => {
     <Tabs
       value={activeTab}
       onValueChange={(value) => {
-        setActiveTab(value as "wallet" | "pay" | "valuations" | "causes");
+        setActiveTab(
+          value as "wallet" | "pay" | "valuations" | "causes" | "market",
+        );
       }}
       defaultValue="wallet"
       className="h-full overflow-clip w-full flex flex-col"
@@ -41,6 +45,7 @@ export const Game = () => {
           {activeTab === "pay" && (selectedPayee ? "Paying" : "Pay")}
           {activeTab === "valuations" && "Valuations"}
           {activeTab === "causes" && "Donate to a Cause"}
+          {activeTab === "market" && "Market"}
         </h1>
         <TripleDotMenu />
       </div>
@@ -48,15 +53,17 @@ export const Game = () => {
       <PayTab />
       {!currentPlayer.isDealer && <CausesTab />}
       {!currentPlayer.isDealer && <ValuationsTab />}
+      <MarketTab />
       <TabsList className="w-full shrink-0 rounded-none bg-muted m-0 p-2 justify-evenly gap-2 h-16 border-t overflow-clip">
         {Object.entries(
           currentPlayer.isDealer
-            ? { wallet: HomeIcon, pay: UsersRoundIcon }
+            ? { wallet: HomeIcon, pay: UsersRoundIcon, market: AreaChartIcon }
             : {
                 wallet: HomeIcon,
                 valuations: SlidersHorizontalIcon,
                 causes: HandHeartIcon,
                 pay: UsersRoundIcon,
+                market: AreaChartIcon,
               },
         ).map(([key, Icon]) => (
           <TabsTrigger

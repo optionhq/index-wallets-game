@@ -21,7 +21,7 @@ export const CharacterBadge: FC<CharacterBadgeProps> = ({
       )}
       style={{ background: characterColor[character], ...style }}
     >
-      <img src={characterIcon[character]} className="w-full invert" />
+      <img src={characterIcon[character]} className="w-full" />
     </div>
   );
 };

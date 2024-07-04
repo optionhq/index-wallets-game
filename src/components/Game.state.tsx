@@ -234,9 +234,9 @@ export const playerValuationsAtom = atom(
   },
 );
 
-export const activeTabAtom = atom<"wallet" | "pay" | "valuations" | "causes">(
-  "wallet",
-);
+export const activeTabAtom = atom<
+  "wallet" | "pay" | "valuations" | "causes" | "market"
+>("wallet");
 
 export const purchaseRelativePriceIndexesAtom = atom((get) => {
   const players = [get(dealerAtom), ...get(playersAtom)];
