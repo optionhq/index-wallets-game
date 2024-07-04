@@ -10,6 +10,7 @@ import { ValuationsTab } from "@/components/tabs/Valuations/ValuationsTab";
 import { WalletTab } from "@/components/tabs/Wallet/WalletTab";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotifications } from "@/lib/game/useNotifications";
+import useWakeLock from "@/lib/game/useWakeLock";
 import { useAtom, useAtomValue } from "jotai";
 import {
   HandHeartIcon,
@@ -20,6 +21,7 @@ import {
 
 export const Game = () => {
   useNotifications();
+  useWakeLock();
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
   const currentPlayer = useAtomValue(currentPlayerAtom);
   const selectedPayee = useAtomValue(selectedPayeeAtom);
