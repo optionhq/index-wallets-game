@@ -93,13 +93,11 @@ export const WalletTab = () => {
                   />
                   {currency.symbol}
                 </TableCell>
-                <TableCell className="font-mono">
-                  {formatValue(currentPlayer.balances[i])}
-                </TableCell>
+                <TableCell>{formatValue(currentPlayer.balances[i])}</TableCell>
                 <TableCell className="text-right">
                   {currentPlayer.valuations[i].toFixed(1)}
                 </TableCell>
-                <TableCell className="text-right font-mono">
+                <TableCell className="text-right">
                   {formatValue(
                     currentPlayer.balances[i].mul(currentPlayer.valuations[i]),
                     { withIndexSign: true },

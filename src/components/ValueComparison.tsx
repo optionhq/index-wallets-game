@@ -94,9 +94,7 @@ export const ValueComparison = ({
               />
               {currency}
             </TableCell>
-            <TableCell className="font-mono">
-              {formatValue(data.payment[i])}
-            </TableCell>
+            <TableCell>{formatValue(data.payment[i])}</TableCell>
             <TableCell
               className={cn(
                 "text-right",
