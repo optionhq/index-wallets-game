@@ -108,9 +108,11 @@ export const WalletTab = () => {
           </TableBody>
         </Table>
       </div>
-      <h2 className="text-lg font-bold text-muted-foreground leading-none">
-        History
-      </h2>
+      {transactionHistory && transactionHistory.length > 0 && (
+        <h2 className="text-lg font-bold text-muted-foreground leading-none">
+          History
+        </h2>
+      )}
       <motion.div layout className="grid grid-cols-[auto_1fr] gap-6">
         {intersperse(
           (transactionHistory ?? []).map((transaction) =>
