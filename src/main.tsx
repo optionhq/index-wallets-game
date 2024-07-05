@@ -32,7 +32,7 @@ if (!rootElement.innerHTML) {
           position="bottom-right"
           style={{ bottom: "80px" }}
           closeButton
-          duration={100000000} // do not auto-hide
+          duration={3000}
           gap={8}
           toastOptions={{
             classNames: {
