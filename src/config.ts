@@ -20,13 +20,13 @@ import rollingPinIcon from "@/assets/img/player-tokens/rolling-pin.png";
 import spatulaIcon from "@/assets/img/player-tokens/spatula.png";
 import spoonIcon from "@/assets/img/player-tokens/spoon.png";
 
-import { CauseSymbol } from "@/types/Cause";
 import { Character } from "@/types/Character";
+import { CurrencySymbol } from "@/types/Currency";
 import { FC, SVGProps } from "react";
 
 export const VALUATION_AMPLITUDE = 2;
 
-export const causeColor = {
+export const tokenColor = {
   RIVER: "#3C8FCA",
   FOOD: "#D96666",
   PET: "#A277C4",
@@ -37,7 +37,7 @@ export const causeColor = {
   POLLEN: "#EACD65",
   GARDEN: "#6FC69C",
   USD: "#333",
-} as { [cause in CauseSymbol | "USD"]: `#${string}` };
+} as { [cause in CurrencySymbol]: `#${string}` };
 
 export const characterColor = {
   Knife: "#3C8FCA",
@@ -76,4 +76,10 @@ export const causeIcon = {
   HOME: TentIcon,
   POLLEN: ButterflyIcon,
   GARDEN: SeedlingIcon,
-} as { [cause in CauseSymbol | "USD"]: FC<SVGProps<SVGSVGElement>> };
+} as { [cause in CurrencySymbol]: FC<SVGProps<SVGSVGElement>> };
+
+export const INITIAL_USD_BALANCE = 100;
+
+export const DONATION_PRICE = 20;
+
+export const DONATION_REWARD = 20;

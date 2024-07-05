@@ -1,9 +1,11 @@
 import { CauseSymbol } from "@/types/Cause";
 import { BigNumber } from "mathjs";
 
+export type CurrencySymbol = CauseSymbol | "USD";
+
 export interface Currency {
   name: string;
-  symbol: CauseSymbol | "USD";
+  symbol: CurrencySymbol;
   totalSupply: BigNumber;
 }
 

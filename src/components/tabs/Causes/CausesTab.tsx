@@ -8,6 +8,7 @@ import {
 import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
+import { DONATION_PRICE, DONATION_REWARD } from "@/config";
 import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { CauseSymbol } from "@/types/Cause";
@@ -50,11 +51,14 @@ export const CausesTab = () => {
 
       game.players.find(
         (player) => player.deviceId === currentPlayer.deviceId,
-      )!.balances[0] = usdBalance.sub(20);
+      )!.balances[0] = usdBalance.sub(DONATION_PRICE);
 
       game.players.find(
         (player) => player.deviceId === currentPlayer.deviceId,
-      )!.balances[currencyIndex] = causeTokenBalance.add(20);
+      )!.balances[currencyIndex] = causeTokenBalance.add(DONATION_REWARD);
+
+      game.currencies[currencyIndex].totalSupply =
+        game.currencies[currencyIndex].totalSupply.add(DONATION_REWARD);
     }).then(() => {
       emitEvent({
         type: "DONATION_MADE",

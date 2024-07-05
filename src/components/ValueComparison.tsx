@@ -13,6 +13,7 @@ import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { formatValue } from "@/lib/game/formatValue";
 import { CauseSymbol } from "@/types/Cause";
+import { CurrencySymbol } from "@/types/Currency";
 import { useAtomValue } from "jotai";
 import { BigNumber } from "mathjs";
 import { HTMLAttributes, useMemo } from "react";
@@ -59,7 +60,7 @@ export const ValueComparison = ({
         totalBuyerValue: bn(0),
         totalVendorValue: bn(0),
       } as {
-        currencies: (CauseSymbol | "USD")[];
+        currencies: CurrencySymbol[];
         payment: BigNumber[];
         buyerValues: BigNumber[];
         vendorValues: BigNumber[];

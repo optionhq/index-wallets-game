@@ -1,10 +1,10 @@
-import { causeColor, causeIcon } from "@/config";
+import { causeIcon, tokenColor } from "@/config";
 import { cn } from "@/lib/cn";
-import { CauseSymbol } from "@/types/Cause";
+import { CurrencySymbol } from "@/types/Currency";
 import { FC, HTMLAttributes } from "react";
 
 export interface CauseTokenProps extends HTMLAttributes<HTMLDivElement> {
-  token: CauseSymbol | "USD";
+  token: CurrencySymbol;
   withoutIcon?: boolean;
   classNames?: {
     icon?: string;
@@ -26,7 +26,7 @@ export const TokenBadge: FC<CauseTokenProps> = ({
         "flex items-center justify-center size-[40px] text-white rounded-full",
         className,
       )}
-      style={{ backgroundColor: causeColor[token], ...style }}
+      style={{ backgroundColor: tokenColor[token], ...style }}
     >
       {!withoutIcon && Icon && (
         <Icon className={cn("size-8/12", classNames?.icon)} />

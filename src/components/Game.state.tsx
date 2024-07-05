@@ -11,7 +11,6 @@ import { DonationMadeEvent, Event, PaymentMadeEvent } from "@/types/Events";
 import { GameData } from "@/types/GameData";
 import { Player } from "@/types/Player";
 import {
-  Timestamp,
   addDoc,
   and,
   collection,
@@ -31,7 +30,7 @@ import { withImmer } from "jotai-immer";
 import { atomWithObservable, unwrap } from "jotai/utils";
 import { BigNumber } from "mathjs";
 import memoize from "memoize";
-import { Observable, share } from "rxjs";
+import { Observable, shareReplay } from "rxjs";
 
 export const gameIdAtom = atom<string>("");
 
@@ -279,7 +278,7 @@ const gameEventsObservableAtom = memoize((gameId: string) =>
           collection(getFirestore(), "games", gameId, "events").withConverter(
             eventConverter,
           ),
-          where("timestamp", ">", Timestamp.now()),
+          orderBy("timestamp", "asc"),
         ),
         (snapshot) => {
           snapshot.docChanges().forEach((change) => {
@@ -291,7 +290,7 @@ const gameEventsObservableAtom = memoize((gameId: string) =>
       );
 
       return unsubscribe;
-    }).pipe(share({ resetOnRefCountZero: false })),
+    }).pipe(shareReplay()),
   ),
 );
 
@@ -304,9 +303,7 @@ export const eventsObservableAtom = atom((get) => {
     });
   }
 
-  const gameEventsObservable = get(gameEventsObservableAtom(gameId));
-
-  return gameEventsObservable;
+  return get(gameEventsObservableAtom(gameId));
 });
 
 // Workaround for Omit breaking Discriminated Unions

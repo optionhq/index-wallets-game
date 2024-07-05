@@ -1,5 +1,5 @@
 import { currenciesAtom, playersAtom } from "@/components/Game.state";
-import { causeColor, characterColor, characterIcon } from "@/config";
+import { characterColor, characterIcon, tokenColor } from "@/config";
 import { useAtomValue } from "jotai";
 import {
   Bar,
@@ -61,7 +61,7 @@ export const WalletCompositionsChart = () => {
             );
           }}
         />
-        <YAxis width={20} className="text-xs" allowDataOverflow />
+        <YAxis width={20} className="text-xs" />
 
         {currencies.map((currency) => (
           <Bar
@@ -69,7 +69,7 @@ export const WalletCompositionsChart = () => {
             key={currency.symbol}
             dataKey={currency.symbol}
             stackId="a"
-            fill={causeColor[currency.symbol]}
+            fill={tokenColor[currency.symbol]}
           />
         ))}
         <Tooltip
@@ -77,11 +77,8 @@ export const WalletCompositionsChart = () => {
             fill: "hsl(47.9 95.8% 53.1% / 0.2)",
             strokeWidth: 2,
           }}
-          allowEscapeViewBox={{ x: false, y: true }}
-          position={{ y: 200 }}
-          //   offset={-46}
           labelClassName="font-bold pb-2"
-          wrapperClassName="text-xs rounded-md shadow-sm"
+          wrapperClassName="text-xs rounded-md shadow-sm opacity-95"
           itemStyle={{ padding: 0 }}
           formatter={(value: number) => value.toFixed(2)}
         />

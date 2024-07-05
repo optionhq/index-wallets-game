@@ -8,6 +8,7 @@ import {
 import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { INITIAL_USD_BALANCE } from "@/config";
 import { bn } from "@/lib/bnMath";
 import { CauseSymbol, allCauses, cause } from "@/types/Cause";
 import { Character, allPlayerCharacters } from "@/types/Character";
@@ -190,7 +191,7 @@ export const PlayerOnboarding = () => {
                     deviceId,
                     name: chosenPlayerName,
                     balances: [
-                      bn("100"),
+                      bn(INITIAL_USD_BALANCE),
                       ...times(amountOfCurrencies - 1, () => bn("0")),
                     ],
                     valuations: [
@@ -204,6 +205,9 @@ export const PlayerOnboarding = () => {
                   };
 
                   game.players.push(newPlayer);
+
+                  game.currencies[0].totalSupply =
+                    game.currencies[0].totalSupply.add(INITIAL_USD_BALANCE);
 
                   emitEvent({ type: "PLAYER_JOINED", ...newPlayer });
                 })
