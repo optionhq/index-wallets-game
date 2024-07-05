@@ -172,7 +172,7 @@ export const TokenSuppliesChart = () => {
             key={currency.symbol}
             dataKey={currency.symbol}
             stackId="1"
-            stroke={"white"}
+            stroke={tokenColor[currency.symbol]}
             fill={tokenColor[currency.symbol]}
             fillOpacity={1}
             connectNulls
