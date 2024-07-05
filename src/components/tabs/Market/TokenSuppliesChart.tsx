@@ -168,12 +168,13 @@ export const TokenSuppliesChart = () => {
         {currencies.map((currency) => (
           <Area
             activeDot={false}
-            type="stepAfter"
+            type="bump"
             key={currency.symbol}
             dataKey={currency.symbol}
             stackId="1"
-            stroke={tokenColor[currency.symbol]}
+            stroke={"white"}
             fill={tokenColor[currency.symbol]}
+            fillOpacity={1}
             connectNulls
           />
         ))}
