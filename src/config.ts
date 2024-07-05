@@ -36,7 +36,7 @@ export const tokenColor = {
   HOME: "#D566A9",
   POLLEN: "#EACD65",
   GARDEN: "#6FC69C",
-  USD: "#333",
+  USD: "#555",
 } as { [cause in CurrencySymbol]: `#${string}` };
 
 export const characterColor = {
@@ -49,7 +49,7 @@ export const characterColor = {
   Grater: "#D566A9",
   "Cooking Pot": "#EACD65",
   "Cutting Board": "#6FC69C",
-  Dealer: "#333",
+  Dealer: "#555",
 } as { [character in Character]: `#${string}` };
 
 export const characterIcon = {
