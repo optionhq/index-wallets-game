@@ -30,6 +30,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { InfoIcon, ReceiptIcon, Undo2Icon } from "lucide-react";
 import { useCallback, useMemo } from "react";
+import { sort } from "remeda";
 
 export const PayTab = () => {
   const purchaseRelativePriceIndexes = useAtomValue(
@@ -39,6 +40,16 @@ export const PayTab = () => {
   const [selectedPayee, setSelectedPayee] = useAtom(selectedPayeeAtom);
 
   const otherPlayers = useAtomValue(otherPlayersAtom);
+  const sortedOtherPlayers = useMemo(
+    () =>
+      sort(otherPlayers, (playerA, playerB) =>
+        purchaseRelativePriceIndexes[playerA.deviceId]
+          .sub(purchaseRelativePriceIndexes[playerB.deviceId])
+          .toNumber(),
+      ),
+
+    [otherPlayers, purchaseRelativePriceIndexes],
+  );
   const currentPlayer = useAtomValue(currentPlayerAtom);
   const dealer = useAtomValue(dealerAtom);
 
@@ -128,18 +139,20 @@ export const PayTab = () => {
     currentPlayer.deviceId,
     price,
     emitEvent,
+    payee,
   ]);
 
   return (
     <TabsContent value="pay" className="justify-between xs:pt-10">
       {!selectedPayee && (
         <>
-          <div className="flex flex-col gap-2">
+          <motion.div layout className="flex flex-col gap-2">
             {(currentPlayer.isDealer
-              ? otherPlayers
-              : [dealer, ...otherPlayers]
+              ? sortedOtherPlayers
+              : [dealer, ...sortedOtherPlayers]
             ).map((player) => (
-              <div
+              <motion.div
+                layoutId={player.deviceId}
                 onClick={() => setSelectedPayee(player.deviceId)}
                 key={player.deviceId}
                 className="flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary"
@@ -157,9 +170,9 @@ export const PayTab = () => {
                     {purchaseRelativePriceIndexes[player.deviceId].toFixed(1)}{" "}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </>
       )}
       {selectedPayee && payee && (
