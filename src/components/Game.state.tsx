@@ -280,9 +280,13 @@ const gameEventsObservableAtom = memoize((gameId: string) =>
           ),
           orderBy("timestamp", "asc"),
         ),
+        { includeMetadataChanges: true },
         (snapshot) => {
           snapshot.docChanges().forEach((change) => {
-            if (change.type !== "added") return;
+            if (change.type === "removed") return;
+
+            // Ignore local changes (will be re-emitted on server write)
+            if (change.doc.metadata.hasPendingWrites) return;
 
             subscriber.next(change.doc.data());
           });
