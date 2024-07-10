@@ -9,6 +9,7 @@ export type PaymentMadeEvent = {
   from: string;
   to: string;
   payment: BigNumber[];
+  valuations: BigNumber[];
 };
 
 export type PlayerJoinedEvent = {
@@ -51,6 +52,7 @@ export type PaymentMadeDbEvent = {
   from: string;
   to: string;
   payment: string[];
+  valuations: string[];
 };
 
 export type PlayerJoinedDbEvent = {

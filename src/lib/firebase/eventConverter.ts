@@ -12,6 +12,7 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
         return {
           ...event,
           payment: event.payment.map((payment) => bn(payment)),
+          valuations: event.valuations.map((valuation) => bn(valuation)),
         };
       case "PLAYER_JOINED":
         return {
@@ -40,6 +41,7 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
         return {
           ...event,
           payment: event.payment.map((payment) => payment.toString()),
+          valuations: event.valuations.map((valuation) => valuation.toString()),
         };
       case "PLAYER_JOINED":
         return {

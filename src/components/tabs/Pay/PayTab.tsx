@@ -124,6 +124,7 @@ export const PayTab = () => {
         from: currentPlayer.deviceId,
         to: selectedPayee,
         payment: price,
+        valuations: payee!.valuations,
       });
     });
 
