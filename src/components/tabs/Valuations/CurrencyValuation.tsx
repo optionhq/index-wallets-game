@@ -1,7 +1,7 @@
 import { CharacterBadge } from "@/components/CharacterBadge";
 import {
   currenciesAtom,
-  currentPlayerAtom,
+  currentAgentAtom,
   playersAtom,
 } from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
@@ -27,7 +27,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
   setValuation,
   ...props
 }) => {
-  const currentPlayer = useAtomValue(currentPlayerAtom);
+  const currentPlayer = useAtomValue(currentAgentAtom);
   const players = useAtomValue(playersAtom);
   const currencies = useAtomValue(currenciesAtom);
   const currency = currencies[currencyIndex];

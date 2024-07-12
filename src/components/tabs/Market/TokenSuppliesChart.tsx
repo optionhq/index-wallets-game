@@ -1,8 +1,8 @@
 import {
+  agentsAtom,
   currenciesAtom,
   dealerAtom,
   eventsObservableAtom,
-  playersAndDealerAtom,
 } from "@/components/Game.state";
 import { INITIAL_USD_BALANCE, tokenColor } from "@/config";
 import { CurrencySymbol } from "@/types/Currency";
@@ -57,10 +57,19 @@ const dataAtom = atomWithObservable((get) => {
               {
                 ...latestPoint,
                 timestamp: event.timestamp.toMillis(),
-                [event.cause]:
-                  (latestPoint?.[event.cause] ?? 0) +
-                  event.tokensAcquired.toNumber(),
-                USD: latestPoint.USD - event.payment.toNumber(),
+
+                ...event.payment.reduce(
+                  (balances, amount, index) => ({
+                    ...balances,
+                    [currencies[index].symbol]:
+                      (latestPoint[currencies[index].symbol] ?? 0) -
+                      amount.toNumber() +
+                      (currencies[index].symbol === event.cause
+                        ? event.tokensAcquired.toNumber()
+                        : 0),
+                  }),
+                  {} as Partial<Record<CurrencySymbol, number>>,
+                ),
                 event,
                 index: latestPoint.index + 1,
               },
@@ -125,7 +134,7 @@ const dataAtom = atomWithObservable((get) => {
 export const TokenSuppliesChart = () => {
   const data = useAtomValue(dataAtom);
   const currencies = useAtomValue(currenciesAtom);
-  const players = useAtomValue(playersAndDealerAtom);
+  const players = useAtomValue(agentsAtom);
 
   return (
     <ResponsiveContainer width="100%" height={200}>

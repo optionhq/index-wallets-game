@@ -1,4 +1,4 @@
-import { currenciesAtom, currentPlayerAtom } from "@/components/Game.state";
+import { currenciesAtom, currentAgentAtom } from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
 import {
   Table,
@@ -13,7 +13,7 @@ import { CauseSymbol } from "@/types/Cause";
 import { useAtomValue } from "jotai";
 
 export const Balances = () => {
-  const currentPlayer = useAtomValue(currentPlayerAtom);
+  const currentPlayer = useAtomValue(currentAgentAtom);
   const currencies = useAtomValue(currenciesAtom);
   return (
     <Table>

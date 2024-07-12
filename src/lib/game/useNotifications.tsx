@@ -1,6 +1,6 @@
 import { CharacterBadge } from "@/components/CharacterBadge";
 import {
-  currentPlayerAtom,
+  currentAgentAtom,
   eventsObservableAtom,
   gameAtom,
 } from "@/components/Game.state";
@@ -16,7 +16,7 @@ import { toast } from "sonner";
 export const useNotifications = () => {
   const eventsObservable = useAtomValue(eventsObservableAtom);
   const getCurrentPlayer = useAtomCallback(
-    useCallback((get) => get(currentPlayerAtom), []),
+    useCallback((get) => get(currentAgentAtom), []),
   );
   const getGame = useAtomCallback(useCallback((get) => get(gameAtom), []));
 
@@ -83,13 +83,13 @@ export const useNotifications = () => {
           case "DONATION_MADE":
             if (event.playerId === currentPlayer.deviceId) {
               toast.success(
-                `Donated $${event.payment.toFixed(2)} to ${event.cause}`,
+                `Donated $${event.payment[0].toFixed(2)} to ${event.cause}`,
               );
             }
 
             if (event.playerId !== currentPlayer.deviceId) {
               toast(
-                `${game.players.find((p) => p.deviceId === event.playerId)?.name} donated $${event.payment.toFixed(2)} to ${event.cause}`,
+                `${game.players.find((p) => p.deviceId === event.playerId)?.name} donated $${event.payment[0].toFixed(2)} to ${event.cause}`,
               );
             }
             break;

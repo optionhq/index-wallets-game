@@ -1,6 +1,6 @@
 import {
   currenciesAtom,
-  currentPlayerAtom,
+  currentAgentAtom,
   emitEventAtom,
   otherPlayersAtom,
   playerProvisionalValuationsAtom,
@@ -24,7 +24,7 @@ export const ValuationsTab = () => {
   const emitEvent = useSetAtom(emitEventAtom);
   const otherPlayers = useAtomValue(otherPlayersAtom);
   const currencies = useAtomValue(currenciesAtom);
-  const currentPlayer = useAtomValue(currentPlayerAtom);
+  const currentPlayer = useAtomValue(currentAgentAtom);
   const players = useAtomValue(playersAtom);
 
   const purchaseRelativePriceIndexes = useAtomValue(
@@ -111,7 +111,9 @@ export const ValuationsTab = () => {
                 emitEvent({
                   type: "VALUATIONS_UPDATED",
                   playerId: currentPlayer.deviceId,
-                  valuations: provisionalValuations,
+                  newValuations: provisionalValuations,
+                  oldValuations: valuations,
+                  playerName: currentPlayer.name,
                 });
               });
             }}

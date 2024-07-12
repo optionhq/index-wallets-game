@@ -7,24 +7,22 @@ import { generateId } from "@/lib/generateId";
 import { generateUUID } from "@/lib/generateUUID";
 import { relativePriceIndex } from "@/lib/indexWallets/relativePriceIndex";
 import { Currency } from "@/types/Currency";
-import { DonationMadeEvent, Event, PaymentMadeEvent } from "@/types/Events";
+import { Event } from "@/types/Events";
 import { GameData } from "@/types/GameData";
 import { Player } from "@/types/Player";
+import { WithId } from "@/types/utils";
 import {
   addDoc,
-  and,
   collection,
   doc,
   onSnapshot,
-  or,
   orderBy,
   query,
   serverTimestamp,
   setDoc,
-  where,
 } from "firebase/firestore";
 import { produce } from "immer";
-import { Atom, Getter, atom } from "jotai";
+import { Atom, atom, Getter } from "jotai";
 import { atomEffect } from "jotai-effect";
 import { withImmer } from "jotai-immer";
 import { atomWithObservable, unwrap } from "jotai/utils";
@@ -35,7 +33,7 @@ import { Observable, shareReplay } from "rxjs";
 export const gameIdAtom = atom<string>("");
 
 export const updateProvisionalValuationsEffect = atomEffect((get, set) => {
-  const currentPlayer = get(maybeCurrentPlayerAtom);
+  const currentPlayer = get(maybeCurrentAgentAtom);
   if (currentPlayer) {
     set(playerProvisionalValuationsAtom, currentPlayer.valuations);
   }
@@ -123,7 +121,7 @@ export const deviceIdAtom = atom(() => {
   return deviceId;
 });
 
-export const maybeCurrentPlayerAtom = atom((get) => {
+export const maybeCurrentAgentAtom = atom((get) => {
   const deviceId = get(deviceIdAtom);
   const game = get(maybeGameAtom);
 
@@ -143,9 +141,9 @@ export const maybeCurrentPlayerAtom = atom((get) => {
 
 export const playerAtom = memoize((playerId: string) =>
   atom((get) => {
-    const players = get(playersAndDealerAtom);
+    const agents = get(agentsAtom);
 
-    const player = players.find((player) => player.deviceId === playerId);
+    const player = agents.find((player) => player.deviceId === playerId);
 
     if (!player) {
       throw new Error(`Player with ID ${playerId} not found in game.`);
@@ -155,8 +153,8 @@ export const playerAtom = memoize((playerId: string) =>
   }),
 );
 
-export const currentPlayerAtom = atom((get) => {
-  const currentPlayer = get(maybeCurrentPlayerAtom);
+export const currentAgentAtom = atom((get) => {
+  const currentPlayer = get(maybeCurrentAgentAtom);
 
   if (!currentPlayer) {
     throw new Error(
@@ -187,7 +185,7 @@ export const dealerAtom = atom((get) => {
   return { ...game.players[0], isDealer: true };
 });
 
-export const playersAndDealerAtom = atom((get) => {
+export const agentsAtom = atom((get) => {
   const deviceId = get(deviceIdAtom);
   const game = get(defined(maybeGameAtom));
 
@@ -198,7 +196,7 @@ export const playersAndDealerAtom = atom((get) => {
   }));
 });
 
-export const playersAtom = atom((get) => get(playersAndDealerAtom).slice(1));
+export const playersAtom = atom((get) => get(agentsAtom).slice(1));
 
 export const otherPlayersAtom = atom((get) => {
   const players = get(playersAtom);
@@ -218,7 +216,7 @@ export const causesAtom = atom<Currency[]>((get) =>
 export const playerProvisionalValuationsAtom = atom<BigNumber[]>([]);
 
 export const playerValuationsAtom = atom(
-  (get) => get(currentPlayerAtom).valuations,
+  (get) => get(currentAgentAtom).valuations,
   async (get, _set, newValuations: BigNumber[]) => {
     const gameId = get(gameIdAtom);
     const deviceId = get(deviceIdAtom);
@@ -238,17 +236,17 @@ export const activeTabAtom = atom<
 >("wallet");
 
 export const purchaseRelativePriceIndexesAtom = atom((get) => {
-  const players = [get(dealerAtom), ...get(playersAtom)];
-  const currentPlayer = get(currentPlayerAtom);
+  const agents = [get(dealerAtom), ...get(playersAtom)];
+  const currentAgent = get(currentAgentAtom);
   const provisionalValuations = get(playerProvisionalValuationsAtom);
-  return players.reduce(
+  return agents.reduce(
     (indexes, player) => {
       return {
         ...indexes,
         [player.deviceId]: relativePriceIndex({
-          buyerBalances: currentPlayer.balances,
+          buyerBalances: currentAgent.balances,
           vendorValuations:
-            player.deviceId === currentPlayer.deviceId
+            player.deviceId === currentAgent.deviceId
               ? provisionalValuations
               : player.valuations,
           viewerValuations: provisionalValuations,
@@ -266,13 +264,13 @@ export const charityValuationsAtom = atom((get) => [
 ]);
 
 export const playerPortfolioValueAtom = atom((get) => {
-  const currentPlayer = get(currentPlayerAtom);
+  const currentPlayer = get(currentAgentAtom);
   return portfolioValue(currentPlayer);
 });
 
 const gameEventsObservableAtom = memoize((gameId: string) =>
   atom(
-    new Observable<Event>((subscriber) => {
+    new Observable<WithId<Event>>((subscriber) => {
       const unsubscribe = onSnapshot(
         query(
           collection(getFirestore(), "games", gameId, "events").withConverter(
@@ -288,7 +286,7 @@ const gameEventsObservableAtom = memoize((gameId: string) =>
             // Ignore local changes (will be re-emitted on server write)
             if (change.doc.metadata.hasPendingWrites) return;
 
-            subscriber.next(change.doc.data());
+            subscriber.next({ ...change.doc.data(), id: change.doc.id });
           });
         },
       );
@@ -302,7 +300,7 @@ export const eventsObservableAtom = atom((get) => {
   const gameId = get(gameIdAtom);
 
   if (!gameId) {
-    return new Observable<Event>((subscriber) => {
+    return new Observable<WithId<Event>>((subscriber) => {
       subscriber.complete();
     });
   }
@@ -347,54 +345,29 @@ export const vendorPriceAtom = memoize(
 
 export const selectedPayeeAtom = atom<string | undefined>(undefined);
 
-export const transactionsHistoryAtom = unwrap(
-  atomWithObservable((get) => {
-    const gameId = get(gameIdAtom);
-
-    if (!gameId) {
-      return new Observable<
-        ((PaymentMadeEvent | DonationMadeEvent) & { id: string })[]
-      >((subscriber) => {
-        subscriber.complete();
-      });
-    }
-
-    const deviceId = get(deviceIdAtom);
-
-    return new Observable<
-      ((PaymentMadeEvent | DonationMadeEvent) & { id: string })[]
-    >((subscriber) => {
-      const unsubscribe = onSnapshot(
-        query(
-          collection(getFirestore(), "games", gameId, "events").withConverter(
-            eventConverter,
-          ),
-          or(
-            and(
-              where("type", "==", "PAYMENT_MADE"),
-              or(where("from", "==", deviceId), where("to", "==", deviceId)),
-            ),
-            and(
-              where("type", "==", "DONATION_MADE"),
-              where("playerId", "==", deviceId),
-            ),
-          ),
-          orderBy("timestamp", "desc"),
-        ),
-        (snapshot) => {
-          const events = snapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-          }));
-          subscriber.next(
-            events as ((PaymentMadeEvent | DonationMadeEvent) & {
-              id: string;
-            })[],
-          );
-        },
-      );
-
-      return unsubscribe;
-    });
-  }),
-);
+// export const marketValuationsAtom = atomWithObservable((get) => {
+//   const currencies = get(currenciesAtom);
+//   const dealer = get(dealerAtom);
+//   // Only USD is valued at first
+//   const initialValuations = [
+//     bn(1),
+//     ...times(currencies.length - 1, () => bn(0)),
+//   ];
+//   const isPlayerEvent = (event: Event): event is PaymentMadeEvent =>
+//     event.type === "PAYMENT_MADE" &&
+//     event.from !== dealer.deviceId &&
+//     event.to !== dealer.deviceId;
+//   return get(eventsObservableAtom)
+//     .pipe(filter(isPlayerEvent))
+//     .pipe(map((event) => event.valuations))
+//     .pipe(
+//       // Start by filling the sliding window with initial valuations, so the first transactions aren't weighted disproportionately
+//       startWith(...times(MARKET_VALUATIONS_WINDOW, () => initialValuations)),
+//     )
+//     .pipe(bufferCount(MARKET_VALUATIONS_WINDOW, 1))
+//     .pipe(
+//       map((latestTransactionValuations) =>
+//         latestTransactionValuations.reduce(() => {}, [] as BigNumber[]),
+//       ),
+//     );
+// });

@@ -1,6 +1,6 @@
 import { Game } from "@/components/Game";
 import {
-  maybeCurrentPlayerAtom,
+  maybeCurrentAgentAtom,
   maybeGameAtom,
   updateProvisionalValuationsEffect,
 } from "@/components/Game.state";
@@ -11,7 +11,7 @@ import { useAtomValue } from "jotai";
 export const GameRoom = () => {
   const game = useAtomValue(maybeGameAtom);
   useAtomValue(updateProvisionalValuationsEffect);
-  const currentPlayer = useAtomValue(maybeCurrentPlayerAtom);
+  const currentPlayer = useAtomValue(maybeCurrentAgentAtom);
 
   if (!game) {
     return (

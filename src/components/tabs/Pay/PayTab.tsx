@@ -1,7 +1,7 @@
 import { BalancesDonut } from "@/components/BalancesDonut";
 import { CharacterBadge } from "@/components/CharacterBadge";
 import {
-  currentPlayerAtom,
+  currentAgentAtom,
   dealerAtom,
   emitEventAtom,
   gameAtom,
@@ -50,7 +50,7 @@ export const PayTab = () => {
 
     [otherPlayers, purchaseRelativePriceIndexes],
   );
-  const currentPlayer = useAtomValue(currentPlayerAtom);
+  const currentPlayer = useAtomValue(currentAgentAtom);
   const dealer = useAtomValue(dealerAtom);
 
   const payee = [dealer, ...otherPlayers].find(
@@ -122,9 +122,12 @@ export const PayTab = () => {
       emitEvent({
         type: "PAYMENT_MADE",
         from: currentPlayer.deviceId,
+        fromName: currentPlayer.name,
         to: selectedPayee,
+        toName: payee!.name,
         payment: price,
-        valuations: payee!.valuations,
+        vendorValuations: payee!.valuations,
+        buyerValuations: currentPlayer.valuations,
       });
     });
 

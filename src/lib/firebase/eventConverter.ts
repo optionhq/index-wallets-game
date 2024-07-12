@@ -1,7 +1,8 @@
-import { bn } from "@/lib/bnMath";
+import { bn, bnStringify } from "@/lib/bnMath";
 import { playerConverter } from "@/lib/firebase/playerConverter";
 import { DbEvent, Event } from "@/types/Events";
 import { FirestoreDataConverter } from "firebase/firestore";
+import { BigNumber } from "mathjs";
 
 export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
   fromFirestore: (snapshot, options) => {
@@ -11,8 +12,13 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
       case "PAYMENT_MADE":
         return {
           ...event,
-          payment: event.payment.map((payment) => bn(payment)),
-          valuations: event.valuations.map((valuation) => bn(valuation)),
+          payment: event.payment.map<BigNumber>((value) => bn(value)),
+          vendorValuations: event.vendorValuations.map<BigNumber>((value) =>
+            bn(value),
+          ),
+          buyerValuations: event.buyerValuations.map<BigNumber>((value) =>
+            bn(value),
+          ),
         };
       case "PLAYER_JOINED":
         return {
@@ -23,12 +29,23 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
       case "VALUATIONS_UPDATED":
         return {
           ...event,
-          valuations: event.valuations.map((valuation) => bn(valuation)),
+          newValuations: event.newValuations.map<BigNumber>((value) =>
+            bn(value),
+          ),
+          oldValuations: event.oldValuations.map<BigNumber>((value) =>
+            bn(value),
+          ),
         };
       case "DONATION_MADE":
         return {
           ...event,
-          payment: bn(event.payment),
+          payment: event.payment.map<BigNumber>((value) => bn(value)),
+          donorValuations: event.donorValuations.map<BigNumber>((value) =>
+            bn(value),
+          ),
+          causeValuations: event.causeValuations.map<BigNumber>((value) =>
+            bn(value),
+          ),
           tokensAcquired: bn(event.tokensAcquired),
         };
       case "GAME_CREATED":
@@ -40,8 +57,9 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
       case "PAYMENT_MADE":
         return {
           ...event,
-          payment: event.payment.map((payment) => payment.toString()),
-          valuations: event.valuations.map((valuation) => valuation.toString()),
+          payment: event.payment.map(bnStringify),
+          vendorValuations: event.vendorValuations.map(bnStringify),
+          buyerValuations: event.buyerValuations.map(bnStringify),
         };
       case "PLAYER_JOINED":
         return {
@@ -52,13 +70,16 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
       case "VALUATIONS_UPDATED":
         return {
           ...event,
-          valuations: event.valuations.map((valuation) => valuation.toString()),
+          newValuations: event.newValuations.map(bnStringify),
+          oldValuations: event.oldValuations.map(bnStringify),
         };
       case "DONATION_MADE":
         return {
           ...event,
-          payment: event.payment.toString(),
+          payment: event.payment.map(bnStringify),
           tokensAcquired: event.tokensAcquired.toString(),
+          donorValuations: event.donorValuations.map(bnStringify),
+          causeValuations: event.causeValuations.map(bnStringify),
         };
       case "GAME_CREATED":
         return event;

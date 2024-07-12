@@ -1,7 +1,7 @@
 import {
   activeTabAtom,
   causesAtom,
-  currentPlayerAtom,
+  currentAgentAtom,
   emitEventAtom,
   gameAtom,
 } from "@/components/Game.state";
@@ -9,7 +9,7 @@ import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
 import { DONATION_PRICE, DONATION_REWARD } from "@/config";
-import { bn } from "@/lib/bnMath";
+import { bn, bnZeroPad } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { CauseSymbol } from "@/types/Cause";
 import { Currency } from "@/types/Currency";
@@ -22,7 +22,7 @@ export const CausesTab = () => {
     undefined,
   );
   const causes = useAtomValue(causesAtom);
-  const currentPlayer = useAtomValue(currentPlayerAtom);
+  const currentPlayer = useAtomValue(currentAgentAtom);
   const setActiveTab = useSetAtom(activeTabAtom);
   const updateGame = useSetAtom(gameAtom);
   const emitEvent = useSetAtom(emitEventAtom);
@@ -65,16 +65,13 @@ export const CausesTab = () => {
         cause: selectedCause.symbol as CauseSymbol,
         tokensAcquired: bn(20),
         playerId: currentPlayer.deviceId,
-        payment: bn(20),
+        playerName: currentPlayer.name,
+        payment: bnZeroPad([bn(20)], currentPlayer.valuations.length),
+        causeValuations: bnZeroPad([bn(1)], currentPlayer.valuations.length),
+        donorValuations: currentPlayer.valuations,
       });
     });
-  }, [
-    currentPlayer.deviceId,
-    emitEvent,
-    selectedCause,
-    setActiveTab,
-    updateGame,
-  ]);
+  }, [currentPlayer, emitEvent, selectedCause, setActiveTab, updateGame]);
 
   return (
     <TabsContent value="causes">

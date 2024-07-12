@@ -2,12 +2,11 @@ import { BalancesDonut } from "@/components/BalancesDonut";
 import { CharacterBadge } from "@/components/CharacterBadge";
 import {
   activeTabAtom,
-  currentPlayerAtom,
+  currentAgentAtom,
   playerPortfolioValueAtom,
-  transactionsHistoryAtom,
 } from "@/components/Game.state";
 import { Balances } from "@/components/tabs/Wallet/Balances";
-import { History } from "@/components/tabs/Wallet/History";
+import { History, historyAtom } from "@/components/tabs/Wallet/History";
 import { Button } from "@/components/ui/button";
 
 import { TabsContent } from "@/components/ui/tabs";
@@ -15,11 +14,11 @@ import { formatValue } from "@/lib/game/formatValue";
 import { useAtomValue, useSetAtom } from "jotai";
 
 export const WalletTab = () => {
-  const currentPlayer = useAtomValue(currentPlayerAtom);
+  const currentPlayer = useAtomValue(currentAgentAtom);
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
   const totalBalance = formatValue(portfolioValue, { withIndexSign: true });
   const setActiveTab = useSetAtom(activeTabAtom);
-  const transactionHistory = useAtomValue(transactionsHistoryAtom);
+  const history = useAtomValue(historyAtom);
 
   return (
     <TabsContent value="wallet" className="gap-10">
@@ -54,7 +53,7 @@ export const WalletTab = () => {
         </div>
         <Balances />
       </div>
-      {transactionHistory && transactionHistory.length > 0 && (
+      {history && history.length > 0 && (
         <>
           <h2 className="text-lg font-bold text-muted-foreground leading-none">
             History

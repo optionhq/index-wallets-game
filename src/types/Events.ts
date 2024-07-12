@@ -7,9 +7,12 @@ export type PaymentMadeEvent = {
   type: "PAYMENT_MADE";
   timestamp: Timestamp;
   from: string;
+  fromName: string;
   to: string;
+  toName: string;
   payment: BigNumber[];
-  valuations: BigNumber[];
+  vendorValuations: BigNumber[];
+  buyerValuations: BigNumber[];
 };
 
 export type PlayerJoinedEvent = {
@@ -21,15 +24,20 @@ export type ValuationsUpdatedEvent = {
   type: "VALUATIONS_UPDATED";
   timestamp: Timestamp;
   playerId: string;
-  valuations: BigNumber[];
+  playerName: string;
+  oldValuations: BigNumber[];
+  newValuations: BigNumber[];
 };
 
 export type DonationMadeEvent = {
   type: "DONATION_MADE";
   timestamp: Timestamp;
   playerId: string;
+  playerName: string;
   cause: CauseSymbol;
-  payment: BigNumber;
+  payment: BigNumber[];
+  donorValuations: BigNumber[];
+  causeValuations: BigNumber[];
   tokensAcquired: BigNumber;
 };
 
@@ -50,9 +58,12 @@ export type PaymentMadeDbEvent = {
   type: "PAYMENT_MADE";
   timestamp: Timestamp;
   from: string;
+  fromName: string;
   to: string;
+  toName: string;
   payment: string[];
-  valuations: string[];
+  vendorValuations: string[];
+  buyerValuations: string[];
 };
 
 export type PlayerJoinedDbEvent = {
@@ -64,15 +75,20 @@ export type ValuationsUpdatedDbEvent = {
   type: "VALUATIONS_UPDATED";
   timestamp: Timestamp;
   playerId: string;
-  valuations: string[];
+  playerName: string;
+  newValuations: string[];
+  oldValuations: string[];
 };
 
 export type DonationMadeDbEvent = {
   type: "DONATION_MADE";
   timestamp: Timestamp;
   playerId: string;
+  playerName: string;
   cause: CauseSymbol;
-  payment: string;
+  payment: string[];
+  donorValuations: string[];
+  causeValuations: string[];
   tokensAcquired: string;
 };
 

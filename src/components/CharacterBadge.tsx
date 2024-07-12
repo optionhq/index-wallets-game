@@ -10,6 +10,7 @@ export const CharacterBadge: FC<CharacterBadgeProps> = ({
   className,
   character,
   style,
+  children,
   ...props
 }) => {
   return (
@@ -22,6 +23,7 @@ export const CharacterBadge: FC<CharacterBadgeProps> = ({
       style={{ background: characterColor[character], ...style }}
     >
       <img src={characterIcon[character]} className="w-full" />
+      {children}
     </div>
   );
 };

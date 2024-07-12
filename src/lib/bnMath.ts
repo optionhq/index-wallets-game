@@ -1,5 +1,6 @@
 import {
   absDependencies,
+  BigNumber,
   bignumberDependencies,
   create,
   dotDivideDependencies,
@@ -24,3 +25,8 @@ export const bnMath = create(
 );
 
 export const bn = bnMath.bignumber;
+
+export const bnZeroPad = (vector: BigNumber[], length: number) =>
+  vector.concat(Array(length - vector.length).fill(bn(0)));
+
+export const bnStringify = (bn: BigNumber) => bn.toString();

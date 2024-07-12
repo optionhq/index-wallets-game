@@ -1,6 +1,6 @@
 import {
   activeTabAtom,
-  currentPlayerAtom,
+  currentAgentAtom,
   selectedPayeeAtom,
 } from "@/components/Game.state";
 import { TripleDotMenu } from "@/components/TrippleDotMenu";
@@ -17,7 +17,7 @@ import {
   AreaChartIcon,
   HandHeartIcon,
   HomeIcon,
-  SlidersHorizontalIcon,
+  Settings2Icon,
   UsersRoundIcon,
 } from "lucide-react";
 
@@ -25,7 +25,7 @@ export const Game = () => {
   useNotifications();
   useWakeLock();
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
-  const currentPlayer = useAtomValue(currentPlayerAtom);
+  const currentPlayer = useAtomValue(currentAgentAtom);
   const selectedPayee = useAtomValue(selectedPayeeAtom);
 
   return (
@@ -60,7 +60,7 @@ export const Game = () => {
             ? { wallet: HomeIcon, pay: UsersRoundIcon, market: AreaChartIcon }
             : {
                 wallet: HomeIcon,
-                valuations: SlidersHorizontalIcon,
+                valuations: Settings2Icon,
                 causes: HandHeartIcon,
                 pay: UsersRoundIcon,
                 market: AreaChartIcon,
