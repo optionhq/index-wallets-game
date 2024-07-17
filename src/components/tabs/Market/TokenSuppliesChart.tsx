@@ -58,23 +58,28 @@ const dataAtom = atomWithObservable((get) => {
                 ...latestPoint,
                 timestamp: event.timestamp.toMillis(),
 
-                ...event.payment.reduce(
-                  (balances, amount, index) => ({
-                    ...balances,
-                    [currencies[index].symbol]:
-                      (latestPoint[currencies[index].symbol] ?? 0) -
-                      amount.toNumber() +
-                      (currencies[index].symbol === event.cause
-                        ? event.tokensAcquired.toNumber()
-                        : 0),
-                  }),
-                  {} as Partial<Record<CurrencySymbol, number>>,
-                ),
+                // Remove the donation payment from token supplies
+                // ...event.payment.reduce(
+                //   (balances, amount, index) => ({
+                //     ...balances,
+                //     [currencies[index].symbol]:
+                //       (latestPoint[currencies[index].symbol] ?? 0) -
+                //       amount.toNumber() +
+                //       (currencies[index].symbol === event.cause
+                //         ? event.tokensAcquired.toNumber()
+                //         : 0),
+                //   }),
+                //   {} as Partial<Record<CurrencySymbol, number>>,
+                // ),
+                [event.cause]:
+                  (latestPoint[event.cause] ?? 0) +
+                  event.tokensAcquired.toNumber(),
                 event,
                 index: latestPoint.index + 1,
               },
             ];
           case "PAYMENT_MADE":
+            // payments from the dealer increase token supplies
             if (event.from === dealer.deviceId) {
               return [
                 ...previousData,
@@ -96,26 +101,27 @@ const dataAtom = atomWithObservable((get) => {
               ];
             }
 
-            if (event.to === dealer.deviceId) {
-              return [
-                ...previousData,
-                {
-                  ...latestPoint,
-                  timestamp: event.timestamp.toMillis(),
-                  ...event.payment.reduce(
-                    (balances, amount, index) => ({
-                      ...balances,
-                      [currencies[index].symbol]:
-                        (latestPoint[currencies[index].symbol] ?? 0) -
-                        amount.toNumber(),
-                    }),
-                    {} as Partial<Record<CurrencySymbol, number>>,
-                  ),
-                  event,
-                  index: latestPoint.index + 1,
-                },
-              ];
-            }
+            // Payments to the dealer reduce token supplies
+            // if (event.to === dealer.deviceId) {
+            //   return [
+            //     ...previousData,
+            //     {
+            //       ...latestPoint,
+            //       timestamp: event.timestamp.toMillis(),
+            //       ...event.payment.reduce(
+            //         (balances, amount, index) => ({
+            //           ...balances,
+            //           [currencies[index].symbol]:
+            //             (latestPoint[currencies[index].symbol] ?? 0) -
+            //             amount.toNumber(),
+            //         }),
+            //         {} as Partial<Record<CurrencySymbol, number>>,
+            //       ),
+            //       event,
+            //       index: latestPoint.index + 1,
+            //     },
+            //   ];
+            // }
             return previousData;
           case "VALUATIONS_UPDATED":
             return previousData;
