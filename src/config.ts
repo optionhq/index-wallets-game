@@ -83,3 +83,5 @@ export const INITIAL_USD_BALANCE = 100;
 export const DONATION_PRICE = 20;
 
 export const DONATION_REWARD = 20;
+
+export const MARKET_VALUATIONS_WINDOW_LENGTH = 10;

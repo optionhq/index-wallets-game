@@ -1,3 +1,4 @@
+import { MarketValuationsChart } from "@/components/tabs/Market/MarketValuationsChart";
 import { TokenSuppliesChart } from "@/components/tabs/Market/TokenSuppliesChart";
 import { WalletCompositionsChart } from "@/components/tabs/Market/WalletCompositionsChart";
 import { TabsContent } from "@/components/ui/tabs";
@@ -13,6 +14,10 @@ export const MarketTab = () => {
         Token supplies
       </h2>
       <TokenSuppliesChart />
+      <h2 className="text-lg font-bold text-muted-foreground leading-none mb-2">
+        Market Valuations
+      </h2>
+      <MarketValuationsChart />
     </TabsContent>
   );
 };
