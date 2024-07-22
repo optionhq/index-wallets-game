@@ -1,4 +1,4 @@
-import { MARKET_VALUATIONS_WINDOW_LENGTH } from "@/config";
+import { MARKET_VALUATIONS_WINDOW_LENGTH, RETAIL_PRICE } from "@/config";
 import { bn } from "@/lib/bnMath";
 import { eventConverter } from "@/lib/firebase/eventConverter";
 import { gameConverter } from "@/lib/firebase/gameConverter";
@@ -348,7 +348,7 @@ export const emitEvent = async (
 };
 
 export const vendorPriceAtom = memoize(
-  (_gameId: string, _vendorId?: string) => atom(""),
+  (_gameId: string, _vendorId?: string) => atom(`${RETAIL_PRICE}`),
   { cacheKey: ([vendorId, gameId]) => `vendor-price-${gameId}-${vendorId}` },
 );
 
