@@ -18,6 +18,7 @@ import {
   HandHeartIcon,
   HomeIcon,
   Settings2Icon,
+  StoreIcon,
   UsersRoundIcon,
 } from "lucide-react";
 
@@ -62,7 +63,7 @@ export const Game = () => {
                 wallet: HomeIcon,
                 valuations: Settings2Icon,
                 causes: HandHeartIcon,
-                pay: UsersRoundIcon,
+                pay: StoreIcon,
                 market: AreaChartIcon,
               },
         ).map(([key, Icon]) => (
