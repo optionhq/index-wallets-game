@@ -5,6 +5,7 @@ import {
   create,
   dotDivideDependencies,
   multiplyDependencies,
+  subtractDependencies,
   sumDependencies,
 } from "mathjs";
 
@@ -15,6 +16,7 @@ export const bnMath = create(
     multiplyDependencies,
     dotDivideDependencies,
     sumDependencies,
+    subtractDependencies,
   },
   {
     number: "BigNumber",
