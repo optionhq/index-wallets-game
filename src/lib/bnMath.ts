@@ -3,7 +3,9 @@ import {
   BigNumber,
   bignumberDependencies,
   create,
+  divideDependencies,
   dotDivideDependencies,
+  evaluateDependencies,
   multiplyDependencies,
   subtractDependencies,
   sumDependencies,
@@ -17,6 +19,8 @@ export const bnMath = create(
     dotDivideDependencies,
     sumDependencies,
     subtractDependencies,
+    evaluateDependencies,
+    divideDependencies,
   },
   {
     number: "BigNumber",

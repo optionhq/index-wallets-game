@@ -1,4 +1,4 @@
-import { bnMath } from "@/lib/bnMath";
+import { bnMath, bnZeroPad } from "@/lib/bnMath";
 import { tokenWeights } from "@/lib/indexWallets/tokenWeights";
 import { BigNumber } from "mathjs";
 
@@ -14,13 +14,22 @@ export const price = ({
   vendorValuations,
   viewerValuations,
   buyerBalances,
-}: PriceParams) =>
-  bnMath.sum(
+}: PriceParams) => {
+  const amountCurrencies = Math.max(
+    vendorValuations.length,
+    viewerValuations.length,
+    buyerBalances.length,
+  );
+  return bnMath.sum(
     bnMath.multiply(
       bnMath.multiply(
         vendorPrice,
-        tokenWeights(buyerBalances, vendorValuations)
+        tokenWeights(
+          bnZeroPad(buyerBalances, amountCurrencies),
+          bnZeroPad(vendorValuations, amountCurrencies),
+        ),
       ),
-      viewerValuations
-    ) as BigNumber[]
+      bnZeroPad(viewerValuations, amountCurrencies),
+    ) as BigNumber[],
   );
+};
