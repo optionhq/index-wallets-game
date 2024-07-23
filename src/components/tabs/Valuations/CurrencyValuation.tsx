@@ -33,7 +33,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
   const currency = currencies[currencyIndex];
 
   return (
-    <div {...props} className="flex pt-4 gap-6">
+    <div {...props} className="flex pt-4 p-2 gap-6">
       <div className="flex flex-col flex-grow gap-2">
         <div className="flex justify-between">
           <div className="flex items-center h-fit gap-2">
@@ -82,7 +82,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
           step={0.1}
           className="pb-8"
         >
-          <span className="absolute bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
+          <span className="absolute -top-1 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
           {players.map((player) => {
             const SIZE = 25;
             const MARGIN = 3;
