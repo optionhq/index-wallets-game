@@ -242,7 +242,17 @@ export const History = () => {
                             <strong>{event.playerName}</strong>{" "}
                           </>
                         )}
-                        to {cause[event.cause].name}
+                        acquired{" "}
+                        <strong>
+                          {" "}
+                          {event.tokensAcquired.toFixed(2)}{" "}
+                          <TokenBadge
+                            withoutIcon
+                            token={event.cause}
+                            className="inline-block mb-0.5 size-1.5 rounded-none rotate-45"
+                          />{" "}
+                          {event.cause}{" "}
+                        </strong>
                       </span>
                     </div>
                   </AccordionTrigger>

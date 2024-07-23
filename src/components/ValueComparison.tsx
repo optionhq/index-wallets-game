@@ -9,24 +9,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { bn } from "@/lib/bnMath";
+import { bn, bnZeroPad } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { formatValue } from "@/lib/game/formatValue";
-import { CauseSymbol } from "@/types/Cause";
 import { CurrencySymbol } from "@/types/Currency";
 import { useAtomValue } from "jotai";
 import { BigNumber } from "mathjs";
 import { HTMLAttributes, useMemo } from "react";
 
 export interface ValueComparisonProps extends HTMLAttributes<HTMLTableElement> {
-  vendorName: string;
   buyerValuations: BigNumber[];
   vendorValuations: BigNumber[];
   compositePayment: BigNumber[];
 }
 
 export const ValueComparison = ({
-  vendorName,
   buyerValuations,
   vendorValuations,
   compositePayment,
@@ -39,10 +36,12 @@ export const ValueComparison = ({
       (data, currency, index) => {
         if (compositePayment[index].isZero()) return data;
 
-        const vendorValue = vendorValuations[index].mul(
-          compositePayment[index],
-        );
-        const buyerValue = buyerValuations[index].mul(compositePayment[index]);
+        const vendorValue = bnZeroPad(vendorValuations, currencies.length)[
+          index
+        ].mul(compositePayment[index]);
+        const buyerValue = bnZeroPad(buyerValuations, currencies.length)[
+          index
+        ].mul(compositePayment[index]);
         return {
           currencies: [...data.currencies, currency.symbol],
           buyerValues: [...data.buyerValues, buyerValue],

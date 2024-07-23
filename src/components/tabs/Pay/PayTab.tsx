@@ -289,7 +289,6 @@ export const PayTab = () => {
                     className="max-h-64 w-72 overflow-auto p-1"
                   >
                     <ValueComparison
-                      vendorName={payee.name}
                       className="w-full rounded-sm overflow-clip"
                       compositePayment={price!}
                       buyerValuations={currentPlayer.valuations}

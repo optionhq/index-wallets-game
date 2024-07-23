@@ -20,6 +20,7 @@ import rollingPinIcon from "@/assets/img/player-tokens/rolling-pin.png";
 import spatulaIcon from "@/assets/img/player-tokens/spatula.png";
 import spoonIcon from "@/assets/img/player-tokens/spoon.png";
 
+import { bn } from "@/lib/bnMath";
 import { Character } from "@/types/Character";
 import { CurrencySymbol } from "@/types/Currency";
 import { FC, SVGProps } from "react";
@@ -98,3 +99,5 @@ export const MARKET_VALUATIONS_WINDOW_LENGTH = 10;
 export const WHOLESALE_PRICE = 5;
 
 export const RETAIL_PRICE = 10;
+
+export const CAUSE_VALUATIONS = [bn(1)];

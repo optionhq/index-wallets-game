@@ -1,20 +1,32 @@
+import { BalancesDonut } from "@/components/BalancesDonut";
 import {
   activeTabAtom,
   causesAtom,
+  currenciesAtom,
   currentAgentAtom,
   emitEventAtom,
   gameAtom,
+  playerPortfolioValueAtom,
 } from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TabsContent } from "@/components/ui/tabs";
-import { DONATION_PRICE, DONATION_REWARD } from "@/config";
-import { bn, bnZeroPad } from "@/lib/bnMath";
+import { ValueComparison } from "@/components/ValueComparison";
+import { CAUSE_VALUATIONS, DONATION_PRICE, DONATION_REWARD } from "@/config";
+import { bn, bnMath, bnZeroPad } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
+import { formatValue } from "@/lib/game/formatValue";
+import { compositePrice } from "@/lib/indexWallets/compositePrice";
+import { valueOf } from "@/lib/indexWallets/valueOf";
 import { CauseSymbol } from "@/types/Cause";
 import { Currency } from "@/types/Currency";
+import { Popover } from "@radix-ui/react-popover";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue, useSetAtom } from "jotai";
-import { HeartHandshakeIcon, Undo2Icon } from "lucide-react";
+import { BarChart3Icon, HeartHandshakeIcon, Undo2Icon } from "lucide-react";
+import { BigNumber } from "mathjs";
 import { useCallback, useMemo, useState } from "react";
 
 export const CausesTab = () => {
@@ -26,9 +38,22 @@ export const CausesTab = () => {
   const setActiveTab = useSetAtom(activeTabAtom);
   const updateGame = useSetAtom(gameAtom);
   const emitEvent = useSetAtom(emitEventAtom);
-  const hasEnoughFunds = useMemo(
-    () => currentPlayer.balances[0].greaterThanOrEqualTo(20),
+  const currencies = useAtomValue(currenciesAtom);
+
+  const compositeDonationPrice = useMemo(
+    () =>
+      compositePrice({
+        buyerBalances: currentPlayer.balances,
+        vendorPrice: bn(DONATION_PRICE),
+        vendorValuations: CAUSE_VALUATIONS,
+      }),
     [currentPlayer],
+  );
+
+  const donationPrice = useMemo(
+    () => valueOf(compositeDonationPrice, currentPlayer.valuations),
+
+    [currentPlayer, compositeDonationPrice],
   );
 
   const makeDonation = useCallback(() => {
@@ -36,26 +61,30 @@ export const CausesTab = () => {
 
     setSelectedCause(undefined);
     setActiveTab("wallet");
+    const currencyIndex = currencies.findIndex(
+      (currency) => currency.symbol === selectedCause.symbol,
+    )!;
+
+    const tokensAcquired = bn(DONATION_REWARD).sub(
+      compositeDonationPrice[currencyIndex],
+    );
 
     updateGame((game) => {
-      const currencyIndex = game.currencies.findIndex(
-        (currency) => currency.symbol === selectedCause.symbol,
-      )!;
-      const currentPlayerState = game.players.find(
+      const startingBalances = game.players.find(
         (player) => player.deviceId === currentPlayer.deviceId,
-      )!;
-
-      const usdBalance = currentPlayerState.balances[0];
-
-      const causeTokenBalance = currentPlayerState.balances[currencyIndex];
+      )!.balances;
 
       game.players.find(
         (player) => player.deviceId === currentPlayer.deviceId,
-      )!.balances[0] = usdBalance.sub(DONATION_PRICE);
+      )!.balances = bnMath.subtract(
+        startingBalances,
+        compositeDonationPrice,
+      ) as BigNumber[];
 
       game.players.find(
         (player) => player.deviceId === currentPlayer.deviceId,
-      )!.balances[currencyIndex] = causeTokenBalance.add(DONATION_REWARD);
+      )!.balances[currencyIndex] =
+        startingBalances[currencyIndex].add(tokensAcquired);
 
       game.currencies[currencyIndex].totalSupply =
         game.currencies[currencyIndex].totalSupply.add(DONATION_REWARD);
@@ -63,18 +92,37 @@ export const CausesTab = () => {
       emitEvent({
         type: "DONATION_MADE",
         cause: selectedCause.symbol as CauseSymbol,
-        tokensAcquired: bn(20),
+        tokensAcquired,
         playerId: currentPlayer.deviceId,
         playerName: currentPlayer.name,
-        payment: bnZeroPad([bn(20)], currentPlayer.valuations.length),
+        payment: compositeDonationPrice,
         causeValuations: bnZeroPad([bn(1)], currentPlayer.valuations.length),
         donorValuations: currentPlayer.valuations,
       });
     });
-  }, [currentPlayer, emitEvent, selectedCause, setActiveTab, updateGame]);
+  }, [
+    currentPlayer,
+    emitEvent,
+    selectedCause,
+    setActiveTab,
+    updateGame,
+    compositeDonationPrice,
+  ]);
+
+  const portfolioValue = useAtomValue(playerPortfolioValueAtom);
+
+  const hasEnoughFunds = useMemo(() => {
+    if (!donationPrice) return undefined;
+    return donationPrice.lte(portfolioValue);
+  }, [donationPrice, portfolioValue]);
+
+  const balanceAfterPurchase = useMemo(() => {
+    if (!donationPrice) return undefined;
+    return portfolioValue.sub(donationPrice);
+  }, [donationPrice, portfolioValue]);
 
   return (
-    <TabsContent value="causes">
+    <TabsContent value="causes" className="justify-between xs:pt-10">
       {!selectedCause && (
         <>
           <div className="flex flex-col gap-2">
@@ -96,9 +144,12 @@ export const CausesTab = () => {
                     <p className="font-bold text-lg">{cause.name}</p>
                     <p className="text-sm text-muted-foreground">
                       <strong>
-                        {20} {cause.symbol}
+                        {DONATION_REWARD} {cause.symbol}
                       </strong>{" "}
-                      for <strong>U$20</strong>
+                      for{" "}
+                      <strong>
+                        {formatValue(donationPrice, { withIndexSign: true })}
+                      </strong>
                     </p>
                   </div>
                   {isPlayerCause && (
@@ -115,41 +166,148 @@ export const CausesTab = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute left-2 top-2"
+            className="absolute left-2 top-0.5"
             onClick={() => setSelectedCause(undefined)}
           >
             <Undo2Icon />
           </Button>
 
-          <p className="font-bold text-md text-muted-foreground text-center">
-            Donating to
-          </p>
+          <motion.div
+            layout
+            className="flex flex-col items-center gap-1 self-center"
+          >
+            <p className="font-bold text-lg">{selectedCause.name}</p>
 
-          <div className="flex flex-col items-center border-2 mt-4 p-6 shadow-sm rounded-lg">
             <TokenBadge
-              className="size-32"
-              token={selectedCause.symbol as CauseSymbol}
+              token={selectedCause.symbol}
+              className="size-24 xs:size-28"
             />
-            <div className="flex flex-col gap-0">
-              <p className="font-bold text-xl">{selectedCause.name}</p>
-            </div>
-          </div>
+          </motion.div>
 
-          <div className="flex-grow" />
+          <motion.div
+            layout
+            className="flex flex-col items-center justify-center"
+          >
+            <Label
+              htmlFor="vendor-price"
+              className="text-center text-muted-foreground"
+            >
+              Their price
+            </Label>
+            <p className="relative inline-block place-self-center w-32 h-12 mt-1 text-center  text-lg">
+              ⱡ{DONATION_PRICE}
+            </p>
+          </motion.div>
 
-          <div className="mt-14 flex flex-col items-center">
-            {hasEnoughFunds === false && (
-              <p className="text-destructive">Not enough funds</p>
-            )}
-            {hasEnoughFunds && (
-              <Button
-                onClick={makeDonation}
-                className="font-bold w-full text-lg h-14"
+          <AnimatePresence mode="popLayout">
+            {balanceAfterPurchase && (
+              <motion.div
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-3"
               >
-                Donate
-              </Button>
+                <div className="flex items-center flex-col text-muted-foreground/60">
+                  <Label className="">You have</Label>
+                  <p className="mt-2 text-lg font-bold ">
+                    {formatValue(portfolioValue, {
+                      withIndexSign: true,
+                    })}
+                  </p>
+                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <div className="flex items-center flex-col">
+                      <Label className="flex flex-col items-center mt-2 text-md text-muted-foreground">
+                        <p className="font-bold">You pay</p>
+                        <p className=" text-xs text-muted-foreground/60">
+                          x{donationPrice.div(bn(DONATION_PRICE)).toFixed(1)}
+                        </p>
+                      </Label>
+                      <div className="flex gap-1 items-center">
+                        <p className="text-xl font-bold text-muted-foreground">
+                          {formatValue(donationPrice, { withIndexSign: true })}
+                        </p>
+                        <BalancesDonut
+                          balances={currentPlayer.balances}
+                          className="relative"
+                        >
+                          <div className="size-2 bg-background rounded-full" />
+                        </BalancesDonut>
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="rounded-sm w-fit h-fit px-3 py-1 font-bold text-muted-foreground tracking-wider text-xs"
+                      >
+                        <BarChart3Icon className="mr-1 size-2.5 align-text-top" />
+                        BREAKDOWN
+                      </Button>
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    side="top"
+                    className="max-h-64 w-72 overflow-auto p-1"
+                  >
+                    <ValueComparison
+                      className="w-full rounded-sm overflow-clip"
+                      compositePayment={compositeDonationPrice}
+                      buyerValuations={currentPlayer.valuations}
+                      vendorValuations={CAUSE_VALUATIONS}
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <div className="flex items-center flex-col text-muted-foreground/60">
+                  <Label className=" ">You'll have</Label>
+                  <p
+                    className={cn(
+                      "mt-2 text-lg font-bold",
+                      balanceAfterPurchase.isNegative() && "text-destructive",
+                    )}
+                  >
+                    {formatValue(balanceAfterPurchase, {
+                      withIndexSign: true,
+                    })}
+                  </p>
+                </div>
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
+
+          <motion.div className="grid">
+            {hasEnoughFunds === false && (
+              <motion.p
+                key="not-enough-funds"
+                className="overlap text-destructive w-full leading-[3.5rem] align-middle text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                Not enough funds
+              </motion.p>
+            )}
+
+            <AnimatePresence mode="popLayout">
+              {hasEnoughFunds && (
+                <Button
+                  key="pay-button"
+                  asChild
+                  onClick={makeDonation}
+                  className="relative overlap font-bold w-full text-lg h-14"
+                >
+                  <motion.div
+                    className="relative"
+                    initial={{ translateY: 200 }}
+                    animate={{ translateY: 0 }}
+                    exit={{ translateY: 200, zIndex: -10 }}
+                  >
+                    Donate
+                  </motion.div>
+                </Button>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </>
       )}
     </TabsContent>
