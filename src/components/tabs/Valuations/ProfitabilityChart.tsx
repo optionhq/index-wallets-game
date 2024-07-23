@@ -152,15 +152,16 @@ export const ProfitabilityChart = () => {
         <Tooltip
           allowEscapeViewBox={{ y: true }}
           position={{ y: -150 }}
+          labelClassName="w-24 text-wrap !mb-2"
           labelFormatter={(value: string, data) => {
             const color = data.find((entry) => entry.name === value)?.color;
             return (
-              <p className="w-24 text-wrap mb-2">
+              <>
                 Selling <strong>1 item</strong> to <br />
                 <strong style={{ color }}>{value}</strong>
                 <br />
                 buys you:
-              </p>
+              </>
             );
           }}
           formatter={(value: number) =>
