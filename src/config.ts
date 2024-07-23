@@ -1,13 +1,13 @@
 import { DollarSignIcon } from "lucide-react";
-import ButterflyIcon from "./assets/img/cause-tokens/Butterfly.svg?react";
-import CouchIcon from "./assets/img/cause-tokens/Couch.svg?react";
+import BridgeIcon from "./assets/img/cause-tokens/Bridge.svg?react";
 import DogIcon from "./assets/img/cause-tokens/Dog.svg?react";
-import ElderIcon from "./assets/img/cause-tokens/Elder.svg?react";
-import FoodIcon from "./assets/img/cause-tokens/Food.svg?react";
-import ParkIcon from "./assets/img/cause-tokens/Park.svg?react";
+import ForestIcon from "./assets/img/cause-tokens/Forest.svg?react";
+import HospitalIcon from "./assets/img/cause-tokens/Hospital.svg?react";
+import HousesIcon from "./assets/img/cause-tokens/Houses.svg?react";
+import KidIcon from "./assets/img/cause-tokens/Kid.svg?react";
+import PubIcon from "./assets/img/cause-tokens/Pub.svg?react";
 import RiverIcon from "./assets/img/cause-tokens/River.svg?react";
 import SeedlingIcon from "./assets/img/cause-tokens/Seedling.svg?react";
-import TentIcon from "./assets/img/cause-tokens/Tent.svg?react";
 
 import potIcon from "@/assets/img/player-tokens/cooking-pot.png";
 import boardIcon from "@/assets/img/player-tokens/cutting-board.png";
@@ -28,14 +28,14 @@ export const VALUATION_AMPLITUDE = 2;
 
 export const tokenColor = {
   RIVER: "#3C8FCA",
-  FOOD: "#D96666",
-  PET: "#A277C4",
-  ELDER: "#65C5CB",
-  SOCIAL: "#EDA059",
-  PARK: "#62835C",
-  HOME: "#D566A9",
-  POLLEN: "#EACD65",
-  GARDEN: "#6FC69C",
+  BRIDGE: "#D96666",
+  WILD: "#A277C4",
+  KIDS: "#65C5CB",
+  PUB: "#EDA059",
+  FOREST: "#62835C",
+  HEAL: "#D566A9",
+  CLEAN: "#EACD65",
+  SEED: "#6FC69C",
   USD: "#555",
 } as { [cause in CurrencySymbol]: `#${string}` };
 
@@ -68,14 +68,23 @@ export const characterIcon = {
 export const causeIcon = {
   USD: DollarSignIcon,
   RIVER: RiverIcon,
-  FOOD: FoodIcon,
-  PET: DogIcon,
-  ELDER: ElderIcon,
-  SOCIAL: CouchIcon,
-  PARK: ParkIcon,
-  HOME: TentIcon,
-  POLLEN: ButterflyIcon,
-  GARDEN: SeedlingIcon,
+  BRIDGE: BridgeIcon,
+  WILD: DogIcon,
+  KIDS: KidIcon,
+  PUB: PubIcon,
+  FOREST: ForestIcon,
+  HEAL: HospitalIcon,
+  CLEAN: HousesIcon,
+  SEED: SeedlingIcon,
+  // RIVER: RiverIcon,
+  // FOOD: FoodIcon,
+  // PET: DogIcon,
+  // ELDER: ElderIcon,
+  // SOCIAL: CouchIcon,
+  // PARK: ParkIcon,
+  // HOME: TentIcon,
+  // POLLEN: ButterflyIcon,
+  // GARDEN: SeedlingIcon,
 } as { [cause in CurrencySymbol]: FC<SVGProps<SVGSVGElement>> };
 
 export const INITIAL_USD_BALANCE = 100;
