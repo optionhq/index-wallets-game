@@ -31,28 +31,33 @@ export const ProfitabilityChart = () => {
       vendorValuations: currentPlayerValuations,
     });
 
-    const priceToThem = valueOf(buyerPayment, buyer.valuations)
+    const myPriceToThem = valueOf(buyerPayment, buyer.valuations)
       .clamp(0, 99.9)
       .toNumber();
 
-    const bestPrice = bnMath
-      .min(
-        otherPlayers.map((p) =>
-          price({
-            buyerBalances: p.balances,
-            vendorPrice: bn(RETAIL_PRICE),
-            vendorValuations: buyer.valuations,
-            viewerValuations: p.valuations,
-          }).clamp(-99.9, 99.9),
-        ),
-      )
-      .toNumber();
-    const isBestPrice = priceToThem <= bestPrice;
+    const priceFromOthers = otherPlayers.flatMap((p) => {
+      if (p.name === buyer.name) return [];
+      return [
+        price({
+          buyerBalances: p.balances,
+          vendorPrice: bn(RETAIL_PRICE),
+          vendorValuations: buyer.valuations,
+          viewerValuations: p.valuations,
+        })
+          .clamp(-99.9, 99.9)
+          .toNumber(),
+      ];
+    });
+
+    const isBestPrice =
+      priceFromOthers.length > 0
+        ? myPriceToThem <= bnMath.min(priceFromOthers)
+        : true;
     return {
       name: `${buyer.name}`,
       character: buyer.character,
       color: characterColor[buyer.character],
-      priceToThem,
+      priceToThem: myPriceToThem,
       isBestPrice,
       ...otherPlayers.reduce(
         (purchasingPowers, seller) => {
