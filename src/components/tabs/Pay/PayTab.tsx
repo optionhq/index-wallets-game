@@ -28,7 +28,7 @@ import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { InfoIcon, ReceiptIcon, Undo2Icon } from "lucide-react";
+import { BarChart3Icon, ReceiptIcon, Undo2Icon } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { sort } from "remeda";
 
@@ -139,8 +139,7 @@ export const PayTab = () => {
     hasEnoughFunds,
     updateGame,
     setSelectedPayee,
-    currentPlayer.balances,
-    currentPlayer.deviceId,
+    currentPlayer,
     price,
     emitEvent,
     payee,
@@ -260,8 +259,7 @@ export const PayTab = () => {
                           x
                           {purchaseRelativePriceIndexes[selectedPayee].toFixed(
                             1,
-                          )}{" "}
-                          <InfoIcon className="inline size-3.5 align-text-top" />
+                          )}
                         </p>
                       </Label>
                       <div className="flex gap-1 items-center">
@@ -274,9 +272,16 @@ export const PayTab = () => {
                           balances={currentPlayer.balances}
                           className="relative"
                         >
-                          <div className="size-1 bg-background rounded-full" />
+                          <div className="size-2 bg-background rounded-full" />
                         </BalancesDonut>
                       </div>
+                      <Button
+                        variant="outline"
+                        className="rounded-sm w-fit h-fit px-3 py-1 font-bold text-muted-foreground tracking-wider text-xs"
+                      >
+                        <BarChart3Icon className="mr-1 size-2.5 align-text-top" />
+                        BREAKDOWN
+                      </Button>
                     </div>
                   </PopoverTrigger>
                   <PopoverContent
