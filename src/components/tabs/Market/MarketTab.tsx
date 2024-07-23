@@ -15,7 +15,7 @@ export const MarketTab = () => {
       </h2>
       <TokenSuppliesChart />
       <h2 className="text-lg font-bold text-muted-foreground leading-none mb-2">
-        Market Valuations
+        Transacted token valuations
       </h2>
       <MarketValuationsChart />
     </TabsContent>
