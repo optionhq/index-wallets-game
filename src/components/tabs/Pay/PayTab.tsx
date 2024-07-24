@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { BalancesDonut } from "@/components/BalancesDonut";
 import { CharacterBadge } from "@/components/CharacterBadge";
 import {
@@ -28,7 +29,7 @@ import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { BarChart3Icon, ReceiptIcon, Undo2Icon } from "lucide-react";
+import { BarChart3Icon, ChevronLeftIcon, ReceiptIcon } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { sort } from "remeda";
 
@@ -180,14 +181,7 @@ export const PayTab = () => {
       )}
       {selectedPayee && payee && (
         <>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-2 top-0.5"
-            onClick={() => setSelectedPayee(undefined)}
-          >
-            <Undo2Icon />
-          </Button>
+          <BackButton onClick={() => setSelectedPayee(undefined)} />
 
           <motion.div
             layout

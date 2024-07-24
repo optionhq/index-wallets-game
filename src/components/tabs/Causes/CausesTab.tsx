@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { BalancesDonut } from "@/components/BalancesDonut";
 import {
   activeTabAtom,
@@ -25,7 +26,7 @@ import { Currency } from "@/types/Currency";
 import { Popover } from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue, useSetAtom } from "jotai";
-import { BarChart3Icon, HeartHandshakeIcon, Undo2Icon } from "lucide-react";
+import { BarChart3Icon, HeartHandshakeIcon } from "lucide-react";
 import { BigNumber } from "mathjs";
 import { useCallback, useMemo, useState } from "react";
 
@@ -163,14 +164,7 @@ export const CausesTab = () => {
       )}
       {selectedCause && (
         <>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-2 top-0.5"
-            onClick={() => setSelectedCause(undefined)}
-          >
-            <Undo2Icon />
-          </Button>
+          <BackButton onClick={() => setSelectedCause(undefined)} />
 
           <motion.div
             layout
