@@ -29,8 +29,8 @@ if (!rootElement.innerHTML) {
         <RouterProvider router={router} />
         <Toaster
           theme="light"
-          position="bottom-right"
-          style={{ bottom: "80px" }}
+          position="top-right"
+          style={{ top: "48px" }}
           closeButton
           duration={3000}
           gap={8}
