@@ -98,11 +98,11 @@ export const useNotifications = () => {
               toast.success(`Valuations updated`);
             }
 
-            if (event.playerId !== currentPlayer.deviceId) {
-              toast(
-                `${game.players.find((p) => p.deviceId === event.playerId)?.name} updated their valuations`,
-              );
-            }
+            // if (event.playerId !== currentPlayer.deviceId) {
+            //   toast(
+            //     `${game.players.find((p) => p.deviceId === event.playerId)?.name} updated their valuations`,
+            //   );
+            // }
             break;
         }
       });
