@@ -4,7 +4,7 @@ import {
   dealerAtom,
   eventsObservableAtom,
 } from "@/components/Game.state";
-import { INITIAL_USD_BALANCE, tokenColor } from "@/config";
+import { DONATION_REWARD, INITIAL_USD_BALANCE, tokenColor } from "@/config";
 import { CurrencySymbol } from "@/types/Currency";
 import { Event } from "@/types/Events";
 import { useAtomValue } from "jotai";
@@ -72,8 +72,7 @@ const dataAtom = atomWithObservable((get) => {
                 //   {} as Partial<Record<CurrencySymbol, number>>,
                 // ),
                 [event.cause]:
-                  (latestPoint[event.cause] ?? 0) +
-                  event.tokensAcquired.toNumber(),
+                  (latestPoint[event.cause] ?? 0) + DONATION_REWARD,
                 event,
                 index: latestPoint.index + 1,
               },
