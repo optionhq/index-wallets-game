@@ -98,7 +98,6 @@ export const ValueComparison = ({
             <TableCell
               className={cn(
                 "text-right",
-                data.buyerValues[i].isNegative() && "text-destructive",
                 data.buyerValues[i].isZero() && "text-muted-foreground/70",
               )}
             >
@@ -107,8 +106,10 @@ export const ValueComparison = ({
             <TableCell
               className={cn(
                 "text-right",
-                data.vendorValues[i].isNegative() && "text-destructive",
-                data.vendorValues[i].isZero() && "text-muted-foreground/70",
+                data.vendorValues[i].lessThan(data.buyerValues[i]) &&
+                  "text-red-700/80",
+                data.vendorValues[i].greaterThan(data.buyerValues[i]) &&
+                  "text-green-700/80",
               )}
             >
               {formatValue(data.vendorValues[i], { withIndexSign: true })}

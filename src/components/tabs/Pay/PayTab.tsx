@@ -29,7 +29,7 @@ import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { BarChart3Icon, ChevronLeftIcon, ReceiptIcon } from "lucide-react";
+import { BarChart3Icon } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { sort } from "remeda";
 
@@ -146,36 +146,58 @@ export const PayTab = () => {
     payee,
   ]);
 
+  const payeePriceMultiplier = payee
+    ? purchaseRelativePriceIndexes[payee.deviceId]
+    : bn(1);
+
+  const payeeGivesDiscount = payeePriceMultiplier.lessThanOrEqualTo(1);
+
   return (
     <TabsContent value="pay" className="justify-between xs:pt-10">
       {!selectedPayee && (
         <>
           <motion.div layout className="flex flex-col gap-2">
-            {(currentPlayer.isDealer
-              ? sortedOtherPlayers
-              : [dealer, ...sortedOtherPlayers]
-            ).map((player) => (
-              <motion.div
-                layoutId={player.deviceId}
-                onClick={() => setSelectedPayee(player.deviceId)}
-                key={player.deviceId}
-                className="flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary"
-              >
-                <BalancesDonut balances={player.balances}>
-                  <CharacterBadge
-                    className="size-16"
-                    character={player.character}
-                  />
-                </BalancesDonut>
-                <div className="flex flex-col gap-0">
-                  <p className="font-bold text-lg">{player.name}</p>
-                  <p className="font-bold text-sm text-muted-foreground">
-                    <ReceiptIcon className="inline size-4 align-text-top" /> x
-                    {purchaseRelativePriceIndexes[player.deviceId].toFixed(1)}{" "}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+            {sort(
+              currentPlayer.isDealer
+                ? sortedOtherPlayers
+                : [...sortedOtherPlayers, dealer],
+              (p1, p2) =>
+                purchaseRelativePriceIndexes[p1.deviceId].comparedTo(
+                  purchaseRelativePriceIndexes[p2.deviceId],
+                ),
+            ).map((player) => {
+              const priceMultiplier =
+                purchaseRelativePriceIndexes[player.deviceId];
+              const isDiscount = priceMultiplier.lessThanOrEqualTo(1);
+              return (
+                <motion.div
+                  layoutId={player.deviceId}
+                  onClick={() => setSelectedPayee(player.deviceId)}
+                  key={player.deviceId}
+                  className="flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary"
+                >
+                  <BalancesDonut balances={player.balances}>
+                    <CharacterBadge
+                      className="size-16"
+                      character={player.character}
+                    />
+                  </BalancesDonut>
+                  <div className="flex flex-col gap-0">
+                    <p className="font-bold text-lg">{player.name}</p>
+                    <p
+                      className={cn(
+                        "font-bold text-sm text-muted-foreground",
+                        isDiscount && "text-green-600/70",
+                      )}
+                    >
+                      {isDiscount
+                        ? `${priceMultiplier.eq(1) ? "no" : bn(1).sub(priceMultiplier).mul(100).toFixed(1) + "%"} discount`
+                        : `${priceMultiplier.add(-1).mul(100).toFixed(1)}% premium`}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </>
       )}
@@ -249,11 +271,15 @@ export const PayTab = () => {
                     <div className="flex items-center flex-col">
                       <Label className="flex flex-col items-center mt-2 text-md text-muted-foreground">
                         <p className="font-bold">You pay</p>
-                        <p className=" text-xs text-muted-foreground/60">
-                          x
-                          {purchaseRelativePriceIndexes[selectedPayee].toFixed(
-                            1,
+                        <p
+                          className={cn(
+                            "text-xs text-muted-foreground/60",
+                            payeeGivesDiscount && "text-green-600/70",
                           )}
+                        >
+                          {payeeGivesDiscount
+                            ? `${payeePriceMultiplier.eq(1) ? "no" : bn(1).sub(payeePriceMultiplier).mul(100).toFixed(1) + "%"} discount`
+                            : `${payeePriceMultiplier.add(-1).mul(100).toFixed(1)}% premium`}
                         </p>
                       </Label>
                       <div className="flex gap-1 items-center">
