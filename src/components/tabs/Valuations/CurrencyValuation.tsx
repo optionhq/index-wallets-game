@@ -80,7 +80,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
           min={-VALUATION_AMPLITUDE}
           max={VALUATION_AMPLITUDE}
           step={0.1}
-          className="pb-8"
+          className="mb-8"
         >
           <span className="absolute -top-1 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
           {players.map((player) => {
