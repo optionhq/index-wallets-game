@@ -33,7 +33,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
   const currency = currencies[currencyIndex];
 
   return (
-    <div {...props} className="flex pt-4 p-2 gap-6">
+    <div {...props} className="flex pt-4 p-2 px-6 gap-6">
       <div className="flex flex-col flex-grow gap-2">
         <div className="flex justify-between">
           <div className="flex items-center h-fit gap-2">
