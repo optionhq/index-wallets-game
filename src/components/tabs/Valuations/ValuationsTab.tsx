@@ -53,7 +53,7 @@ export const ValuationsTab = () => {
         <Button
           disabled={!valuationsHaveChanged}
           size={"sm"}
-          className="absolute -top-4 left-0 transition-opacity disabled:opacity-0 z-20 rounded-l-none w-20"
+          className="absolute -top-6 left-0 transition-opacity disabled:opacity-0 z-20 rounded-l-none w-20 h-12 text-primary shadow-md"
           variant="outline"
           onClick={() => setProvisionalValuations(valuations)}
         >
@@ -63,7 +63,7 @@ export const ValuationsTab = () => {
         <Button
           disabled={!valuationsHaveChanged}
           size={"sm"}
-          className="absolute -top-4 right-0 transition-opacity disabled:opacity-0 z-20 border rounded-r-none w-20"
+          className="absolute -top-6 right-0 transition-opacity disabled:opacity-0 z-20  rounded-r-none w-20 h-12 shadow-md"
           onClick={async () => {
             setValuations(provisionalValuations).then(() => {
               emitEvent({
