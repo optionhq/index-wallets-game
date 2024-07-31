@@ -354,6 +354,8 @@ export const vendorPriceAtom = memoize(
 
 export const selectedPayeeAtom = atom<string | undefined>(undefined);
 
+export const selectedCauseAtom = atom<Currency | undefined>(undefined);
+
 export const marketValuationsObservableAtom = atom((get) => {
   const dealer = get(dealerAtom);
   // Only USD is valued at first

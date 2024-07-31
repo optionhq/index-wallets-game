@@ -1,6 +1,7 @@
 import {
   activeTabAtom,
   currentAgentAtom,
+  selectedCauseAtom,
   selectedPayeeAtom,
 } from "@/components/Game.state";
 import { TripleDotMenu } from "@/components/TrippleDotMenu";
@@ -13,7 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/cn";
 import { useNotifications } from "@/lib/game/useNotifications";
 import useWakeLock from "@/lib/game/useWakeLock";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   AreaChartIcon,
   HeartHandshakeIcon,
@@ -27,7 +28,8 @@ export const Game = () => {
   useWakeLock();
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
   const currentPlayer = useAtomValue(currentAgentAtom);
-  const selectedPayee = useAtomValue(selectedPayeeAtom);
+  const [selectedPayee, setSelectedPayee] = useAtom(selectedPayeeAtom);
+  const setSelectedCause = useSetAtom(selectedCauseAtom);
 
   return (
     <Tabs
@@ -71,6 +73,17 @@ export const Game = () => {
             key={`${key}-trigger`}
             value={key}
             className="flex-grow flex gap-2 h-full data-[state=active]:bg-foreground/5 data-[state=active]:shadow-inner"
+            onClick={
+              key === "pay"
+                ? () => {
+                    activeTab === "pay" && setSelectedPayee(undefined);
+                  }
+                : key === "causes"
+                  ? () => {
+                      activeTab === "causes" && setSelectedCause(undefined);
+                    }
+                  : undefined
+            }
           >
             <Icon className={cn("inline size-6", key === "pay" && "size-7")} />
           </TabsTrigger>

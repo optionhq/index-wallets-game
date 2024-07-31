@@ -8,6 +8,7 @@ import {
   emitEventAtom,
   gameAtom,
   playerPortfolioValueAtom,
+  selectedCauseAtom,
 } from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
@@ -23,18 +24,15 @@ import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { valueOf } from "@/lib/indexWallets/valueOf";
 import { CauseSymbol } from "@/types/Cause";
-import { Currency } from "@/types/Currency";
 import { Popover } from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { BarChart3Icon, HeartHandshakeIcon } from "lucide-react";
 import { BigNumber } from "mathjs";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 export const CausesTab = () => {
-  const [selectedCause, setSelectedCause] = useState<Currency | undefined>(
-    undefined,
-  );
+  const [selectedCause, setSelectedCause] = useAtom(selectedCauseAtom);
   const causes = useAtomValue(causesAtom);
   const currentPlayer = useAtomValue(currentAgentAtom);
   const setActiveTab = useSetAtom(activeTabAtom);
