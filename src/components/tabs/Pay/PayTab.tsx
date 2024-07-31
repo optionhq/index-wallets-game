@@ -25,6 +25,7 @@ import {
 import { TabsContent } from "@/components/ui/tabs";
 import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
+import { formatPercentage } from "@/lib/game/formatPercentage";
 import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { AnimatePresence, motion } from "framer-motion";
@@ -279,7 +280,7 @@ export const PayTab = () => {
                         >
                           {payeeGivesDiscount
                             ? `${payeePriceMultiplier.eq(1) ? "no" : bn(1).sub(payeePriceMultiplier).mul(100).toFixed(1) + "%"} discount`
-                            : `${payeePriceMultiplier.add(-1).mul(100).toFixed(1)}% premium`}
+                            : `${formatPercentage(payeePriceMultiplier.add(-1).mul(100))} premium`}
                         </p>
                       </Label>
                       <div className="flex gap-1 items-center">

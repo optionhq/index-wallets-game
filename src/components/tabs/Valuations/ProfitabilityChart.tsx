@@ -4,6 +4,7 @@ import {
 } from "@/components/Game.state";
 import { characterColor, characterIcon, RETAIL_PRICE } from "@/config";
 import { bn, bnMath } from "@/lib/bnMath";
+import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { price } from "@/lib/indexWallets/price";
 import { valueOf } from "@/lib/indexWallets/valueOf";
@@ -31,27 +32,24 @@ export const ProfitabilityChart = () => {
       vendorValuations: currentPlayerValuations,
     });
 
-    const myPriceToThem = valueOf(buyerPayment, buyer.valuations)
-      .clamp(0, 99.9)
-      .toNumber();
+    const myPriceToThem = valueOf(buyerPayment, buyer.valuations);
 
-    const priceFromOthers = otherPlayers.flatMap((p) => {
-      if (p.name === buyer.name) return [];
-      return [
-        price({
-          buyerBalances: p.balances,
+    const pricesFromCompetitors = otherPlayers
+      .filter((otherPlayer) => otherPlayer.deviceId !== buyer.deviceId)
+      .flatMap((competitor) => {
+        const competitorPriceToThem = price({
+          buyerBalances: buyer.balances,
           vendorPrice: bn(RETAIL_PRICE),
-          vendorValuations: buyer.valuations,
-          viewerValuations: p.valuations,
-        })
-          .clamp(-99.9, 99.9)
-          .toNumber(),
-      ];
-    });
+          vendorValuations: competitor.valuations,
+          viewerValuations: buyer.valuations,
+        });
+
+        return [competitorPriceToThem.toNumber()];
+      });
 
     const isBestPrice =
-      priceFromOthers.length > 0
-        ? myPriceToThem <= bnMath.min(priceFromOthers)
+      pricesFromCompetitors.length > 0
+        ? myPriceToThem.lessThan(bnMath.min(pricesFromCompetitors))
         : true;
     return {
       name: `${buyer.name}`,
@@ -64,14 +62,7 @@ export const ProfitabilityChart = () => {
           const valueToSeller = valueOf(buyerPayment, seller.valuations);
           const purchasingPower = valueToSeller
             .div(bn(RETAIL_PRICE))
-            .clamp(0, 100)
             .toNumber();
-          if (isNaN(purchasingPower))
-            console.log({
-              buyerPayment: buyerPayment.map((v) => v.toNumber()),
-              sellerValuations: seller.valuations.map((v) => v.toNumber()),
-              valueToSeller: valueToSeller.toNumber(),
-            });
           return {
             ...purchasingPowers,
             [seller.name]: purchasingPower,
@@ -132,7 +123,10 @@ export const ProfitabilityChart = () => {
                   fontSize={9}
                   y={2 * RADIUS + 10}
                 >
-                  ⱡ{data[index].priceToThem.toFixed(1)}
+                  {formatValue(data[index].priceToThem, {
+                    withIndexSign: true,
+                    decimalPlaces: 1,
+                  })}
                 </text>
                 {data[index].isBestPrice && (
                   <text

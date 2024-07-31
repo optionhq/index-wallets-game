@@ -18,6 +18,7 @@ import { ValueComparison } from "@/components/ValueComparison";
 import { CAUSE_VALUATIONS, DONATION_PRICE, DONATION_REWARD } from "@/config";
 import { bn, bnMath, bnZeroPad } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
+import { formatBalance } from "@/lib/game/formatBalance";
 import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { valueOf } from "@/lib/indexWallets/valueOf";
@@ -127,30 +128,41 @@ export const CausesTab = () => {
       {!selectedCause && (
         <>
           <div className="flex flex-col gap-2">
-            {causes.map((cause) => {
+            <p className="text-center p-2 text-sm text-muted-foreground/80 -mt-2">
+              Donate{" "}
+              <strong>
+                {formatValue(donationPrice, {
+                  withIndexSign: true,
+                  decimalPlaces: 1,
+                })}
+              </strong>{" "}
+              (<strong>${DONATION_PRICE}</strong>) to a cause and earn cashback
+              in their token
+            </p>
+            {causes.map((cause, index) => {
+              const currencyIndex = index + 1;
               const isPlayerCause = currentPlayer.cause === cause.symbol;
+              const tokensAcquired = bn(DONATION_REWARD).sub(
+                compositeDonationPrice[currencyIndex],
+              );
               return (
                 <div
                   onClick={() => setSelectedCause(cause)}
                   key={cause.symbol}
                   className={cn(
-                    "relative flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary",
+                    "relative flex items-center border-2 cursor-pointer py-4 px-6 gap-4 shadow-sm rounded-lg hover:border-primary",
                   )}
                 >
                   <TokenBadge
                     className="size-16"
                     token={cause.symbol as CauseSymbol}
                   />
-                  <div className="flex flex-col gap-0">
+                  <div className="flex flex-col gap-2">
                     <p className="font-bold text-lg">{cause.name}</p>
                     <p className="text-sm text-muted-foreground">
                       <strong>
-                        {DONATION_REWARD} {cause.symbol}
+                        {formatBalance(tokensAcquired)} {cause.symbol}
                       </strong>{" "}
-                      for{" "}
-                      <strong>
-                        {formatValue(donationPrice, { withIndexSign: true })}
-                      </strong>
                     </p>
                   </div>
                   {isPlayerCause && (
