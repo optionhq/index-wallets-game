@@ -16,7 +16,7 @@ import useWakeLock from "@/lib/game/useWakeLock";
 import { useAtom, useAtomValue } from "jotai";
 import {
   AreaChartIcon,
-  HandHeartIcon,
+  HeartHandshakeIcon,
   HomeIcon,
   SendIcon,
   Settings2Icon,
@@ -63,7 +63,7 @@ export const Game = () => {
                 wallet: HomeIcon,
                 valuations: Settings2Icon,
                 pay: SendIcon,
-                causes: HandHeartIcon,
+                causes: HeartHandshakeIcon,
                 market: AreaChartIcon,
               },
         ).map(([key, Icon]) => (
