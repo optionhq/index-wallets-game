@@ -298,10 +298,10 @@ export const PayTab = () => {
                       </div>
                       <Button
                         variant="outline"
-                        className="rounded-sm w-fit h-fit px-3 py-1 font-bold text-muted-foreground tracking-wider text-xs"
+                        className="rounded-sm w-fit h-fit px-3 py-1 font-bold text-primary border-primary tracking-wider text-xs"
                       >
                         <BarChart3Icon className="mr-1 size-2.5 align-text-top" />
-                        BREAKDOWN
+                        SHOW BREAKDOWN
                       </Button>
                     </div>
                   </PopoverTrigger>
