@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DONATION_REWARD } from "@/config";
 import { cn } from "@/lib/cn";
 import { formatValue } from "@/lib/game/formatValue";
 import { valueOf } from "@/lib/indexWallets/valueOf";
@@ -245,7 +246,7 @@ export const History = () => {
                         acquired{" "}
                         <strong>
                           {" "}
-                          {event.tokensAcquired.toFixed(2)}{" "}
+                          {DONATION_REWARD}{" "}
                           <TokenBadge
                             withoutIcon
                             token={event.cause}
