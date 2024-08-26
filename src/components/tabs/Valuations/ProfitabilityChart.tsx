@@ -2,7 +2,7 @@ import {
   otherPlayersAtom,
   playerProvisionalValuationsAtom,
 } from "@/components/Game.state";
-import { characterColor, characterIcon, RETAIL_PRICE } from "@/config";
+import { characterColor, characterIcon, INITIAL_RETAIL_PRICE } from "@/config";
 import { bn, bnMath } from "@/lib/bnMath";
 import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
@@ -27,7 +27,7 @@ export const ProfitabilityChart = () => {
 
   const data = otherPlayers.flatMap((buyer) => {
     const buyerPayment = compositePrice({
-      vendorPrice: bn(RETAIL_PRICE),
+      vendorPrice: bn(INITIAL_RETAIL_PRICE),
       buyerBalances: buyer.balances,
       vendorValuations: currentPlayerValuations,
     });
@@ -39,7 +39,7 @@ export const ProfitabilityChart = () => {
       .flatMap((competitor) => {
         const competitorPriceToThem = price({
           buyerBalances: buyer.balances,
-          vendorPrice: bn(RETAIL_PRICE),
+          vendorPrice: bn(INITIAL_RETAIL_PRICE),
           vendorValuations: competitor.valuations,
           viewerValuations: buyer.valuations,
         });
@@ -61,7 +61,7 @@ export const ProfitabilityChart = () => {
         (purchasingPowers, seller) => {
           const valueToSeller = valueOf(buyerPayment, seller.valuations);
           const purchasingPower = valueToSeller
-            .div(bn(RETAIL_PRICE))
+            .div(bn(INITIAL_RETAIL_PRICE))
             .toNumber();
           return {
             ...purchasingPowers,

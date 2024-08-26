@@ -1,4 +1,7 @@
-import { MARKET_VALUATIONS_WINDOW_LENGTH, RETAIL_PRICE } from "@/config";
+import {
+  INITIAL_RETAIL_PRICE,
+  MARKET_VALUATIONS_WINDOW_LENGTH,
+} from "@/config";
 import { bn } from "@/lib/bnMath";
 import { eventConverter } from "@/lib/firebase/eventConverter";
 import { gameConverter } from "@/lib/firebase/gameConverter";
@@ -6,7 +9,6 @@ import { getFirestore } from "@/lib/firebase/getFirestore";
 import { portfolioValue } from "@/lib/game/portfolioValue";
 import { generateId } from "@/lib/generateId";
 import { generateUUID } from "@/lib/generateUUID";
-import { relativePriceIndex } from "@/lib/indexWallets/relativePriceIndex";
 import { Currency } from "@/types/Currency";
 import { Event, PaymentMadeEvent } from "@/types/Events";
 import { GameData } from "@/types/GameData";
@@ -45,6 +47,13 @@ export const updateProvisionalValuationsEffect = atomEffect((get, set) => {
   const currentPlayer = get(maybeCurrentAgentAtom);
   if (currentPlayer) {
     set(playerProvisionalValuationsAtom, currentPlayer.valuations);
+  }
+});
+
+export const updateProvisionalPriceEffect = atomEffect((get, set) => {
+  const currentPlayer = get(maybeCurrentAgentAtom);
+  if (currentPlayer) {
+    set(playerProvisionalPriceAtom, currentPlayer.retailPrice);
   }
 });
 
@@ -224,6 +233,10 @@ export const causesAtom = atom<Currency[]>((get) =>
 
 export const playerProvisionalValuationsAtom = atom<BigNumber[]>([]);
 
+export const playerProvisionalPriceAtom = atom<BigNumber>(
+  bn(INITIAL_RETAIL_PRICE),
+);
+
 export const playerValuationsAtom = atom(
   (get) => get(currentAgentAtom).valuations,
   async (get, _set, newValuations: BigNumber[]) => {
@@ -240,31 +253,25 @@ export const playerValuationsAtom = atom(
   },
 );
 
-export const activeTabAtom = atom<
-  "wallet" | "pay" | "valuations" | "causes" | "market"
->("wallet");
+export const playerPriceAtom = atom(
+  (get) => get(currentAgentAtom).retailPrice,
+  async (get, _set, newPrice: BigNumber) => {
+    const gameId = get(gameIdAtom);
+    const deviceId = get(deviceIdAtom);
+    await setDoc(
+      doc(getFirestore(), "games", gameId).withConverter(gameConverter),
+      produce(get(maybeGameAtom), (draft) => {
+        draft!.players.find(
+          (player) => player.deviceId === deviceId,
+        )!.retailPrice = newPrice;
+      }),
+    );
+  },
+);
 
-export const purchaseRelativePriceIndexesAtom = atom((get) => {
-  const agents = [get(dealerAtom), ...get(playersAtom)];
-  const currentAgent = get(currentAgentAtom);
-  const provisionalValuations = get(playerProvisionalValuationsAtom);
-  return agents.reduce(
-    (indexes, player) => {
-      return {
-        ...indexes,
-        [player.deviceId]: relativePriceIndex({
-          buyerBalances: currentAgent.balances,
-          vendorValuations:
-            player.deviceId === currentAgent.deviceId
-              ? provisionalValuations
-              : player.valuations,
-          viewerValuations: provisionalValuations,
-        }),
-      };
-    },
-    {} as Record<string, BigNumber>,
-  );
-});
+export const activeTabAtom = atom<
+  "wallet" | "buy" | "valuations" | "causes" | "market"
+>("wallet");
 
 // Charities only value USD
 export const charityValuationsAtom = atom((get) => [
@@ -347,9 +354,12 @@ export const emitEvent = async (
   ).id;
 };
 
-export const vendorPriceAtom = memoize(
-  (_gameId: string, _vendorId?: string) => atom(`${RETAIL_PRICE}`),
-  { cacheKey: ([vendorId, gameId]) => `vendor-price-${gameId}-${vendorId}` },
+export const payeePaymentValueInputAtom = memoize(
+  (_gameId: string, _vendorId?: string) => atom(`${INITIAL_RETAIL_PRICE}`),
+  {
+    cacheKey: ([vendorId, gameId]) =>
+      `payee-payment-value-${gameId}-${vendorId}`,
+  },
 );
 
 export const selectedPayeeAtom = atom<string | undefined>(undefined);
@@ -394,3 +404,15 @@ export const marketValuationsObservableAtom = atom((get) => {
 export const marketValuationsAtom = atomWithObservable((get) =>
   get(marketValuationsObservableAtom),
 );
+
+export const networkValuationsAtom = atom((get) => {
+  const otherPlayers = get(otherPlayersAtom);
+  const amountOfOtherPlayers = otherPlayers.length;
+  return otherPlayers.reduce((networkValuations, player) => {
+    return player.valuations.map((valuation, i) => {
+      return (networkValuations?.[i] ?? bn(0)).add(
+        valuation.div(amountOfOtherPlayers),
+      );
+    });
+  }, [] as BigNumber[]);
+});

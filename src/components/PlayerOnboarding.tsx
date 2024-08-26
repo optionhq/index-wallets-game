@@ -13,6 +13,7 @@ import { bn } from "@/lib/bnMath";
 import { CauseSymbol, allCauses, cause } from "@/types/Cause";
 import { Character, allPlayerCharacters } from "@/types/Character";
 import { useAtomValue, useSetAtom } from "jotai";
+import { re } from "mathjs";
 import { useEffect, useMemo, useState } from "react";
 import { times } from "remeda";
 import { toast } from "sonner";
@@ -202,6 +203,7 @@ export const PlayerOnboarding = () => {
                     ],
                     cause: playerCause,
                     character: playerCharacter,
+                    retailPrice: bn(10),
                   };
 
                   game.players.push(newPlayer);

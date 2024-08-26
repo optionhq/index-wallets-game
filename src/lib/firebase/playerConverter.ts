@@ -7,6 +7,7 @@ export const playerConverter = {
       ...player,
       balances: player.balances.map((balance) => bn(balance)),
       valuations: player.valuations.map((valuation) => bn(valuation)),
+      retailPrice: bn(player.retailPrice),
     }) as Player,
 
   toFirestore: (player: Player) =>
@@ -14,5 +15,6 @@ export const playerConverter = {
       ...player,
       balances: player.balances.map((balance) => balance.toString()),
       valuations: player.valuations.map((valuation) => valuation.toString()),
+      retailPrice: player.retailPrice.toString(),
     }) as DbPlayer,
 };

@@ -10,6 +10,7 @@ export interface Player {
   valuations: BigNumber[];
   cause?: CauseSymbol;
   character: Character;
+  retailPrice: BigNumber;
 }
 
 export interface DbPlayer extends DocumentData {

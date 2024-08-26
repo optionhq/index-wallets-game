@@ -7,11 +7,11 @@ import {
   emitEventAtom,
   gameAtom,
   gameIdAtom,
+  networkValuationsAtom,
   otherPlayersAtom,
+  payeePaymentValueInputAtom,
   playerPortfolioValueAtom,
-  purchaseRelativePriceIndexesAtom,
   selectedPayeeAtom,
-  vendorPriceAtom,
 } from "@/components/Game.state";
 import { ValueComparison } from "@/components/ValueComparison";
 import { Button } from "@/components/ui/button";
@@ -25,34 +25,45 @@ import {
 import { TabsContent } from "@/components/ui/tabs";
 import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
-import { formatPercentage } from "@/lib/game/formatPercentage";
 import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
+import { price } from "@/lib/indexWallets/price";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { BarChart3Icon } from "lucide-react";
-import { useCallback, useMemo } from "react";
+import { BarChart3Icon, MinusIcon, PlusIcon } from "lucide-react";
+import { BigNumber } from "mathjs";
+import { useCallback, useMemo, useState } from "react";
 import { sort } from "remeda";
 
-export const PayTab = () => {
-  const purchaseRelativePriceIndexes = useAtomValue(
-    purchaseRelativePriceIndexesAtom,
-  );
-
+export const BuyTab = () => {
   const [selectedPayee, setSelectedPayee] = useAtom(selectedPayeeAtom);
 
   const otherPlayers = useAtomValue(otherPlayersAtom);
+  const networkValuations = useAtomValue(networkValuationsAtom);
+  const currentPlayer = useAtomValue(currentAgentAtom);
+  const prices = useMemo(() => {
+    return otherPlayers.reduce(
+      (playerPrices, player) => ({
+        ...playerPrices,
+        [player.deviceId]: price({
+          vendorPrice: player.retailPrice,
+          buyerBalances: currentPlayer.balances,
+          vendorValuations: player.valuations,
+          viewerValuations: networkValuations,
+        }),
+      }),
+      {} as Record<string, BigNumber>,
+    );
+  }, [currentPlayer, networkValuations, otherPlayers]);
+
   const sortedOtherPlayers = useMemo(
     () =>
       sort(otherPlayers, (playerA, playerB) =>
-        purchaseRelativePriceIndexes[playerA.deviceId]
-          .sub(purchaseRelativePriceIndexes[playerB.deviceId])
-          .toNumber(),
+        prices[playerA.deviceId].sub(prices[playerB.deviceId]).toNumber(),
       ),
 
-    [otherPlayers, purchaseRelativePriceIndexes],
+    [otherPlayers, prices],
   );
-  const currentPlayer = useAtomValue(currentAgentAtom);
   const dealer = useAtomValue(dealerAtom);
 
   const payee = [dealer, ...otherPlayers].find(
@@ -62,51 +73,84 @@ export const PayTab = () => {
 
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
 
-  const [vendorPriceInput, setVendorPriceInput] = useAtom(
-    vendorPriceAtom(gameId, selectedPayee),
+  const [payeePaymentValueInput, setPayeePaymentValueInput] = useAtom(
+    payeePaymentValueInputAtom(gameId, selectedPayee),
   );
-  const vendorPrice = useMemo(() => {
-    try {
-      return bn(vendorPriceInput);
-    } catch {
-      return undefined;
+
+  const [amountOfGoods, setAmountOfGoods] = useState(1);
+
+  const isDealerPayment = payee?.isDealer || currentPlayer.isDealer;
+  const isPurchaseOfGoods = !isDealerPayment;
+
+  const payeeValue = useMemo(() => {
+    if (isDealerPayment) {
+      try {
+        return bn(payeePaymentValueInput);
+      } catch {
+        return undefined;
+      }
     }
-  }, [vendorPriceInput]);
 
-  const buyerPrice = useMemo(() => {
-    if (!selectedPayee || !vendorPrice) return undefined;
+    if (!payee) return undefined;
 
-    return vendorPrice.mul(purchaseRelativePriceIndexes[selectedPayee]);
-  }, [selectedPayee, vendorPrice, purchaseRelativePriceIndexes]);
+    return payee.retailPrice.mul(amountOfGoods);
+  }, [payee, payeePaymentValueInput, isDealerPayment, amountOfGoods]);
+
+  const payerValue = useMemo(() => {
+    if (!selectedPayee) return undefined;
+
+    if (isPurchaseOfGoods) return prices[selectedPayee].mul(amountOfGoods);
+
+    if (!payeeValue) return undefined;
+
+    if (isDealerPayment) {
+      return price({
+        vendorPrice: payeeValue,
+        buyerBalances: currentPlayer.balances,
+        vendorValuations: dealer.valuations,
+        viewerValuations: networkValuations,
+      });
+    }
+  }, [
+    prices,
+    selectedPayee,
+    payeeValue,
+    isDealerPayment,
+    amountOfGoods,
+    currentPlayer,
+    dealer,
+    networkValuations,
+    isPurchaseOfGoods,
+  ]);
 
   const hasEnoughFunds = useMemo(() => {
-    if (!buyerPrice) return undefined;
-    return buyerPrice.lte(portfolioValue);
-  }, [buyerPrice, portfolioValue]);
+    if (!payerValue) return undefined;
+    return payerValue.lte(portfolioValue);
+  }, [payerValue, portfolioValue]);
 
   const balanceAfterPurchase = useMemo(() => {
-    if (!buyerPrice) return undefined;
-    return portfolioValue.sub(buyerPrice);
-  }, [buyerPrice, portfolioValue]);
+    if (!payerValue) return undefined;
+    return portfolioValue.sub(payerValue);
+  }, [payerValue, portfolioValue]);
 
   const updateGame = useSetAtom(gameAtom);
   const emitEvent = useSetAtom(emitEventAtom);
 
-  const price = useMemo(() => {
-    if (!payee || !vendorPrice) return undefined;
+  const payeePrice = useMemo(() => {
+    if (!payee || !payeeValue) return undefined;
     return compositePrice({
-      vendorPrice,
+      vendorPrice: payeeValue,
       buyerBalances: currentPlayer.balances,
       vendorValuations: payee.valuations,
     });
-  }, [currentPlayer, payee, vendorPrice]);
+  }, [currentPlayer, payee, payeeValue]);
 
   const makePayment = useCallback(async () => {
     if (
       !selectedPayee ||
-      !vendorPrice ||
-      !buyerPrice ||
-      !price ||
+      !payeeValue ||
+      !payerValue ||
+      !payeePrice ||
       !hasEnoughFunds
     )
       return;
@@ -115,11 +159,13 @@ export const PayTab = () => {
       game.players.find(
         (player) => player.deviceId === currentPlayer.deviceId,
       )!.balances = currentPlayer.balances.map((balance, i) =>
-        balance.sub(price[i]),
+        balance.sub(payeePrice[i]),
       );
       game.players.find(
         (player) => player.deviceId === selectedPayee,
-      )!.balances = payee!.balances.map((balance, i) => balance.add(price[i]));
+      )!.balances = payee!.balances.map((balance, i) =>
+        balance.add(payeePrice[i]),
+      );
     }).then(() => {
       emitEvent({
         type: "PAYMENT_MADE",
@@ -127,7 +173,7 @@ export const PayTab = () => {
         fromName: currentPlayer.name,
         to: selectedPayee,
         toName: payee!.name,
-        payment: price,
+        payment: payeePrice,
         vendorValuations: payee!.valuations,
         buyerValuations: currentPlayer.valuations,
       });
@@ -136,40 +182,26 @@ export const PayTab = () => {
     setSelectedPayee(undefined);
   }, [
     selectedPayee,
-    vendorPrice,
-    buyerPrice,
+    payeeValue,
+    payerValue,
     hasEnoughFunds,
     updateGame,
     setSelectedPayee,
     currentPlayer,
-    price,
+    payeePrice,
     emitEvent,
     payee,
   ]);
 
-  const payeePriceMultiplier = payee
-    ? purchaseRelativePriceIndexes[payee.deviceId]
-    : bn(1);
-
-  const payeeGivesDiscount = payeePriceMultiplier.lessThanOrEqualTo(1);
-
   return (
-    <TabsContent value="pay" className="justify-between xs:pt-10">
+    <TabsContent value="buy" className="justify-between xs:pt-10">
       {!selectedPayee && (
         <>
           <motion.div layout className="flex flex-col gap-2">
-            {sort(
-              currentPlayer.isDealer
-                ? sortedOtherPlayers
-                : [...sortedOtherPlayers, dealer],
-              (p1, p2) =>
-                purchaseRelativePriceIndexes[p1.deviceId].comparedTo(
-                  purchaseRelativePriceIndexes[p2.deviceId],
-                ),
+            {(currentPlayer.isDealer
+              ? sortedOtherPlayers
+              : [...sortedOtherPlayers, dealer]
             ).map((player) => {
-              const priceMultiplier =
-                purchaseRelativePriceIndexes[player.deviceId];
-              const isDiscount = priceMultiplier.lessThanOrEqualTo(1);
               return (
                 <motion.div
                   layoutId={player.deviceId}
@@ -185,16 +217,14 @@ export const PayTab = () => {
                   </BalancesDonut>
                   <div className="flex flex-col gap-0">
                     <p className="font-bold text-lg">{player.name}</p>
-                    <p
-                      className={cn(
-                        "font-bold text-sm text-muted-foreground",
-                        isDiscount && "text-green-600/70",
-                      )}
-                    >
-                      {isDiscount
-                        ? `${priceMultiplier.eq(1) ? "no" : bn(1).sub(priceMultiplier).mul(100).toFixed(1) + "%"} discount`
-                        : `${priceMultiplier.add(-1).mul(100).toFixed(1)}% premium`}
-                    </p>
+
+                    {prices[player.deviceId] && (
+                      <p>
+                        {formatValue(prices[player.deviceId], {
+                          withIndexSign: true,
+                        })}
+                      </p>
+                    )}
                   </div>
                 </motion.div>
               );
@@ -223,31 +253,91 @@ export const PayTab = () => {
             layout
             className="flex flex-col items-center justify-center"
           >
-            <Label
-              htmlFor="vendor-price"
-              className="text-center text-muted-foreground"
-            >
-              Their price
-            </Label>
-            <div className="relative inline-block">
-              <span className="absolute text-2xl align-middle left-4  top-3 h-4">
-                ⱡ
-              </span>
-              <Input
-                maxLength={6}
-                max={100}
-                value={vendorPriceInput}
-                onChange={(event) => setVendorPriceInput(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") makePayment();
-                }}
-                step={0.01}
-                pattern="^\d+(\.\d{1,2})?$"
-                id="vendor-price"
-                inputMode="decimal"
-                className="place-self-center w-32 h-12 mt-1 text-center  text-lg"
-              />
-            </div>
+            {isDealerPayment && (
+              <>
+                <Label
+                  htmlFor="payee-value"
+                  className="text-center text-muted-foreground"
+                >
+                  Send
+                </Label>
+                <div className="relative inline-block">
+                  <span className="absolute text-2xl align-middle left-4  top-3 h-4">
+                    ⱡ
+                  </span>
+                  <Input
+                    maxLength={6}
+                    max={100}
+                    value={payeePaymentValueInput}
+                    onChange={(event) =>
+                      setPayeePaymentValueInput(event.target.value)
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") makePayment();
+                    }}
+                    step={0.01}
+                    pattern="^\d+(\.\d{1,2})?$"
+                    id="payee-value"
+                    inputMode="decimal"
+                    className="place-self-center w-32 h-12 mt-1 text-center  text-lg"
+                  />
+                </div>
+              </>
+            )}
+            {isPurchaseOfGoods && (
+              <>
+                <Label
+                  htmlFor="amount-of-products"
+                  className="text-center text-muted-foreground"
+                >
+                  Amount of products
+                </Label>
+                <div className="flex relative items-center gap-1 mt-1">
+                  <Button
+                    size="icon"
+                    className="size-12 rounded-sm"
+                    variant={"secondary"}
+                    disabled={amountOfGoods <= 1}
+                    onClick={() =>
+                      setAmountOfGoods((amountOfGoods) =>
+                        Math.max(amountOfGoods - 1, 1),
+                      )
+                    }
+                  >
+                    <MinusIcon />
+                  </Button>
+                  <Input
+                    maxLength={6}
+                    max={100}
+                    value={amountOfGoods}
+                    onChange={(event) =>
+                      setAmountOfGoods(
+                        Math.max(Math.floor(Number(event.target.value)), 1),
+                      )
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") makePayment();
+                    }}
+                    pattern="^\d+$"
+                    step={1}
+                    id="amount-of-products"
+                    type="number"
+                    min={1}
+                    className="place-self-center w-32 h-12 text-center  text-lg"
+                  />
+                  <Button
+                    size={"icon"}
+                    className="size-12 rounded-sm"
+                    variant={"secondary"}
+                    onClick={() =>
+                      setAmountOfGoods((amountOfGoods) => amountOfGoods + 1)
+                    }
+                  >
+                    <PlusIcon />
+                  </Button>
+                </div>
+              </>
+            )}
           </motion.div>
 
           <AnimatePresence mode="popLayout">
@@ -272,22 +362,12 @@ export const PayTab = () => {
                     <div className="flex items-center flex-col">
                       <Label className="flex flex-col items-center mt-2 text-md text-muted-foreground">
                         <p className="font-bold">You pay</p>
-                        <p
-                          className={cn(
-                            "text-xs text-muted-foreground/60",
-                            payeeGivesDiscount && "text-green-600/70",
-                          )}
-                        >
-                          {payeeGivesDiscount
-                            ? `${payeePriceMultiplier.eq(1) ? "no" : bn(1).sub(payeePriceMultiplier).mul(100).toFixed(1) + "%"} discount`
-                            : `${formatPercentage(payeePriceMultiplier.add(-1).mul(100))} premium`}
-                        </p>
                       </Label>
                       <div className="flex gap-1 items-center">
                         <p className="text-xl font-bold text-muted-foreground">
-                          {!buyerPrice
+                          {!payerValue
                             ? "---"
-                            : formatValue(buyerPrice, { withIndexSign: true })}
+                            : formatValue(payerValue, { withIndexSign: true })}
                         </p>
                         <BalancesDonut
                           balances={currentPlayer.balances}
@@ -311,7 +391,7 @@ export const PayTab = () => {
                   >
                     <ValueComparison
                       className="w-full rounded-sm overflow-clip"
-                      compositePayment={price!}
+                      compositePayment={payeePrice!}
                       buyerValuations={currentPlayer.valuations}
                       vendorValuations={payee.valuations}
                     />

@@ -26,6 +26,13 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
           ...playerConverter.fromFirestore(event),
         };
 
+      case "PRICE_UPDATED":
+        return {
+          ...event,
+          oldPrice: bn(event.oldPrice),
+          newPrice: bn(event.newPrice),
+        };
+
       case "VALUATIONS_UPDATED":
         return {
           ...event,
@@ -65,6 +72,13 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
         return {
           ...event,
           ...playerConverter.toFirestore(event),
+        };
+
+      case "PRICE_UPDATED":
+        return {
+          ...event,
+          oldPrice: event.oldPrice.toString(),
+          newPrice: event.newPrice.toString(),
         };
 
       case "VALUATIONS_UPDATED":

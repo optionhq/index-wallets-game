@@ -123,6 +123,7 @@ const dataAtom = atomWithObservable((get) => {
             // }
             return previousData;
           case "VALUATIONS_UPDATED":
+          case "PRICE_UPDATED":
             return previousData;
         }
       },

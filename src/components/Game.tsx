@@ -5,9 +5,9 @@ import {
   selectedPayeeAtom,
 } from "@/components/Game.state";
 import { TripleDotMenu } from "@/components/TrippleDotMenu";
+import { BuyTab } from "@/components/tabs/Buy/BuyTab";
 import { CausesTab } from "@/components/tabs/Causes/CausesTab";
 import { MarketTab } from "@/components/tabs/Market/MarketTab";
-import { PayTab } from "@/components/tabs/Pay/PayTab";
 import { ValuationsTab } from "@/components/tabs/Valuations/ValuationsTab";
 import { WalletTab } from "@/components/tabs/Wallet/WalletTab";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,7 +20,8 @@ import {
   HeartHandshakeIcon,
   HomeIcon,
   SendIcon,
-  Settings2Icon,
+  ShoppingCartIcon,
+  StoreIcon,
 } from "lucide-react";
 
 export const Game = () => {
@@ -36,7 +37,7 @@ export const Game = () => {
       value={activeTab}
       onValueChange={(value) => {
         setActiveTab(
-          value as "wallet" | "pay" | "valuations" | "causes" | "market",
+          value as "wallet" | "buy" | "valuations" | "causes" | "market",
         );
       }}
       defaultValue="wallet"
@@ -45,26 +46,26 @@ export const Game = () => {
       <div className="w-full grid grid-cols-[36px_1fr_36px] shrink-0 items-center shadow-sm border-b justify-between h-10 bg-muted">
         <h1 className="col-start-2 text-center font-bold text-lg text-muted-foreground">
           {activeTab === "wallet" && "Balances"}
-          {activeTab === "pay" && (selectedPayee ? "Paying" : "Pay")}
-          {activeTab === "valuations" && "Valuations"}
+          {activeTab === "buy" && (selectedPayee ? "Buying from" : "Buy")}
+          {activeTab === "valuations" && "Storefront"}
           {activeTab === "causes" && "Donate to a Cause"}
           {activeTab === "market" && "Market"}
         </h1>
         <TripleDotMenu />
       </div>
       <WalletTab />
-      <PayTab />
+      <BuyTab />
       {!currentPlayer.isDealer && <CausesTab />}
       {!currentPlayer.isDealer && <ValuationsTab />}
       <MarketTab />
       <TabsList className="w-full shrink-0 rounded-none bg-muted m-0 p-2 justify-evenly gap-2 h-16 border-t overflow-clip">
         {Object.entries(
           currentPlayer.isDealer
-            ? { wallet: HomeIcon, pay: SendIcon, market: AreaChartIcon }
+            ? { wallet: HomeIcon, buy: SendIcon, market: AreaChartIcon }
             : {
                 wallet: HomeIcon,
-                valuations: Settings2Icon,
-                pay: SendIcon,
+                valuations: StoreIcon,
+                buy: ShoppingCartIcon,
                 causes: HeartHandshakeIcon,
                 market: AreaChartIcon,
               },
@@ -74,9 +75,9 @@ export const Game = () => {
             value={key}
             className="flex-grow flex gap-2 h-full data-[state=active]:bg-foreground/5 data-[state=active]:shadow-inner"
             onClick={
-              key === "pay"
+              key === "buy"
                 ? () => {
-                    activeTab === "pay" && setSelectedPayee(undefined);
+                    activeTab === "buy" && setSelectedPayee(undefined);
                   }
                 : key === "causes"
                   ? () => {
@@ -85,7 +86,7 @@ export const Game = () => {
                   : undefined
             }
           >
-            <Icon className={cn("inline size-6", key === "pay" && "size-7")} />
+            <Icon className={cn("inline size-6", key === "buy" && "size-7")} />
           </TabsTrigger>
         ))}
       </TabsList>

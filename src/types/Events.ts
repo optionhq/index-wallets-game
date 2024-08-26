@@ -20,6 +20,15 @@ export type PlayerJoinedEvent = {
   timestamp: Timestamp;
 } & Player;
 
+export type PriceUpdatedEvent = {
+  playerId: string;
+  playerName: string;
+  type: "PRICE_UPDATED";
+  timestamp: Timestamp;
+  oldPrice: BigNumber;
+  newPrice: BigNumber;
+};
+
 export type ValuationsUpdatedEvent = {
   type: "VALUATIONS_UPDATED";
   timestamp: Timestamp;
@@ -50,6 +59,7 @@ export type GameCreatedEvent = {
 export type Event =
   | PaymentMadeEvent
   | PlayerJoinedEvent
+  | PriceUpdatedEvent
   | ValuationsUpdatedEvent
   | DonationMadeEvent
   | GameCreatedEvent;
@@ -70,6 +80,15 @@ export type PlayerJoinedDbEvent = {
   type: "PLAYER_JOINED";
   timestamp: Timestamp;
 } & DbPlayer;
+
+export type PriceUpdatedDbEvent = {
+  type: "PRICE_UPDATED";
+  timestamp: Timestamp;
+  playerId: string;
+  playerName: string;
+  oldPrice: string;
+  newPrice: string;
+};
 
 export type ValuationsUpdatedDbEvent = {
   type: "VALUATIONS_UPDATED";
@@ -101,6 +120,7 @@ export type GameCreatedDbEvent = {
 export type DbEvent =
   | PaymentMadeDbEvent
   | PlayerJoinedDbEvent
+  | PriceUpdatedDbEvent
   | ValuationsUpdatedDbEvent
   | DonationMadeDbEvent
   | GameCreatedDbEvent;
@@ -108,6 +128,7 @@ export type DbEvent =
 export interface DbEventOf {
   PaymentMadeEvent: PaymentMadeDbEvent;
   PlayerJoinedEvent: PlayerJoinedDbEvent;
+  PriceUpdatedEvent: PriceUpdatedDbEvent;
   ValuationsUpdatedEvent: ValuationsUpdatedDbEvent;
   DonationMadeEvent: DonationMadeDbEvent;
   GameCreatedEvent: GameCreatedDbEvent;

@@ -96,8 +96,6 @@ export const DONATION_REWARD = 20;
 
 export const MARKET_VALUATIONS_WINDOW_LENGTH = 10;
 
-export const WHOLESALE_PRICE = 5;
-
-export const RETAIL_PRICE = 10;
+export const INITIAL_RETAIL_PRICE = 10;
 
 export const CAUSE_VALUATIONS = [bn(1)];
