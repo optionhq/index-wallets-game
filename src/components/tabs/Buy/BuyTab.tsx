@@ -175,7 +175,7 @@ export const BuyTab = () => {
         toName: payee!.name,
         payment: payeePrice,
         vendorValuations: payee!.valuations,
-        buyerValuations: currentPlayer.valuations,
+        buyerValuations: networkValuations,
       });
     });
 
@@ -191,6 +191,7 @@ export const BuyTab = () => {
     payeePrice,
     emitEvent,
     payee,
+    networkValuations,
   ]);
 
   return (
@@ -392,7 +393,7 @@ export const BuyTab = () => {
                     <ValueComparison
                       className="w-full rounded-sm overflow-clip"
                       compositePayment={payeePrice!}
-                      buyerValuations={currentPlayer.valuations}
+                      buyerValuations={networkValuations}
                       vendorValuations={payee.valuations}
                     />
                   </PopoverContent>

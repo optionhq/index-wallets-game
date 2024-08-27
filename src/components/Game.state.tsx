@@ -6,9 +6,9 @@ import { bn } from "@/lib/bnMath";
 import { eventConverter } from "@/lib/firebase/eventConverter";
 import { gameConverter } from "@/lib/firebase/gameConverter";
 import { getFirestore } from "@/lib/firebase/getFirestore";
-import { portfolioValue } from "@/lib/game/portfolioValue";
 import { generateId } from "@/lib/generateId";
 import { generateUUID } from "@/lib/generateUUID";
+import { valueOf } from "@/lib/indexWallets/valueOf";
 import { Currency } from "@/types/Currency";
 import { Event, PaymentMadeEvent } from "@/types/Events";
 import { GameData } from "@/types/GameData";
@@ -281,7 +281,8 @@ export const charityValuationsAtom = atom((get) => [
 
 export const playerPortfolioValueAtom = atom((get) => {
   const currentPlayer = get(currentAgentAtom);
-  return portfolioValue(currentPlayer);
+  const networkValuations = get(networkValuationsAtom);
+  return valueOf(currentPlayer.balances, networkValuations);
 });
 
 const gameEventsObservableAtom = memoize((gameId: string) =>

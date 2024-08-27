@@ -7,6 +7,7 @@ import {
   currentAgentAtom,
   emitEventAtom,
   gameAtom,
+  networkValuationsAtom,
   playerPortfolioValueAtom,
   selectedCauseAtom,
 } from "@/components/Game.state";
@@ -39,6 +40,7 @@ export const CausesTab = () => {
   const updateGame = useSetAtom(gameAtom);
   const emitEvent = useSetAtom(emitEventAtom);
   const currencies = useAtomValue(currenciesAtom);
+  const networkValuations = useAtomValue(networkValuationsAtom);
 
   const compositeDonationPrice = useMemo(
     () =>
@@ -51,9 +53,9 @@ export const CausesTab = () => {
   );
 
   const donationPrice = useMemo(
-    () => valueOf(compositeDonationPrice, currentPlayer.valuations),
+    () => valueOf(compositeDonationPrice, networkValuations),
 
-    [currentPlayer, compositeDonationPrice],
+    [networkValuations, compositeDonationPrice],
   );
 
   const makeDonation = useCallback(() => {
@@ -96,17 +98,21 @@ export const CausesTab = () => {
         playerId: currentPlayer.deviceId,
         playerName: currentPlayer.name,
         payment: compositeDonationPrice,
-        causeValuations: bnZeroPad([bn(1)], currentPlayer.valuations.length),
-        donorValuations: currentPlayer.valuations,
+        causeValuations: bnZeroPad([bn(1)], networkValuations.length),
+        donorValuations: networkValuations,
       });
     });
   }, [
-    currentPlayer,
-    emitEvent,
     selectedCause,
+    setSelectedCause,
     setActiveTab,
-    updateGame,
+    currencies,
     compositeDonationPrice,
+    updateGame,
+    currentPlayer.deviceId,
+    currentPlayer.name,
+    emitEvent,
+    networkValuations,
   ]);
 
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
@@ -256,7 +262,7 @@ export const CausesTab = () => {
                     <ValueComparison
                       className="w-full rounded-sm overflow-clip"
                       compositePayment={compositeDonationPrice}
-                      buyerValuations={currentPlayer.valuations}
+                      buyerValuations={networkValuations}
                       vendorValuations={CAUSE_VALUATIONS}
                     />
                   </PopoverContent>

@@ -1,4 +1,8 @@
-import { currenciesAtom, currentAgentAtom } from "@/components/Game.state";
+import {
+  currenciesAtom,
+  currentAgentAtom,
+  networkValuationsAtom,
+} from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
 import {
   Table,
@@ -15,6 +19,7 @@ import { useAtomValue } from "jotai";
 export const Balances = () => {
   const currentPlayer = useAtomValue(currentAgentAtom);
   const currencies = useAtomValue(currenciesAtom);
+  const networkValuations = useAtomValue(networkValuationsAtom);
   return (
     <Table>
       <TableHeader>
@@ -40,11 +45,11 @@ export const Balances = () => {
             </TableCell>
             <TableCell>{formatValue(currentPlayer.balances[i])}</TableCell>
             <TableCell className="text-right">
-              {currentPlayer.valuations[i].toFixed(1)}
+              {networkValuations[i].toFixed(1)}
             </TableCell>
             <TableCell className="text-right">
               {formatValue(
-                currentPlayer.balances[i].mul(currentPlayer.valuations[i]),
+                currentPlayer.balances[i].mul(networkValuations[i]),
                 { withIndexSign: true },
               )}
             </TableCell>
