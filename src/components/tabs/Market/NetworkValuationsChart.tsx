@@ -1,7 +1,6 @@
 import {
-  agentsAtom,
   currenciesAtom,
-  marketValuationsObservableAtom,
+  networkValuationsObservableAtom,
 } from "@/components/Game.state";
 import { tokenColor } from "@/config";
 import { bn } from "@/lib/bnMath";
@@ -23,7 +22,7 @@ import { scan } from "rxjs";
 
 const dataAtom = atomWithObservable((get) => {
   const currencies = get(currenciesAtom);
-  return get(marketValuationsObservableAtom).pipe(
+  return get(networkValuationsObservableAtom).pipe(
     scan(
       (previousData, valuationsArray, index) => [
         ...previousData,
@@ -47,10 +46,9 @@ const dataAtom = atomWithObservable((get) => {
   );
 });
 
-export const MarketValuationsChart = () => {
+export const NetworkValuationsChart = () => {
   const data = useAtomValue(dataAtom);
   const currencies = useAtomValue(currenciesAtom);
-  const players = useAtomValue(agentsAtom);
 
   return (
     <ResponsiveContainer width="100%" height={200}>

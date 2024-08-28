@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { bn } from "@/lib/bnMath";
 import { formatValue } from "@/lib/game/formatValue";
 import { CauseSymbol } from "@/types/Cause";
 import { useAtomValue } from "jotai";
@@ -45,11 +46,11 @@ export const Balances = () => {
             </TableCell>
             <TableCell>{formatValue(currentPlayer.balances[i])}</TableCell>
             <TableCell className="text-right">
-              {networkValuations[i].toFixed(1)}
+              {(networkValuations[i] ?? bn(0)).toFixed(1)}
             </TableCell>
             <TableCell className="text-right">
               {formatValue(
-                currentPlayer.balances[i].mul(networkValuations[i]),
+                currentPlayer.balances[i].mul(networkValuations[i] ?? bn(0)),
                 { withIndexSign: true },
               )}
             </TableCell>

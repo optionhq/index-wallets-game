@@ -1,7 +1,4 @@
-import {
-  INITIAL_RETAIL_PRICE,
-  MARKET_VALUATIONS_WINDOW_LENGTH,
-} from "@/config";
+import { INITIAL_RETAIL_PRICE } from "@/config";
 import { bn } from "@/lib/bnMath";
 import { eventConverter } from "@/lib/firebase/eventConverter";
 import { gameConverter } from "@/lib/firebase/gameConverter";
@@ -10,7 +7,7 @@ import { generateId } from "@/lib/generateId";
 import { generateUUID } from "@/lib/generateUUID";
 import { valueOf } from "@/lib/indexWallets/valueOf";
 import { Currency } from "@/types/Currency";
-import { Event, PaymentMadeEvent } from "@/types/Events";
+import { Event, ValuationsUpdatedEvent } from "@/types/Events";
 import { GameData } from "@/types/GameData";
 import { Player } from "@/types/Player";
 import { WithId } from "@/types/utils";
@@ -31,15 +28,7 @@ import { withImmer } from "jotai-immer";
 import { atomWithObservable, unwrap } from "jotai/utils";
 import { BigNumber } from "mathjs";
 import memoize from "memoize";
-import { times } from "remeda";
-import {
-  bufferCount,
-  filter,
-  map,
-  Observable,
-  shareReplay,
-  startWith,
-} from "rxjs";
+import { filter, Observable, scan, shareReplay } from "rxjs";
 
 export const gameIdAtom = atom<string>("");
 
@@ -94,6 +83,7 @@ export const initializeGameAtom = atom(null, async (get, _set) => {
         balances: ["1000000000"],
         valuations: ["1"],
         character: "Dealer",
+        retailPrice: INITIAL_RETAIL_PRICE,
       },
     ],
     currencies: [{ name: "US Dollars", symbol: "USD", totalSupply: "0" }],
@@ -367,53 +357,41 @@ export const selectedPayeeAtom = atom<string | undefined>(undefined);
 
 export const selectedCauseAtom = atom<Currency | undefined>(undefined);
 
-export const marketValuationsObservableAtom = atom((get) => {
-  const dealer = get(dealerAtom);
+export const networkValuationsObservableAtom = atom((get) => {
+  const currentAgent = get(currentAgentAtom);
+  const otherPlayers = get(otherPlayersAtom);
+  const playerWeight = 1 / otherPlayers.length;
   // Only USD is valued at first
   const initialValuations = [bn(1)];
-  const isPlayerPaymentEvent = (event: Event): event is PaymentMadeEvent =>
-    event.type === "PAYMENT_MADE" &&
-    event.from !== dealer.deviceId &&
-    event.to !== dealer.deviceId;
+  const isValuationsUpdatedEvent = (
+    event: Event,
+  ): event is ValuationsUpdatedEvent => event.type === "VALUATIONS_UPDATED";
   return get(eventsObservableAtom)
-    .pipe(filter(isPlayerPaymentEvent))
-    .pipe(map((event) => event.vendorValuations))
+    .pipe(filter(isValuationsUpdatedEvent))
+    .pipe(filter((event) => event.playerId !== currentAgent.deviceId)) //only interested in other players' valuations
     .pipe(
-      // Start by filling the sliding window with initial valuations (only USD valued), so the first transactions aren't weighted disproportionately
-      startWith(
-        ...times(MARKET_VALUATIONS_WINDOW_LENGTH, () => initialValuations),
-      ),
-    )
-    .pipe(bufferCount(MARKET_VALUATIONS_WINDOW_LENGTH, 1))
-    .pipe(
-      map((marketValuationsWindow) =>
-        marketValuationsWindow.reduce(
-          (marketValuations, transactionValuations) => {
-            return transactionValuations.map((valuation, i) => {
-              return (marketValuations?.[i] ?? bn(0)).add(
-                valuation.div(MARKET_VALUATIONS_WINDOW_LENGTH),
-              );
-            });
-          },
-          [] as BigNumber[],
-        ),
+      scan(
+        (valuations, event) =>
+          produce(valuations, (draftValuations) => {
+            for (let i = 0; i < event.newValuations.length; i++) {
+              const oldNetworkValuation = draftValuations[i] ?? bn(0);
+              const playerPreviousContribution =
+                event.oldValuations[i].div(playerWeight);
+              const playerNewContribution =
+                event.newValuations[i].div(playerWeight);
+              draftValuations[i] = oldNetworkValuation
+                .sub(playerPreviousContribution)
+                .add(playerNewContribution);
+            }
+            return draftValuations;
+          }),
+        initialValuations,
       ),
     )
     .pipe(shareReplay());
 });
 
-export const marketValuationsAtom = atomWithObservable((get) =>
-  get(marketValuationsObservableAtom),
+export const networkValuationsAtom = unwrap(
+  atomWithObservable((get) => get(networkValuationsObservableAtom)),
+  () => [bn(1)],
 );
-
-export const networkValuationsAtom = atom((get) => {
-  const otherPlayers = get(otherPlayersAtom);
-  const amountOfOtherPlayers = otherPlayers.length;
-  return otherPlayers.reduce((networkValuations, player) => {
-    return player.valuations.map((valuation, i) => {
-      return (networkValuations?.[i] ?? bn(0)).add(
-        valuation.div(amountOfOtherPlayers),
-      );
-    });
-  }, [] as BigNumber[]);
-});
