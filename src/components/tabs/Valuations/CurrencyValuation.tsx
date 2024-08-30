@@ -1,16 +1,13 @@
-import { CharacterBadge } from "@/components/CharacterBadge";
 import {
   currenciesAtom,
-  currentAgentAtom,
+  networkValuationsAtom,
   playersAtom,
 } from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
 import { ValuationSlider } from "@/components/ValuationSlider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { VALUATION_AMPLITUDE } from "@/config";
 import { bn, bnMath } from "@/lib/bnMath";
-import { cn } from "@/lib/cn";
 import { useAtomValue } from "jotai";
 import { BigNumber } from "mathjs";
 import { FC, HTMLAttributes } from "react";
@@ -27,10 +24,10 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
   setValuation,
   ...props
 }) => {
-  const currentPlayer = useAtomValue(currentAgentAtom);
   const players = useAtomValue(playersAtom);
   const currencies = useAtomValue(currenciesAtom);
   const currency = currencies[currencyIndex];
+  const networkValuations = useAtomValue(networkValuationsAtom);
 
   return (
     <div {...props} className="flex pt-4 p-2 px-6 gap-6">
@@ -43,8 +40,8 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
 
           <div className="flex gap-2">
             <Input
-              className="w-16 h-8 text-right"
-              maxLength={4}
+              className="w-20 h-8 text-right"
+              maxLength={5}
               type="number"
               inputMode="decimal"
               value={valuation.toFixed(1)}
@@ -77,38 +74,11 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
         <ValuationSlider
           value={[valuation.toNumber()]}
           onValueChange={([value]) => setValuation(bn(value))}
-          min={-VALUATION_AMPLITUDE}
-          max={VALUATION_AMPLITUDE}
+          // min={-VALUATION_AMPLITUDE}
+          // max={VALUATION_AMPLITUDE}
           step={0.1}
-          className="mb-8"
         >
-          <span className="absolute -top-1 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
-          {players.map((player) => {
-            const SIZE = 25;
-            const MARGIN = 3;
-            const playerValuation = player.isCurrentPlayer
-              ? valuation.toNumber()
-              : player.valuations[currencyIndex].toNumber();
-            const percentage =
-              (playerValuation + VALUATION_AMPLITUDE) /
-              (2 * VALUATION_AMPLITUDE);
-            return (
-              <CharacterBadge
-                key={`${player.deviceId}-marker`}
-                character={player.character}
-                className={cn(
-                  "absolute p-0.5 mt-px",
-                  player.isCurrentPlayer && "z-10",
-                )}
-                style={{
-                  width: SIZE,
-                  height: SIZE,
-                  left: `calc(${100 * percentage}% + ${(SIZE + MARGIN) / 2 - (SIZE + MARGIN) * percentage}px)`,
-                  transform: "var(--radix-slider-thumb-transform)",
-                }}
-              />
-            );
-          })}
+          <span className="absolute -top-0.5 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
         </ValuationSlider>
       </div>
     </div>
