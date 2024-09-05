@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DONATION_REWARD } from "@/config";
+import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { formatValue } from "@/lib/game/formatValue";
 import { valueOf } from "@/lib/indexWallets/valueOf";
@@ -216,7 +217,7 @@ export const History = () => {
             case "DONATION_MADE": {
               const isDonor = event.playerId === currentAgent.deviceId;
               const donorValues = event.payment.map((amount, i) =>
-                event.donorValuations[i].mul(amount),
+                (event.donorValuations[i] ?? bn(0)).mul(amount),
               );
               return (
                 <AccordionItem value={event.id} key={event.id}>
