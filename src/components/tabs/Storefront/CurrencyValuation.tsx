@@ -3,8 +3,8 @@ import {
   networkValuationsAtom,
   playersAtom,
 } from "@/components/Game.state";
+import { InfiniteSlider } from "@/components/InfiniteSlider";
 import { TokenBadge } from "@/components/TokenBadge";
-import { ValuationSlider } from "@/components/ValuationSlider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { bn, bnMath } from "@/lib/bnMath";
@@ -71,7 +71,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
             </div>
           </div>
         </div>
-        <ValuationSlider
+        <InfiniteSlider
           value={[valuation.toNumber()]}
           onValueChange={([value]) => setValuation(bn(value))}
           // min={-VALUATION_AMPLITUDE}
@@ -79,7 +79,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
           step={0.1}
         >
           <span className="absolute -top-0.5 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
-        </ValuationSlider>
+        </InfiniteSlider>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { BalancesDonut } from "@/components/BalancesDonut";
-import { CharacterBadge } from "@/components/CharacterBadge";
+import { CharacterIcon } from "@/components/CharacterIcon";
 import {
   currenciesAtom,
   currentAgentAtom,
@@ -435,7 +435,7 @@ export const History = () => {
                       </strong>
 
                       <div className="flex gap-2 items-center">
-                        <CharacterBadge
+                        <CharacterIcon
                           character={event.character}
                           key={`${event.id}-badge`}
                           className="p-2 size-12 rounded-full bg-muted"
@@ -446,7 +446,7 @@ export const History = () => {
                               className="absolute bottom-0 right-0 border-background border size-5 "
                             />
                           )}
-                        </CharacterBadge>
+                        </CharacterIcon>
                         <div className="flex flex-col text-left text-sm leading-none">
                           <strong>{event.name}</strong>
                           {event.cause && (

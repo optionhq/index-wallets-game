@@ -6,7 +6,7 @@ import { tokenColor } from "@/config";
 import { bn } from "@/lib/bnMath";
 import { CurrencySymbol } from "@/types/Currency";
 import { useAtomValue } from "jotai";
-import { atomWithObservable } from "jotai/utils";
+import { atomWithObservable, unwrap } from "jotai/utils";
 import {
   CartesianGrid,
   Line,
@@ -20,35 +20,39 @@ import {
 } from "recharts";
 import { scan } from "rxjs";
 
-const dataAtom = atomWithObservable((get) => {
-  const currencies = get(currenciesAtom);
-  return get(networkValuationsObservableAtom).pipe(
-    scan(
-      (previousData, valuationsArray, index) => [
-        ...previousData,
-        {
-          index,
-          ...currencies.reduce(
-            (valuations, _currency, index) => ({
-              ...valuations,
-              [currencies[index].symbol]: (
-                valuationsArray?.[index] ?? bn(0)
-              ).toNumber(),
-            }),
-            {} as Partial<Record<CurrencySymbol, number>>,
-          ),
-        },
-      ],
-      [] as ({
-        index: number;
-      } & Partial<Record<CurrencySymbol, number>>)[],
-    ),
-  );
-});
+const dataAtom = unwrap(
+  atomWithObservable((get) => {
+    const currencies = get(currenciesAtom);
+    return get(networkValuationsObservableAtom).pipe(
+      scan(
+        (previousData, valuationsArray, index) => [
+          ...previousData,
+          {
+            index,
+            ...currencies.reduce(
+              (valuations, _currency, index) => ({
+                ...valuations,
+                [currencies[index].symbol]: (
+                  valuationsArray?.[index] ?? bn(0)
+                ).toNumber(),
+              }),
+              {} as Partial<Record<CurrencySymbol, number>>,
+            ),
+          },
+        ],
+        [] as ({
+          index: number;
+        } & Partial<Record<CurrencySymbol, number>>)[],
+      ),
+    );
+  }),
+);
 
 export const NetworkValuationsChart = () => {
   const data = useAtomValue(dataAtom);
   const currencies = useAtomValue(currenciesAtom);
+
+  console.log({ data, currencies });
 
   return (
     <ResponsiveContainer width="100%" height={200}>

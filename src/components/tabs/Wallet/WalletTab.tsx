@@ -1,5 +1,4 @@
-import { BalancesDonut } from "@/components/BalancesDonut";
-import { CharacterBadge } from "@/components/CharacterBadge";
+import { CharacterIcon } from "@/components/CharacterIcon";
 import {
   activeTabAtom,
   currentAgentAtom,
@@ -23,12 +22,10 @@ export const WalletTab = () => {
   return (
     <TabsContent value="wallet" className="gap-10">
       <div className="flex items-center gap-2">
-        <BalancesDonut balances={currentPlayer.balances}>
-          <CharacterBadge
-            character={currentPlayer.character}
-            className="size-16"
-          />
-        </BalancesDonut>
+        <CharacterIcon
+          character={currentPlayer.character}
+          className="size-16"
+        />
         <div className="flex flex-col gap-0">
           <p className="font-bold text-lg text-muted-foreground">
             {currentPlayer.name}
@@ -45,7 +42,7 @@ export const WalletTab = () => {
             <Button
               variant="link"
               className="p-0 h-fit mt-6 text-xs"
-              onClick={() => setActiveTab("valuations")}
+              onClick={() => setActiveTab("storefront")}
             >
               Change valuations
             </Button>

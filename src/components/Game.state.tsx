@@ -28,7 +28,7 @@ import { withImmer } from "jotai-immer";
 import { atomWithObservable, unwrap } from "jotai/utils";
 import { BigNumber } from "mathjs";
 import memoize from "memoize";
-import { filter, Observable, scan, shareReplay } from "rxjs";
+import { filter, Observable, scan, shareReplay, startWith } from "rxjs";
 
 export const gameIdAtom = atom<string>("");
 
@@ -260,7 +260,7 @@ export const playerPriceAtom = atom(
 );
 
 export const activeTabAtom = atom<
-  "wallet" | "buy" | "valuations" | "causes" | "market"
+  "wallet" | "buy" | "storefront" | "causes" | "market"
 >("wallet");
 
 // Charities only value USD
@@ -388,6 +388,7 @@ export const networkValuationsObservableAtom = atom((get) => {
         initialValuations,
       ),
     )
+    .pipe(startWith(initialValuations))
     .pipe(shareReplay());
 });
 

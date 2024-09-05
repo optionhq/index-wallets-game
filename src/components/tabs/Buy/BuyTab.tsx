@@ -1,6 +1,5 @@
 import { BackButton } from "@/components/BackButton";
-import { BalancesDonut } from "@/components/BalancesDonut";
-import { CharacterBadge } from "@/components/CharacterBadge";
+import { CharacterIcon } from "@/components/CharacterIcon";
 import {
   currentAgentAtom,
   dealerAtom,
@@ -210,12 +209,10 @@ export const BuyTab = () => {
                   key={player.deviceId}
                   className="flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary"
                 >
-                  <BalancesDonut balances={player.balances}>
-                    <CharacterBadge
-                      className="size-16"
-                      character={player.character}
-                    />
-                  </BalancesDonut>
+                  <CharacterIcon
+                    className="size-16"
+                    character={player.character}
+                  />
                   <div className="flex flex-col gap-0">
                     <p className="font-bold text-lg">{player.name}</p>
 
@@ -242,12 +239,10 @@ export const BuyTab = () => {
             className="flex flex-col items-center gap-1 self-center"
           >
             <p className="font-bold text-lg">{payee.name}</p>
-            <BalancesDonut balances={payee.balances} className="p-1.5">
-              <CharacterBadge
-                character={payee.character}
-                className="size-24 xs:size-28"
-              />
-            </BalancesDonut>
+            <CharacterIcon
+              character={payee.character}
+              className="size-24 xs:size-28"
+            />
           </motion.div>
 
           <motion.div
@@ -370,12 +365,6 @@ export const BuyTab = () => {
                             ? "---"
                             : formatValue(payerValue, { withIndexSign: true })}
                         </p>
-                        <BalancesDonut
-                          balances={currentPlayer.balances}
-                          className="relative"
-                        >
-                          <div className="size-2 bg-background rounded-full" />
-                        </BalancesDonut>
                       </div>
                       <Button
                         variant="outline"

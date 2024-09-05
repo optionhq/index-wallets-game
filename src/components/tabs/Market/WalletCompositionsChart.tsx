@@ -1,5 +1,5 @@
 import { currenciesAtom, playersAtom } from "@/components/Game.state";
-import { characterColor, characterIcon, tokenColor } from "@/config";
+import { characterIcon, tokenColor } from "@/config";
 import { useAtomValue } from "jotai";
 import {
   Bar,
@@ -44,12 +44,12 @@ export const WalletCompositionsChart = () => {
                 height={2 * RADIUS}
                 viewBox={`0 0 ${2 * RADIUS} ${2 * RADIUS}`}
               >
-                <circle
+                {/* <circle
                   cx={RADIUS}
                   cy={RADIUS}
                   r={RADIUS}
                   fill={characterColor[data[index].character]}
-                />
+                /> */}
                 <image
                   href={characterIcon[data[index].character]}
                   x={PADDING}

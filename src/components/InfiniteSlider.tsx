@@ -4,18 +4,28 @@ import * as React from "react";
 import { VALUATION_AMPLITUDE } from "@/config";
 import { cn } from "@/lib/cn";
 
-export const ValuationSlider = React.forwardRef<
+export const InfiniteSlider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
->(({ className, children, value, ...props }, ref) => {
-  const [min, setMin] = React.useState(value![0] - VALUATION_AMPLITUDE);
-  const [max, setMax] = React.useState(value![0] + VALUATION_AMPLITUDE);
+>(({ className, children, value, min, max: _max, ...props }, ref) => {
+  const [localMin, setLocalMin] = React.useState(
+    value![0] - VALUATION_AMPLITUDE,
+  );
+  const [localMax, setLocalMax] = React.useState(
+    value![0] + VALUATION_AMPLITUDE,
+  );
   const [isDragging, setIsDragging] = React.useState(false);
   React.useEffect(() => {
     if (isDragging) return;
-    setMin(value![0] - VALUATION_AMPLITUDE);
-    setMax(value![0] + VALUATION_AMPLITUDE);
-  }, [value, isDragging]);
+    const newLocalMin =
+      min !== undefined
+        ? Math.max(value![0] - VALUATION_AMPLITUDE, min)
+        : value![0] - VALUATION_AMPLITUDE;
+    setLocalMin(newLocalMin);
+    setLocalMax(newLocalMin + 2 * VALUATION_AMPLITUDE);
+  }, [value, isDragging, min]);
+
+  // if (min !== undefined) console.log({ min, localMin, localMax, value });
 
   return (
     <SliderPrimitive.Root
@@ -27,8 +37,8 @@ export const ValuationSlider = React.forwardRef<
       onPointerDown={() => setIsDragging(true)}
       onPointerUp={() => setIsDragging(false)}
       value={value}
-      min={min}
-      max={max}
+      min={localMin}
+      max={localMax}
       {...props}
     >
       <SliderPrimitive.Track className="h-4 w-full grow overflow-hidden rounded-full bg-secondary" />

@@ -1,4 +1,4 @@
-import { CharacterBadge } from "@/components/CharacterBadge";
+import { CharacterIcon } from "@/components/CharacterIcon";
 import {
   deviceIdAtom,
   emitEventAtom,
@@ -13,7 +13,6 @@ import { bn } from "@/lib/bnMath";
 import { CauseSymbol, allCauses, cause } from "@/types/Cause";
 import { Character, allPlayerCharacters } from "@/types/Character";
 import { useAtomValue, useSetAtom } from "jotai";
-import { re } from "mathjs";
 import { useEffect, useMemo, useState } from "react";
 import { times } from "remeda";
 import { toast } from "sonner";
@@ -87,7 +86,7 @@ export const PlayerOnboarding = () => {
                 className="flex flex-col gap-1 justify-around w-full text-wrap h-32"
               >
                 <p className="flex-grow capitalize">{character}</p>
-                <CharacterBadge className="size-16" character={character} />
+                <CharacterIcon className="size-16" character={character} />
               </Button>
             ))}
           </div>
@@ -106,7 +105,7 @@ export const PlayerOnboarding = () => {
         <div className="flex flex-col items-center gap-2 p-2 w-full">
           <div className="flex flex-col items-center">
             <p>{chosenPlayerName}</p>
-            <CharacterBadge className="size-16" character={playerCharacter} />
+            <CharacterIcon className="size-16" character={playerCharacter} />
           </div>
           <p>Pick your cause</p>
 
@@ -141,7 +140,7 @@ export const PlayerOnboarding = () => {
         <div className="flex flex-col items-center p-2 gap-10 w-full">
           <div className="flex flex-col items-center">
             <p className="text-muted-foreground">{chosenPlayerName}</p>
-            <CharacterBadge className="size-24" character={playerCharacter} />
+            <CharacterIcon className="size-24" character={playerCharacter} />
           </div>
           <div className="flex flex-col gap-2">
             <p>You've decided to support</p>

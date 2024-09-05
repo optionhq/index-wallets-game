@@ -8,7 +8,7 @@ import { TripleDotMenu } from "@/components/TrippleDotMenu";
 import { BuyTab } from "@/components/tabs/Buy/BuyTab";
 import { CausesTab } from "@/components/tabs/Causes/CausesTab";
 import { MarketTab } from "@/components/tabs/Market/MarketTab";
-import { ValuationsTab } from "@/components/tabs/Valuations/ValuationsTab";
+import { StorefrontTab } from "@/components/tabs/Storefront/StorefrontTab";
 import { WalletTab } from "@/components/tabs/Wallet/WalletTab";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/cn";
@@ -37,7 +37,7 @@ export const Game = () => {
       value={activeTab}
       onValueChange={(value) => {
         setActiveTab(
-          value as "wallet" | "buy" | "valuations" | "causes" | "market",
+          value as "wallet" | "buy" | "storefront" | "causes" | "market",
         );
       }}
       defaultValue="wallet"
@@ -47,7 +47,7 @@ export const Game = () => {
         <h1 className="col-start-2 text-center font-bold text-lg text-muted-foreground">
           {activeTab === "wallet" && "Balances"}
           {activeTab === "buy" && (selectedPayee ? "Buying from" : "Buy")}
-          {activeTab === "valuations" && "Storefront"}
+          {activeTab === "storefront" && "Storefront"}
           {activeTab === "causes" && "Donate to a Cause"}
           {activeTab === "market" && "Market"}
         </h1>
@@ -56,7 +56,7 @@ export const Game = () => {
       <WalletTab />
       <BuyTab />
       {!currentPlayer.isDealer && <CausesTab />}
-      {!currentPlayer.isDealer && <ValuationsTab />}
+      {!currentPlayer.isDealer && <StorefrontTab />}
       <MarketTab />
       <TabsList className="w-full shrink-0 rounded-none bg-muted m-0 p-2 justify-evenly gap-2 h-16 border-t overflow-clip">
         {Object.entries(
@@ -64,7 +64,7 @@ export const Game = () => {
             ? { wallet: HomeIcon, buy: SendIcon, market: AreaChartIcon }
             : {
                 wallet: HomeIcon,
-                valuations: StoreIcon,
+                storefront: StoreIcon,
                 buy: ShoppingCartIcon,
                 causes: HeartHandshakeIcon,
                 market: AreaChartIcon,
