@@ -376,9 +376,9 @@ export const networkValuationsObservableAtom = atom((get) => {
             for (let i = 0; i < event.newValuations.length; i++) {
               const oldNetworkValuation = draftValuations[i] ?? bn(0);
               const playerPreviousContribution =
-                event.oldValuations[i].div(playerWeight);
+                event.oldValuations[i].mul(playerWeight);
               const playerNewContribution =
-                event.newValuations[i].div(playerWeight);
+                event.newValuations[i].mul(playerWeight);
               draftValuations[i] = oldNetworkValuation
                 .sub(playerPreviousContribution)
                 .add(playerNewContribution);
