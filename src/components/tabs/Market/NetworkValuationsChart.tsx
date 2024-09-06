@@ -97,7 +97,7 @@ export const NetworkValuationsChart = () => {
         <ReferenceArea
           y1={0}
           y2={-10000}
-          fill="red"
+          fill="gray"
           fillOpacity={0.05}
           ifOverflow="hidden"
         />
