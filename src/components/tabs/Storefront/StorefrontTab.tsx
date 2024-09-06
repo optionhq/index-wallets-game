@@ -94,6 +94,7 @@ export const StorefrontTab = () => {
             min={0}
             // max={VALUATION_AMPLITUDE}
             step={0.1}
+            symbol="ⱡ"
           >
             <span className="absolute -top-0.5 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
           </InfiniteSlider>
