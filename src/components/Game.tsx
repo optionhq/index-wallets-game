@@ -46,7 +46,14 @@ export const Game = () => {
       <div className="w-full grid grid-cols-[36px_1fr_36px] shrink-0 items-center shadow-sm border-b justify-between h-10 bg-muted">
         <h1 className="col-start-2 text-center font-bold text-lg text-muted-foreground">
           {activeTab === "wallet" && "Balances"}
-          {activeTab === "buy" && (selectedPayee ? "Buying from" : "Buy")}
+          {activeTab === "buy" &&
+            (currentPlayer.isDealer
+              ? selectedPayee
+                ? "Sending to"
+                : "Send"
+              : selectedPayee
+                ? "Buying from"
+                : "Buy")}
           {activeTab === "storefront" && "Storefront"}
           {activeTab === "causes" && "Donate to a Cause"}
           {activeTab === "market" && "Market"}
