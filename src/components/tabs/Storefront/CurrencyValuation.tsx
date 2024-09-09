@@ -1,8 +1,4 @@
-import {
-  currenciesAtom,
-  networkValuationsAtom,
-  playersAtom,
-} from "@/components/Game.state";
+import { currenciesAtom, networkValuationsAtom } from "@/components/Game.state";
 import { InfiniteSlider } from "@/components/InfiniteSlider";
 import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +20,6 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
   setValuation,
   ...props
 }) => {
-  const players = useAtomValue(playersAtom);
   const currencies = useAtomValue(currenciesAtom);
   const currency = currencies[currencyIndex];
   const networkValuations = useAtomValue(networkValuationsAtom);
@@ -39,14 +34,16 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
           </div>
 
           <div className="flex gap-2">
-            <Input
-              className="w-20 h-8 text-right"
-              maxLength={5}
-              type="number"
-              inputMode="decimal"
-              value={valuation.toFixed(1)}
-              onChange={(e) => setValuation(bn(e.target.value))}
-            />
+            <div className="flex flex-col">
+              <Input
+                className="w-20 h-8 text-right"
+                maxLength={5}
+                type="number"
+                inputMode="decimal"
+                value={valuation.toFixed(1)}
+                onChange={(e) => setValuation(bn(e.target.value))}
+              />
+            </div>
             <div className="flex gap-[1px]">
               <Button
                 variant="secondary"
@@ -74,11 +71,12 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
         <InfiniteSlider
           value={[valuation.toNumber()]}
           onValueChange={([value]) => setValuation(bn(value))}
+          referenceValue={networkValuations[currencyIndex].toNumber()}
           // min={-VALUATION_AMPLITUDE}
           // max={VALUATION_AMPLITUDE}
           step={0.1}
         >
-          <span className="absolute -top-0.5 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
+          {/* <span className="absolute -top-0.5 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" /> */}
         </InfiniteSlider>
       </div>
     </div>

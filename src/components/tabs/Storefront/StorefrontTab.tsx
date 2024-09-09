@@ -51,7 +51,7 @@ export const StorefrontTab = () => {
           Your price
         </Label>
         <div className="flex flex-col gap-2 px-4">
-          <div className="flex justify-center items-center gap-1 mt-1">
+          <div className="flex justify-center items-center gap-2 mt-1">
             <div className="relative inline-block">
               <span className="absolute text-lg align-middle left-5  top-2.5 h-4">
                 ⱡ
@@ -70,23 +70,25 @@ export const StorefrontTab = () => {
                 className="place-self-center w-32 h-12 text-center rounded-3xl  text-lg"
               />
             </div>
-            <Button
-              size="icon"
-              className="size-12 rounded-l-full"
-              variant={"secondary"}
-              onClick={() => setProvisionalPrice(provisionalPrice.sub(0.1))}
-              onContextMenu={(e) => e.preventDefault()}
-            >
-              <MinusIcon />
-            </Button>
-            <Button
-              size={"icon"}
-              className="size-12 rounded-sm rounded-r-full"
-              variant={"secondary"}
-              onClick={() => setProvisionalPrice(provisionalPrice.add(0.1))}
-            >
-              <PlusIcon />
-            </Button>
+            <div className="flex gap-px">
+              <Button
+                size="icon"
+                className="size-10 rounded-l-full"
+                variant={"secondary"}
+                onClick={() => setProvisionalPrice(provisionalPrice.sub(0.1))}
+                onContextMenu={(e) => e.preventDefault()}
+              >
+                <MinusIcon className="size-4" />
+              </Button>
+              <Button
+                size={"icon"}
+                className="size-10 rounded-sm rounded-r-full"
+                variant={"secondary"}
+                onClick={() => setProvisionalPrice(provisionalPrice.add(0.1))}
+              >
+                <PlusIcon className="size-4" />
+              </Button>
+            </div>
           </div>
           <InfiniteSlider
             value={[provisionalPrice.toNumber()]}
@@ -96,7 +98,7 @@ export const StorefrontTab = () => {
             step={0.1}
             symbol="ⱡ"
           >
-            <span className="absolute -top-0.5 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" />
+            {/* <span className="absolute -top-0.5 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" /> */}
           </InfiniteSlider>
         </div>
         <h2 className="text-lg font-bold text-muted-foreground leading-none mt-5">
