@@ -187,6 +187,8 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
           ></XAxis>
           <YAxis
             ticks={[0, 10, 20]}
+            fontSize={10}
+            tickFormatter={(value) => `ⱡ${value}`}
             domain={[0, 20]}
             allowDataOverflow
             width={30}
