@@ -20,6 +20,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { produce } from "immer";
 import { Atom, atom, Getter } from "jotai";
@@ -28,6 +29,7 @@ import { withImmer } from "jotai-immer";
 import { atomWithObservable, unwrap } from "jotai/utils";
 import { BigNumber } from "mathjs";
 import memoize from "memoize";
+import { sortBy } from "remeda";
 import { filter, Observable, scan, shareReplay, startWith } from "rxjs";
 
 export const gameIdAtom = atom<string>("");
@@ -76,8 +78,9 @@ export const initializeGameAtom = atom(null, async (get, _set) => {
   const deviceId = get(deviceIdAtom);
   const gameData = {
     createdAt: serverTimestamp(),
-    players: [
-      {
+    players: {
+      [deviceId]: {
+        index: 0,
         deviceId,
         name: "Dealer",
         balances: ["1000000000"],
@@ -85,7 +88,7 @@ export const initializeGameAtom = atom(null, async (get, _set) => {
         character: "Dealer",
         retailPrice: INITIAL_RETAIL_PRICE,
       },
-    ],
+    },
     currencies: [{ name: "US Dollars", symbol: "USD", totalSupply: "0" }],
   };
   await Promise.all([
@@ -135,15 +138,13 @@ export const maybeCurrentAgentAtom = atom((get) => {
 
   if (!game) return undefined;
 
-  const playerIndex = game.players.findIndex(
-    (player) => player.deviceId === deviceId,
-  );
+  const player = game.players[deviceId];
 
-  if (playerIndex === -1) return undefined;
+  if (!player) return undefined;
 
   return {
-    ...game.players[playerIndex],
-    isDealer: playerIndex === 0,
+    ...player,
+    isDealer: player.index === 0,
   };
 });
 
@@ -189,18 +190,22 @@ export const defined: <T>(innerAtom: Atom<T | undefined>) => Atom<T> = (
   });
 
 export const dealerAtom = atom((get) => {
-  const game = get(defined(maybeGameAtom));
-  return { ...game.players[0], isDealer: true };
+  const agents = get(agentsAtom);
+
+  return {
+    ...agents[0],
+    isDealer: true,
+  };
 });
 
 export const agentsAtom = atom((get) => {
   const deviceId = get(deviceIdAtom);
   const game = get(defined(maybeGameAtom));
 
-  return game.players.map((player, i) => ({
+  return sortBy(Object.values(game.players), (p) => p.index).map((player) => ({
     ...player,
     isCurrentPlayer: player.deviceId === deviceId,
-    isDealer: i === 0,
+    isDealer: player.index === 0,
   }));
 });
 
@@ -232,14 +237,11 @@ export const playerValuationsAtom = atom(
   async (get, _set, newValuations: BigNumber[]) => {
     const gameId = get(gameIdAtom);
     const deviceId = get(deviceIdAtom);
-    await setDoc(
-      doc(getFirestore(), "games", gameId).withConverter(gameConverter),
-      produce(get(maybeGameAtom), (draft) => {
-        draft!.players.find(
-          (player) => player.deviceId === deviceId,
-        )!.valuations = newValuations;
-      }),
-    );
+    await updateDoc(doc(getFirestore(), "games", gameId), {
+      [`players.${deviceId}.valuations`]: newValuations.map((v) =>
+        v.toString(),
+      ),
+    });
   },
 );
 
@@ -248,14 +250,9 @@ export const playerPriceAtom = atom(
   async (get, _set, newPrice: BigNumber) => {
     const gameId = get(gameIdAtom);
     const deviceId = get(deviceIdAtom);
-    await setDoc(
-      doc(getFirestore(), "games", gameId).withConverter(gameConverter),
-      produce(get(maybeGameAtom), (draft) => {
-        draft!.players.find(
-          (player) => player.deviceId === deviceId,
-        )!.retailPrice = newPrice;
-      }),
-    );
+    await updateDoc(doc(getFirestore(), "games", gameId), {
+      [`players.${deviceId}.retailPrice`]: newPrice.toString(),
+    });
   },
 );
 

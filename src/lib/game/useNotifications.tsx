@@ -39,11 +39,7 @@ export const useNotifications = () => {
                       withIndexSign: true,
                     },
                   )}{" "}
-                  to{" "}
-                  {
-                    game.players.find((player) => player.deviceId === event.to)
-                      ?.name
-                  }
+                  to {game.players[event.to].name}
                 </>,
               );
             }
@@ -58,12 +54,7 @@ export const useNotifications = () => {
                       withIndexSign: true,
                     },
                   )}{" "}
-                  from{" "}
-                  {
-                    game.players.find(
-                      (player) => player.deviceId === event.from,
-                    )?.name
-                  }
+                  from {game.players[event.from].name}
                 </>,
               );
             }
@@ -89,7 +80,7 @@ export const useNotifications = () => {
 
             if (event.playerId !== currentPlayer.deviceId) {
               toast(
-                `${game.players.find((p) => p.deviceId === event.playerId)?.name} donated $${event.payment[0].toFixed(2)} to ${event.cause}`,
+                `${game.players[event.playerId].name} donated $${event.payment[0].toFixed(2)} to ${event.cause}`,
               );
             }
             break;
@@ -103,7 +94,7 @@ export const useNotifications = () => {
               event.playerId !== currentPlayer.deviceId
             ) {
               toast(
-                `${game.players.find((p) => p.deviceId === event.playerId)?.name} updated their valuations`,
+                `${game.players[event.playerId].name} updated their valuations`,
               );
             }
             break;

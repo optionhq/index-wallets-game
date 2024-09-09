@@ -147,6 +147,7 @@ export const History = () => {
                       <TableBody>
                         {event.payment.map((amount, i) => {
                           const symbol = currencies[i].symbol;
+                          const valueSent = senderValues[i] ?? bn(0);
                           return (
                             <TableRow key={symbol}>
                               <TableCell className="flex items-center gap-1.5 font-medium">
@@ -174,13 +175,12 @@ export const History = () => {
                               <TableCell
                                 className={cn(
                                   "text-right",
-                                  senderValues[i].isNegative() &&
-                                    "text-destructive",
-                                  senderValues[i].isZero() &&
+                                  valueSent.isNegative() && "text-destructive",
+                                  valueSent.isZero() &&
                                     "text-muted-foreground/70",
                                 )}
                               >
-                                {formatValue(senderValues[i], {
+                                {formatValue(valueSent, {
                                   withIndexSign: true,
                                 })}
                               </TableCell>

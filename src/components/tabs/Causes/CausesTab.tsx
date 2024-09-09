@@ -72,20 +72,14 @@ export const CausesTab = () => {
     );
 
     updateGame((game) => {
-      const startingBalances = game.players.find(
-        (player) => player.deviceId === currentPlayer.deviceId,
-      )!.balances;
+      const startingBalances = game.players[currentPlayer.deviceId].balances;
 
-      game.players.find(
-        (player) => player.deviceId === currentPlayer.deviceId,
-      )!.balances = bnMath.subtract(
+      game.players[currentPlayer.deviceId].balances = bnMath.subtract(
         startingBalances,
         compositeDonationPrice,
       ) as BigNumber[];
 
-      game.players.find(
-        (player) => player.deviceId === currentPlayer.deviceId,
-      )!.balances[currencyIndex] =
+      game.players[currentPlayer.deviceId].balances[currencyIndex] =
         startingBalances[currencyIndex].add(tokensAcquired);
 
       game.currencies[currencyIndex].totalSupply =

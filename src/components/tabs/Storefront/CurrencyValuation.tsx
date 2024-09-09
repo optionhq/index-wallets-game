@@ -71,7 +71,9 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
         <InfiniteSlider
           value={[valuation.toNumber()]}
           onValueChange={([value]) => setValuation(bn(value))}
-          referenceValue={networkValuations[currencyIndex].toNumber()}
+          referenceValue={(
+            networkValuations[currencyIndex] ?? bn(0)
+          ).toNumber()}
           // min={-VALUATION_AMPLITUDE}
           // max={VALUATION_AMPLITUDE}
           step={0.1}

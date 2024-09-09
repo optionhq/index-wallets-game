@@ -155,14 +155,9 @@ export const BuyTab = () => {
       return;
 
     updateGame((game) => {
-      game.players.find(
-        (player) => player.deviceId === currentPlayer.deviceId,
-      )!.balances = currentPlayer.balances.map((balance, i) =>
-        balance.sub(payeePrice[i]),
-      );
-      game.players.find(
-        (player) => player.deviceId === selectedPayee,
-      )!.balances = payee!.balances.map((balance, i) =>
+      game.players[currentPlayer.deviceId]!.balances =
+        currentPlayer.balances.map((balance, i) => balance.sub(payeePrice[i]));
+      game.players[selectedPayee].balances = payee!.balances.map((balance, i) =>
         balance.add(payeePrice[i]),
       );
     }).then(() => {

@@ -4,6 +4,7 @@ import { DocumentData } from "firebase/firestore";
 import { BigNumber } from "mathjs";
 
 export interface Player {
+  index: number;
   deviceId: string;
   name: string;
   balances: BigNumber[];
@@ -14,6 +15,7 @@ export interface Player {
 }
 
 export interface DbPlayer extends DocumentData {
+  index: number;
   deviceId: string;
   name: string;
   balances: string[];

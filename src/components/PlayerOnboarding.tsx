@@ -176,10 +176,10 @@ export const PlayerOnboarding = () => {
                       totalSupply: bn("0"),
                     });
 
-                    game.players.forEach((player) => {
+                    for (const player of Object.values(game.players)) {
                       player.balances.push(bn("0"));
                       player.valuations.push(bn("0"));
-                    });
+                    }
                   }
 
                   const amountOfCurrencies = game.currencies.length;
@@ -188,6 +188,7 @@ export const PlayerOnboarding = () => {
                   );
 
                   const newPlayer = {
+                    index: Object.values(game.players).length,
                     deviceId,
                     name: chosenPlayerName,
                     balances: [
@@ -205,7 +206,7 @@ export const PlayerOnboarding = () => {
                     retailPrice: bn(10),
                   };
 
-                  game.players.push(newPlayer);
+                  game.players[deviceId] = newPlayer;
 
                   game.currencies[0].totalSupply =
                     game.currencies[0].totalSupply.add(INITIAL_USD_BALANCE);

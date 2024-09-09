@@ -4,12 +4,12 @@ import { DocumentData, Timestamp } from "firebase/firestore";
 
 export interface GameData {
   createdAt: Timestamp;
-  players: Player[];
+  players: { [playerId: string]: Player };
   currencies: Currency[];
 }
 
 export interface DbGameData extends DocumentData {
   createdAt: Timestamp;
-  players: DbPlayer[];
+  players: { [playerId: string]: DbPlayer };
   currencies: DbCurrency[];
 }
