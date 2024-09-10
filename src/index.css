@@ -71,11 +71,6 @@
   body {
     @apply bg-background text-foreground;
   }
-
-  span:has(> span.animated-slider-thumb) {
-    transition-property: left;
-    transition-duration: 150ms;
-  }
 }
 
 @layer utilities {

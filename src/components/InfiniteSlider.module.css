@@ -1,0 +1,6 @@
+span:has(> span.animated-slider-thumb) {
+  transition-property: left;
+  -webkit-transition-property: left;
+  transition-duration: 150ms;
+  -webkit-transition-duration: 150ms;
+}

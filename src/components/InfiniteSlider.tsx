@@ -1,6 +1,8 @@
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import * as React from "react";
 
+import "./InfiniteSlider.module.css";
+
 import { VALUATION_AMPLITUDE } from "@/config";
 import { cn } from "@/lib/cn";
 import { motion } from "framer-motion";
@@ -152,12 +154,12 @@ export const InfiniteSlider = React.forwardRef<
         {children}
         <SliderPrimitive.Thumb
           className={cn(
-            `relative animated-slider-thumb block z-30  size-8  rounded-full  bg-primary ring-offset-background transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`,
+            `relative animated-slider-thumb block z-30  size-8  rounded-full  bg-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`,
           )}
         >
           <div
             className={cn(
-              "hidden absolute -top-7  rounded-sm bg-background shadow-sm border px-2 -left-10 -right-10 w-fit text-sm mx-auto opacity-85",
+              "hidden absolute -top-7 rounded-sm bg-background shadow-sm border px-2 -left-10 -right-10 w-fit text-sm mx-auto opacity-85",
               isDragging && "block",
             )}
           >
