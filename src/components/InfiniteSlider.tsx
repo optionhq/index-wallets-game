@@ -1,8 +1,6 @@
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import * as React from "react";
 
-import "./InfiniteSlider.module.css";
-
 import { VALUATION_AMPLITUDE } from "@/config";
 import { cn } from "@/lib/cn";
 import { motion } from "framer-motion";
@@ -14,6 +12,8 @@ export interface InfiniteSliderProps
 }
 
 const REFERENCE_POINT_SIZE = "0.6rem";
+
+const MotionThumb = motion(SliderPrimitive.Thumb);
 
 export const InfiniteSlider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -142,9 +142,10 @@ export const InfiniteSlider = React.forwardRef<
             </>
           )}
         {children}
-        <SliderPrimitive.Thumb
+        <MotionThumb
+          layout={isDragging ? false : true}
           className={cn(
-            `animated-slider-thumb relative z-30 block size-8 rounded-full bg-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`,
+            `relative z-30 block size-8 rounded-full bg-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`,
           )}
         >
           <div
@@ -155,7 +156,7 @@ export const InfiniteSlider = React.forwardRef<
           >
             {`${value![0] < 0 ? "-" : ""}${symbol ?? ""}${Math.abs(value![0]).toFixed(1)}`}
           </div>
-        </SliderPrimitive.Thumb>
+        </MotionThumb>
       </SliderPrimitive.Root>
     );
   },
