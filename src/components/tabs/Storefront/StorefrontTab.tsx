@@ -56,6 +56,7 @@ export const StorefrontTab = () => {
             className="absolute left-0 z-50 flex w-full flex-col items-center gap-1 bg-background p-2 shadow-md"
             initial={{ top: -200 }}
             animate={{ top: 0 }}
+            exit={{ top: -200 }}
           >
             <p className="text-center text-xs text-muted-foreground">
               Wallet compositions
