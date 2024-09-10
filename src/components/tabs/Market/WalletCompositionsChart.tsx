@@ -1,17 +1,21 @@
 import { currenciesAtom, playersAtom } from "@/components/Game.state";
 import { characterIcon, tokenColor } from "@/config";
 import { useAtomValue } from "jotai";
+import { FC } from "react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
   ResponsiveContainer,
+  ResponsiveContainerProps,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-export const WalletCompositionsChart = () => {
+export const WalletCompositionsChart: FC<Partial<ResponsiveContainerProps>> = ({
+  ...props
+}) => {
   const players = useAtomValue(playersAtom);
   const currencies = useAtomValue(currenciesAtom);
   const data = players.map((player) => ({
@@ -27,7 +31,7 @@ export const WalletCompositionsChart = () => {
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
+    <ResponsiveContainer width="100%" height={200} {...props}>
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis

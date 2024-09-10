@@ -8,6 +8,7 @@ import {
   playerValuationsAtom,
 } from "@/components/Game.state";
 import { InfiniteSlider } from "@/components/InfiniteSlider";
+import { WalletCompositionsChart } from "@/components/tabs/Market/WalletCompositionsChart";
 import { CurrencyValuation } from "@/components/tabs/Storefront/CurrencyValuation";
 import { PricingChart } from "@/components/tabs/Storefront/PricingChart";
 import { Button } from "@/components/ui/button";
@@ -15,9 +16,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 import { bn } from "@/lib/bnMath";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { MinusIcon, PlusIcon } from "lucide-react";
-import { useMemo } from "react";
+import { MinusIcon, PlusIcon, TargetIcon } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export const StorefrontTab = () => {
   const [provisionalValuations, setProvisionalValuations] = useAtom(
@@ -32,6 +34,8 @@ export const StorefrontTab = () => {
   const currencies = useAtomValue(currenciesAtom);
   const currentPlayer = useAtomValue(currentAgentAtom);
 
+  const [targetingEnabled, setTargetingEnabled] = useState(false);
+
   const valuationsHaveChanged = useMemo(
     () =>
       valuations.some(
@@ -45,8 +49,22 @@ export const StorefrontTab = () => {
   const hasPendingUpdates = valuationsHaveChanged || priceHasChanged;
 
   return (
-    <TabsContent value="storefront" className="p-0">
-      <div className="flex flex-grow flex-col gap-2 overflow-auto p-4">
+    <TabsContent value="storefront" className="relative p-0">
+      <AnimatePresence>
+        {targetingEnabled && (
+          <motion.div
+            className="absolute left-0 z-50 flex w-full flex-col items-center gap-1 bg-background p-2 shadow-md"
+            initial={{ top: -200 }}
+            animate={{ top: 0 }}
+          >
+            <p className="text-center text-xs text-muted-foreground">
+              Wallet compositions
+            </p>
+            <WalletCompositionsChart height={120} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div className="mb-6 flex flex-grow flex-col gap-2 overflow-auto p-4">
         <Label htmlFor="price" className="text-center text-muted-foreground">
           Your price
         </Label>
@@ -125,7 +143,7 @@ export const StorefrontTab = () => {
           <Button
             disabled={!hasPendingUpdates}
             size={"sm"}
-            className="absolute -top-[16px] left-0 z-20 h-12 w-20 rounded-l-none text-primary shadow-md transition-opacity disabled:opacity-0"
+            className="absolute -top-2 left-0 z-20 h-10 w-20 rounded-l-none text-primary shadow-md transition-opacity disabled:opacity-0"
             variant="outline"
             onClick={() => {
               setProvisionalValuations(valuations);
@@ -138,7 +156,7 @@ export const StorefrontTab = () => {
           <Button
             disabled={!hasPendingUpdates}
             size={"sm"}
-            className="absolute -top-[16px] right-0 z-20 h-12 w-20 rounded-r-none shadow-md transition-opacity disabled:opacity-0"
+            className="absolute -top-2 right-0 z-20 h-10 w-20 rounded-r-none shadow-md transition-opacity disabled:opacity-0"
             onClick={async () => {
               valuationsHaveChanged &&
                 setValuations(provisionalValuations).then(() => {
@@ -163,6 +181,16 @@ export const StorefrontTab = () => {
             }}
           >
             Update
+          </Button>
+          <Button
+            size="icon"
+            variant={"outline"}
+            onPointerDown={() => setTargetingEnabled(true)}
+            onPointerUp={() => setTargetingEnabled(false)}
+            onContextMenu={(e) => e.preventDefault()}
+            className="absolute -top-16 right-1 size-12 rounded-full p-1 text-primary shadow-md hover:bg-background hover:text-primary active:bg-muted active:text-primary/80"
+          >
+            <TargetIcon className="size-full" />
           </Button>
         </>
       </PricingChart>
