@@ -50,7 +50,7 @@ export const InfiniteSlider = React.forwardRef<
             : ((referenceValue - localMin) / (localMax - localMin)) * 100
         : undefined;
 
-    const referenceDistance = referenceValue ?? 0 - valueAfterDrag;
+    const referenceDistance = (referenceValue ?? 0) - valueAfterDrag;
 
     const [isDragging, setIsDragging] = React.useState(false);
     React.useEffect(() => {
@@ -63,8 +63,6 @@ export const InfiniteSlider = React.forwardRef<
       setLocalMax(newLocalMin + 2 * VALUATION_AMPLITUDE);
       setValueAfterDrag(value![0]);
     }, [value, isDragging, min]);
-
-    // if (min !== undefined) console.log({ min, localMin, localMax, value });
 
     return (
       <SliderPrimitive.Root
@@ -81,15 +79,6 @@ export const InfiniteSlider = React.forwardRef<
         {...props}
       >
         <SliderPrimitive.Track className="relative h-4 w-full grow overflow-hidden rounded-full bg-secondary">
-          {/* {referenceValuePositionPercent !== undefined && (
-            <div
-              className="absolute h-full bg-purple-500/15"
-              style={{
-                left: 0,
-                right: `${100 - referenceValuePositionPercent}%`,
-              }}
-            />
-          )} */}
           {referenceValuePositionPercent !== undefined && (
             <motion.div
               className="absolute h-full bg-purple-500/15"
@@ -102,55 +91,56 @@ export const InfiniteSlider = React.forwardRef<
           <span className="absolute left-1 z-0 text-xs text-muted-foreground">{`${localMin < 0 ? "-" : ""}${symbol ?? ""}${Math.abs(localMin).toFixed(1)}`}</span>
           <span className="absolute right-1 z-0 text-xs text-muted-foreground">{`${localMax < 0 ? "-" : ""}${symbol ?? ""}${Math.abs(localMax).toFixed(1)}`}</span>
         </SliderPrimitive.Track>
-        {referenceValue && referenceValuePositionPercent !== undefined && (
-          <>
-            <motion.div
-              animate={{
-                top: 2,
-                left: `calc(${referenceValuePositionPercent}% - calc(${REFERENCE_POINT_SIZE}/2))`,
-                scale: Math.max(
-                  VALUATION_AMPLITUDE /
-                    (VALUATION_AMPLITUDE + Math.abs(referenceDistance)),
-                  0.2,
-                ),
-                rotate: 45,
-              }}
-              transition={{
-                top: {
-                  ease:
-                    referenceValuePositionPercent >= 0 &&
-                    referenceValuePositionPercent <= 100
-                      ? "easeOut"
-                      : "easeIn",
-                }, // Controls the arc path vertically
-              }}
-              className={cn(`absolute bg-purple-500`)}
-              style={{
-                width: REFERENCE_POINT_SIZE,
-                height: REFERENCE_POINT_SIZE,
-              }}
-            />
-            <motion.span
-              animate={{
-                top: 1,
-                left:
-                  referenceDistance > 0
-                    ? "auto"
-                    : `calc(${referenceValuePositionPercent}% + ${REFERENCE_POINT_SIZE})`,
-                right:
-                  referenceDistance > 0
-                    ? `calc(${100 - referenceValuePositionPercent}% + ${REFERENCE_POINT_SIZE})`
-                    : "auto",
-              }}
-              className={cn(
-                "absolute w-fit whitespace-nowrap text-xs leading-none text-purple-500",
-              )}
-            >
-              mean{" "}
-              {`${referenceValue < 0 ? "-" : ""}${symbol ?? ""}${Math.abs(referenceValue).toFixed(1)}`}
-            </motion.span>
-          </>
-        )}
+        {referenceValue !== undefined &&
+          referenceValuePositionPercent !== undefined && (
+            <>
+              <motion.div
+                animate={{
+                  top: 2,
+                  left: `calc(${referenceValuePositionPercent}% - calc(${REFERENCE_POINT_SIZE}/2))`,
+                  scale: Math.max(
+                    VALUATION_AMPLITUDE /
+                      (VALUATION_AMPLITUDE + Math.abs(referenceDistance)),
+                    0.2,
+                  ),
+                  rotate: 45,
+                }}
+                transition={{
+                  top: {
+                    ease:
+                      referenceValuePositionPercent >= 0 &&
+                      referenceValuePositionPercent <= 100
+                        ? "easeOut"
+                        : "easeIn",
+                  },
+                }}
+                className={cn(`absolute bg-purple-500`)}
+                style={{
+                  width: REFERENCE_POINT_SIZE,
+                  height: REFERENCE_POINT_SIZE,
+                }}
+              />
+              <motion.span
+                animate={{
+                  top: 1,
+                  left:
+                    referenceDistance > 0
+                      ? "auto"
+                      : `calc(${referenceValuePositionPercent}% + ${REFERENCE_POINT_SIZE})`,
+                  right:
+                    referenceDistance > 0
+                      ? `calc(${100 - referenceValuePositionPercent}% + ${REFERENCE_POINT_SIZE})`
+                      : "auto",
+                }}
+                className={cn(
+                  "absolute w-fit whitespace-nowrap text-xs leading-none text-purple-500",
+                )}
+              >
+                mean{" "}
+                {`${referenceValue < 0 ? "-" : ""}${symbol ?? ""}${Math.abs(referenceValue).toFixed(1)}`}
+              </motion.span>
+            </>
+          )}
         {children}
         <SliderPrimitive.Thumb
           className={cn(

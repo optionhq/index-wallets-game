@@ -52,8 +52,6 @@ export const NetworkValuationsChart = () => {
   const data = useAtomValue(dataAtom);
   const currencies = useAtomValue(currenciesAtom);
 
-  console.log({ data, currencies });
-
   return (
     <ResponsiveContainer width="100%" height={200}>
       <LineChart data={data}>
