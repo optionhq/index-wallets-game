@@ -46,13 +46,13 @@ export const PlayerOnboarding = () => {
   const deviceId = useAtomValue(deviceIdAtom);
   const emitEvent = useSetAtom(emitEventAtom);
   return (
-    <div className="h-full flex flex-col justify-evenly items-center p-2 ">
+    <div className="flex h-full flex-col items-center justify-evenly p-2">
       {!chosenPlayerName && (
-        <div className="flex flex-col items-center gap-2 w-full max-w-64">
+        <div className="flex w-full max-w-64 flex-col items-center gap-2">
           <p>Enter your name</p>
           <Input
             maxLength={20}
-            className="h-16 w-full  text-lg "
+            className="h-16 w-full text-lg"
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
             onKeyDown={(e) => {
@@ -72,7 +72,7 @@ export const PlayerOnboarding = () => {
       )}
 
       {chosenPlayerName && !playerCharacter && (
-        <div className="flex flex-col items-center p-2 gap-2 w-full">
+        <div className="flex w-full flex-col items-center gap-2 p-2">
           <p>Hey {chosenPlayerName}!</p>
           <p>Pick your character</p>
 
@@ -83,7 +83,7 @@ export const PlayerOnboarding = () => {
                 key={character}
                 onClick={() => setPlayerCharacter(character)}
                 variant="outline"
-                className="flex flex-col gap-1 justify-around w-full text-wrap h-32"
+                className="flex h-32 w-full flex-col justify-around gap-1 text-wrap"
               >
                 <p className="flex-grow capitalize">{character}</p>
                 <CharacterIcon className="size-16" character={character} />
@@ -102,7 +102,7 @@ export const PlayerOnboarding = () => {
       )}
 
       {chosenPlayerName && playerCharacter && !playerCause && (
-        <div className="flex flex-col items-center gap-2 p-2 w-full">
+        <div className="flex w-full flex-col items-center gap-2 p-2">
           <div className="flex flex-col items-center">
             <p>{chosenPlayerName}</p>
             <CharacterIcon className="size-16" character={playerCharacter} />
@@ -115,7 +115,7 @@ export const PlayerOnboarding = () => {
                 key={cause.symbol}
                 onClick={() => setPlayerCause(cause.symbol)}
                 variant="outline"
-                className="flex flex-col justify-between gap-1 w-full text-wrap h-40"
+                className="flex h-40 w-full flex-col justify-between gap-1 text-wrap"
               >
                 <p className="flex-grow">{cause.name}</p>
                 <TokenBadge className="size-16" token={cause.symbol} />
@@ -137,14 +137,14 @@ export const PlayerOnboarding = () => {
       )}
 
       {chosenPlayerName && playerCharacter && playerCause && (
-        <div className="flex flex-col items-center p-2 gap-10 w-full">
+        <div className="flex w-full flex-col items-center gap-10 p-2">
           <div className="flex flex-col items-center">
             <p className="text-muted-foreground">{chosenPlayerName}</p>
             <CharacterIcon className="size-24" character={playerCharacter} />
           </div>
           <div className="flex flex-col gap-2">
             <p>You've decided to support</p>
-            <div className="flex flex-col justify-between items-center gap-3 border rounded-lg p-4 text-wrap">
+            <div className="flex flex-col items-center justify-between gap-3 text-wrap rounded-lg border p-4">
               <p className="text-lg">{cause[playerCause].name}</p>
               <TokenBadge className="size-16" token={playerCause} />
               <p className="font-bold text-muted-foreground">
@@ -153,17 +153,17 @@ export const PlayerOnboarding = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 w-full px-4">
+          <div className="flex w-full flex-col gap-2 px-4">
             <Button
               variant="link"
-              className="text-muted-foreground h-fit p-0"
+              className="h-fit p-0 text-muted-foreground"
               onClick={() => setPlayerCause(undefined)}
             >
               Pick another cause
             </Button>
             <Button
               size="lg"
-              className="w-full text-lg font-bold h-14"
+              className="h-14 w-full text-lg font-bold"
               onClick={() =>
                 updateGame((game) => {
                   if (

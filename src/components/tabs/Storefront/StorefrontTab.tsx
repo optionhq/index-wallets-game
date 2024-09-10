@@ -46,14 +46,14 @@ export const StorefrontTab = () => {
 
   return (
     <TabsContent value="storefront" className="p-0">
-      <div className="flex-grow flex flex-col gap-2 overflow-auto p-4 ">
+      <div className="flex flex-grow flex-col gap-2 overflow-auto p-4">
         <Label htmlFor="price" className="text-center text-muted-foreground">
           Your price
         </Label>
         <div className="flex flex-col gap-2 px-4">
-          <div className="flex justify-center items-center gap-2 mt-1">
+          <div className="mt-1 flex items-center justify-center gap-2">
             <div className="relative inline-block">
-              <span className="absolute text-lg align-middle left-5  top-2.5 h-4">
+              <span className="absolute left-5 top-2.5 h-4 align-middle text-lg">
                 ⱡ
               </span>
               <Input
@@ -67,7 +67,7 @@ export const StorefrontTab = () => {
                 step={0.1}
                 id="price"
                 type="number"
-                className="place-self-center w-32 h-12 text-center rounded-3xl  text-lg"
+                className="h-12 w-32 place-self-center rounded-3xl text-center text-lg"
               />
             </div>
             <div className="flex gap-px">
@@ -101,7 +101,7 @@ export const StorefrontTab = () => {
             {/* <span className="absolute -top-0.5 bg-black/20 w-px h-9 left-[calc(50%-0.5px)]" /> */}
           </InfiniteSlider>
         </div>
-        <h2 className="text-lg font-bold text-muted-foreground leading-none mt-5">
+        <h2 className="mt-5 text-lg font-bold leading-none text-muted-foreground">
           Your Valuations
         </h2>
         {currencies.map((currency, currencyIndex) => {
@@ -120,12 +120,12 @@ export const StorefrontTab = () => {
           );
         })}
       </div>
-      <PricingChart className={"px-2 pb-2 pt-4 shadow-2xl border-t"}>
+      <PricingChart className={"border-t px-2 pb-2 pt-4 shadow-2xl"}>
         <>
           <Button
             disabled={!hasPendingUpdates}
             size={"sm"}
-            className="absolute -top-[16px] left-0 transition-opacity disabled:opacity-0 z-20 rounded-l-none w-20 h-12 text-primary shadow-md"
+            className="absolute -top-[16px] left-0 z-20 h-12 w-20 rounded-l-none text-primary shadow-md transition-opacity disabled:opacity-0"
             variant="outline"
             onClick={() => {
               setProvisionalValuations(valuations);
@@ -138,7 +138,7 @@ export const StorefrontTab = () => {
           <Button
             disabled={!hasPendingUpdates}
             size={"sm"}
-            className="absolute -top-[16px] right-0 transition-opacity disabled:opacity-0 z-20  rounded-r-none w-20 h-12 shadow-md"
+            className="absolute -top-[16px] right-0 z-20 h-12 w-20 rounded-r-none shadow-md transition-opacity disabled:opacity-0"
             onClick={async () => {
               valuationsHaveChanged &&
                 setValuations(provisionalValuations).then(() => {

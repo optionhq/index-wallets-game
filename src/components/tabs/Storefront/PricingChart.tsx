@@ -117,7 +117,7 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
 
   return (
     <div className={cn("relative flex flex-col items-center gap-2", className)}>
-      <h2 className="text-xs text-muted-foreground leading-none">
+      <h2 className="text-xs leading-none text-muted-foreground">
         Prices from each perspective
       </h2>
       <ResponsiveContainer width="100%" height={100}>
@@ -209,10 +209,10 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
                   <span className="text-muted-foreground">
                     Prices from the perspective of{" "}
                   </span>
-                  <strong className="flex gap-1 mt-2 whitespace-nowrap w-full justify-center items-center">
+                  <strong className="mt-2 flex w-full items-center justify-center gap-1 whitespace-nowrap">
                     <CharacterIcon
                       character={character}
-                      className="inline p-0.5 size-6 border"
+                      className="inline size-6 border p-0.5"
                     />{" "}
                     {playerName}
                   </strong>
@@ -226,7 +226,7 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
                   ⱡ{value.toFixed(1)} from{" "}
                   <span
                     className={cn(
-                      "inline-flex align-text-top gap-1 items-center",
+                      "inline-flex items-center gap-1 align-text-top",
                       playerData.isViewer &&
                         (i === 0 ? "text-[yellowgreen]" : "text-primary"),
                       playerData.isViewer && "font-bold",
@@ -234,7 +234,7 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
                   >
                     <CharacterIcon
                       character={playerData.playerCharacter}
-                      className="inline p-0 border-none size-4 opacity-75"
+                      className="inline size-4 border-none p-0 opacity-75"
                     />
                     {playerData.playerName}
                   </span>

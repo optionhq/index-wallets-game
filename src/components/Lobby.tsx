@@ -32,11 +32,11 @@ export const Lobby = () => {
   });
 
   return (
-    <div className="h-full flex flex-col justify-evenly items-center p-4 ">
-      <div className="flex items-center gap-2 h-min">
-        <h1 className="flex flex-col w-fit">
+    <div className="flex h-full flex-col items-center justify-evenly p-4">
+      <div className="flex h-min items-center gap-2">
+        <h1 className="flex w-fit flex-col">
           <span className="text-3xl font-bold leading-none">Index Wallets</span>
-          <span className="text-2xl self-end font-bold leading-none">
+          <span className="self-end text-2xl font-bold leading-none">
             The Game
           </span>
         </h1>
@@ -58,12 +58,12 @@ export const Lobby = () => {
           }}
           type="text"
           maxLength={6}
-          className="h-16 w-full font-mono text-center uppercase font-bold text-xl tracking-widest"
+          className="h-16 w-full text-center font-mono text-xl font-bold uppercase tracking-widest"
         />
         <Button
           disabled={!gameExists}
           size="lg"
-          className={cn("font-bold text-lg w-full")}
+          className={cn("w-full text-lg font-bold")}
           onClick={() =>
             navigate({
               to: `/game/${gameId.toUpperCase()}`,

@@ -11,7 +11,7 @@ export const generateUUID = () => {
     .map((b, i) =>
       [4, 6, 8, 10].includes(i)
         ? `-${b.toString(16).padStart(2, "0")}`
-        : b.toString(16).padStart(2, "0")
+        : b.toString(16).padStart(2, "0"),
     )
     .join("");
 };

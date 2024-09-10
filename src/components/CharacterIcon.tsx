@@ -18,14 +18,14 @@ export const CharacterIcon: FC<CharacterIcon> = ({
     <span
       {...props}
       className={cn(
-        "relative flex p-2 items-center justify-center size-[40px] bg-background  rounded-full border-2 border-border",
+        "relative flex size-[40px] items-center justify-center rounded-full border-2 border-border bg-background p-2",
         className,
       )}
 
       // style={{ background: characterColor[character], ...style }}
     >
       <span
-        className={cn("block relative size-full bg-current", iconClassName)}
+        className={cn("relative block size-full bg-current", iconClassName)}
         style={{
           maskImage: `url(${characterIcon[character]})`,
           WebkitMaskImage: `url(${characterIcon[character]})`,

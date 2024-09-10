@@ -50,7 +50,7 @@ export const InfiniteSlider = React.forwardRef<
             : ((referenceValue - localMin) / (localMax - localMin)) * 100
         : undefined;
 
-    const referenceDistance = referenceValue! - valueAfterDrag ?? 0;
+    const referenceDistance = referenceValue ?? 0 - valueAfterDrag;
 
     const [isDragging, setIsDragging] = React.useState(false);
     React.useEffect(() => {
@@ -70,7 +70,7 @@ export const InfiniteSlider = React.forwardRef<
       <SliderPrimitive.Root
         ref={ref}
         className={cn(
-          "relative flex items-center py-2 pt-6 mt-2 w-full touch-none select-none",
+          "relative mt-2 flex w-full touch-none select-none items-center py-2 pt-6",
           className,
         )}
         onPointerDown={() => setIsDragging(true)}
@@ -99,8 +99,8 @@ export const InfiniteSlider = React.forwardRef<
               }}
             />
           )}
-          <span className="absolute text-xs z-0 text-muted-foreground left-1">{`${localMin < 0 ? "-" : ""}${symbol ?? ""}${Math.abs(localMin).toFixed(1)}`}</span>
-          <span className="absolute text-xs z-0 text-muted-foreground right-1">{`${localMax < 0 ? "-" : ""}${symbol ?? ""}${Math.abs(localMax).toFixed(1)}`}</span>
+          <span className="absolute left-1 z-0 text-xs text-muted-foreground">{`${localMin < 0 ? "-" : ""}${symbol ?? ""}${Math.abs(localMin).toFixed(1)}`}</span>
+          <span className="absolute right-1 z-0 text-xs text-muted-foreground">{`${localMax < 0 ? "-" : ""}${symbol ?? ""}${Math.abs(localMax).toFixed(1)}`}</span>
         </SliderPrimitive.Track>
         {referenceValue && referenceValuePositionPercent !== undefined && (
           <>
@@ -154,12 +154,12 @@ export const InfiniteSlider = React.forwardRef<
         {children}
         <SliderPrimitive.Thumb
           className={cn(
-            `relative animated-slider-thumb block z-30  size-8  rounded-full  bg-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`,
+            `animated-slider-thumb relative z-30 block size-8 rounded-full bg-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`,
           )}
         >
           <div
             className={cn(
-              "hidden absolute -top-7 rounded-sm bg-background shadow-sm border px-2 -left-10 -right-10 w-fit text-sm mx-auto opacity-85",
+              "absolute -left-10 -right-10 -top-7 mx-auto hidden w-fit rounded-sm border bg-background px-2 text-sm opacity-85 shadow-sm",
               isDragging && "block",
             )}
           >

@@ -32,7 +32,7 @@ export const BalancesDonut: FC<BalancesDonutProps> = ({
   );
   return (
     <div
-      className={cn("p-1 rounded-full", className)}
+      className={cn("rounded-full p-1", className)}
       style={{
         background: `conic-gradient(${data.map((currency) => `${currency.color} ${currency.start}deg ${currency.stop}deg `)})`,
       }}

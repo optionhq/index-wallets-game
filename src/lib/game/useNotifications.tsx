@@ -62,7 +62,7 @@ export const useNotifications = () => {
           case "PLAYER_JOINED":
             if (event.deviceId !== currentPlayer.deviceId) {
               toast(
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                   <CharacterIcon character={event.character} />
                   <p>
                     <strong>{event.name}</strong> joined the game

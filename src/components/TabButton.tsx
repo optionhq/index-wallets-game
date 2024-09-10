@@ -5,5 +5,5 @@ import { FC } from "react";
 export interface TabButtonProps extends TabsTriggerProps {}
 
 export const TabButton: FC<TabButtonProps> = ({ ...props }) => (
-  <TabsTrigger {...props} className="flex-grow flex gap-2  h-full" />
+  <TabsTrigger {...props} className="flex h-full flex-grow gap-2" />
 );

@@ -27,21 +27,21 @@ export const WalletTab = () => {
           className="size-16"
         />
         <div className="flex flex-col gap-0">
-          <p className="font-bold text-lg text-muted-foreground">
+          <p className="text-lg font-bold text-muted-foreground">
             {currentPlayer.name}
           </p>
-          <p className="font-bold text-lg">{totalBalance}</p>
+          <p className="text-lg font-bold">{totalBalance}</p>
         </div>
       </div>
       <div>
-        <div className="flex justify-between ">
-          <h2 className="text-lg font-bold text-muted-foreground leading-none">
+        <div className="flex justify-between">
+          <h2 className="text-lg font-bold leading-none text-muted-foreground">
             Balances
           </h2>
           {!currentPlayer.isDealer && (
             <Button
               variant="link"
-              className="p-0 h-fit mt-6 text-xs"
+              className="mt-6 h-fit p-0 text-xs"
               onClick={() => setActiveTab("storefront")}
             >
               Change valuations
@@ -52,7 +52,7 @@ export const WalletTab = () => {
       </div>
       {history && history.length > 0 && (
         <>
-          <h2 className="text-lg font-bold text-muted-foreground leading-none">
+          <h2 className="text-lg font-bold leading-none text-muted-foreground">
             History
           </h2>
           <History />

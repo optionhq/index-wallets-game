@@ -44,7 +44,7 @@ const TabsContent = React.forwardRef<
     ref={ref}
     asChild
     className={cn(
-      "data-[state=active]:flex flex-col p-6 flex-grow overflow-auto overflow-x-clip ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "flex-grow flex-col overflow-auto overflow-x-clip p-6 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=active]:flex",
       className,
     )}
     {...props}

@@ -23,7 +23,7 @@ export const TokenBadge: FC<CauseTokenProps> = ({
     <div
       {...props}
       className={cn(
-        "flex items-center justify-center size-[40px] text-white rounded-full",
+        "flex size-[40px] items-center justify-center rounded-full text-white",
         className,
       )}
       style={{ backgroundColor: tokenColor[token], ...style }}

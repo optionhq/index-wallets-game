@@ -88,16 +88,16 @@ export const History = () => {
                   <AccordionTrigger>
                     <BanknoteIcon
                       className={cn(
-                        "p-2 size-10 rounded-full overflow-visible bg-muted",
+                        "size-10 overflow-visible rounded-full bg-muted p-2",
                         isRecipient && "bg-green-100",
                       )}
                     />
-                    <div className="flex flex-col flex-grow items-start">
+                    <div className="flex flex-grow flex-col items-start">
                       <strong className="text-muted-foreground">
                         Payment {isRecipient && "received"}
                         {isSender && "sent"}
                       </strong>
-                      <div className="flex gap-1 items-center mt-2">
+                      <div className="mt-2 flex items-center gap-1">
                         <p>
                           {formatValue(
                             valueOf(event.payment, currentAgent.valuations),
@@ -107,7 +107,7 @@ export const History = () => {
                           )}
                         </p>
                         <BalancesDonut balances={event.payment} className="p-1">
-                          <div className="size-2 bg-background rounded-full" />{" "}
+                          <div className="size-2 rounded-full bg-background" />{" "}
                         </BalancesDonut>
                       </div>
                       <p className="text-sm">
@@ -127,19 +127,19 @@ export const History = () => {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Table className="gap-4 text-xs text-center">
+                    <Table className="gap-4 text-center text-xs">
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="align-middle h-8 row-span-2">
+                          <TableHead className="row-span-2 h-8 align-middle">
                             Token
                           </TableHead>
-                          <TableHead className="align-middle h-8 row-span-2">
+                          <TableHead className="row-span-2 h-8 align-middle">
                             Amount
                           </TableHead>
-                          <TableHead className="text-right align-middle h-8">
+                          <TableHead className="h-8 text-right align-middle">
                             Value to {isRecipient ? "you" : event.toName}
                           </TableHead>
-                          <TableHead className="text-right align-middle h-8">
+                          <TableHead className="h-8 text-right align-middle">
                             Value to {isSender ? "you" : event.fromName}
                           </TableHead>
                         </TableRow>
@@ -154,7 +154,7 @@ export const History = () => {
                                 <TokenBadge
                                   withoutIcon
                                   token={symbol}
-                                  className={`size-1.5 rounded-none rotate-45`}
+                                  className={`size-1.5 rotate-45 rounded-none`}
                                 />
                                 {symbol}
                               </TableCell>
@@ -192,7 +192,7 @@ export const History = () => {
                         <TableRow>
                           <TableCell
                             colSpan={2}
-                            className="font-bold text-right"
+                            className="text-right font-bold"
                           >
                             Total
                           </TableCell>
@@ -223,20 +223,20 @@ export const History = () => {
               return (
                 <AccordionItem value={event.id} key={event.id}>
                   <AccordionTrigger>
-                    <HandHeartIcon className="p-2 size-10 rounded-full bg-muted" />
-                    <div className="flex flex-col flex-grow items-start">
+                    <HandHeartIcon className="size-10 rounded-full bg-muted p-2" />
+                    <div className="flex flex-grow flex-col items-start">
                       <strong className="text-muted-foreground">
                         Donation
                       </strong>
 
-                      <div className="flex gap-1 items-center mt-2">
+                      <div className="mt-2 flex items-center gap-1">
                         <p>
                           {formatValue(sum(donorValues), {
                             withIndexSign: true,
                           })}
                         </p>
                         <BalancesDonut balances={event.payment} className="p-1">
-                          <div className="size-2 bg-background rounded-full" />{" "}
+                          <div className="size-2 rounded-full bg-background" />{" "}
                         </BalancesDonut>
                       </div>
                       <span className="text-left text-sm">
@@ -252,7 +252,7 @@ export const History = () => {
                           <TokenBadge
                             withoutIcon
                             token={event.cause}
-                            className="inline-block mb-0.5 size-1.5 rounded-none rotate-45"
+                            className="mb-0.5 inline-block size-1.5 rotate-45 rounded-none"
                           />{" "}
                           {event.cause}{" "}
                         </strong>
@@ -260,16 +260,16 @@ export const History = () => {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Table className="gap-4 text-xs text-center">
+                    <Table className="gap-4 text-center text-xs">
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="align-middle h-8 row-span-2">
+                          <TableHead className="row-span-2 h-8 align-middle">
                             Token
                           </TableHead>
-                          <TableHead className="align-middle h-8 row-span-2">
+                          <TableHead className="row-span-2 h-8 align-middle">
                             Amount
                           </TableHead>
-                          <TableHead className="text-right align-middle h-8">
+                          <TableHead className="h-8 text-right align-middle">
                             Value
                           </TableHead>
                         </TableRow>
@@ -283,7 +283,7 @@ export const History = () => {
                                 <TokenBadge
                                   withoutIcon
                                   token={symbol}
-                                  className={`size-1.5 rounded-none rotate-45`}
+                                  className={`size-1.5 rotate-45 rounded-none`}
                                 />
                                 {symbol}
                               </TableCell>
@@ -309,7 +309,7 @@ export const History = () => {
                         <TableRow>
                           <TableCell
                             colSpan={2}
-                            className="font-bold text-right"
+                            className="text-right font-bold"
                           >
                             Total
                           </TableCell>
@@ -331,13 +331,13 @@ export const History = () => {
               return (
                 <AccordionItem value={event.id} key={event.id}>
                   <AccordionTrigger>
-                    <Settings2Icon className="p-2 size-10 rounded-full bg-muted" />
-                    <div className="flex flex-col flex-grow items-start">
+                    <Settings2Icon className="size-10 rounded-full bg-muted p-2" />
+                    <div className="flex flex-grow flex-col items-start">
                       <strong className="text-muted-foreground">
                         Valuations updated
                       </strong>
 
-                      <div className="flex gap-2 mt-2">
+                      <div className="mt-2 flex gap-2">
                         {event.newValuations.map((valuation, i) => {
                           return (
                             <div key={i} className="flex flex-col items-center">
@@ -345,7 +345,7 @@ export const History = () => {
                               <TokenBadge
                                 withoutIcon
                                 token={currencies[i].symbol}
-                                className="size-2 rounded-none rotate-45"
+                                className="size-2 rotate-45 rounded-none"
                               />
                             </div>
                           );
@@ -353,23 +353,23 @@ export const History = () => {
                       </div>
 
                       {!isUpdater && (
-                        <p className="text-left text-sm mt-1">
+                        <p className="mt-1 text-left text-sm">
                           by <strong>{event.playerName}</strong>
                         </p>
                       )}
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Table className="gap-4 text-xs text-center">
+                    <Table className="gap-4 text-center text-xs">
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="align-middle h-8 row-span-2">
+                          <TableHead className="row-span-2 h-8 align-middle">
                             Token
                           </TableHead>
-                          <TableHead className="text-right align-middle h-8 row-span-2">
+                          <TableHead className="row-span-2 h-8 text-right align-middle">
                             Old
                           </TableHead>
-                          <TableHead className="text-right align-middle h-8">
+                          <TableHead className="h-8 text-right align-middle">
                             New
                           </TableHead>
                         </TableRow>
@@ -383,7 +383,7 @@ export const History = () => {
                                 <TokenBadge
                                   withoutIcon
                                   token={symbol}
-                                  className={`size-1.5 rounded-none rotate-45`}
+                                  className={`size-1.5 rotate-45 rounded-none`}
                                 />
                                 {symbol}
                               </TableCell>
@@ -407,10 +407,10 @@ export const History = () => {
                                 )}
                               >
                                 {event.oldValuations[i].lt(valuation) && (
-                                  <ArrowUpIcon className="inline size-3 align-baseline -m-0.5 mr-0.5 text-green-500 " />
+                                  <ArrowUpIcon className="-m-0.5 mr-0.5 inline size-3 align-baseline text-green-500" />
                                 )}
                                 {event.oldValuations[i].gt(valuation) && (
-                                  <ArrowDownIcon className="inline size-3 align-baseline -m-0.5 mr-0.5  text-red-500" />
+                                  <ArrowDownIcon className="-m-0.5 mr-0.5 inline size-3 align-baseline text-red-500" />
                                 )}
                                 {valuation.toFixed(1)}
                               </TableCell>
@@ -430,22 +430,22 @@ export const History = () => {
               return (
                 <AccordionItem value={event.id} key={event.id}>
                   <AccordionTrigger disabled>
-                    <UserRoundPlusIcon className="p-2 size-10 rounded-full bg-muted" />
-                    <div className="flex flex-col flex-grow items-start">
+                    <UserRoundPlusIcon className="size-10 rounded-full bg-muted p-2" />
+                    <div className="flex flex-grow flex-col items-start">
                       <strong className="text-muted-foreground">
                         Player Joined
                       </strong>
 
-                      <div className="flex gap-2 items-center">
+                      <div className="flex items-center gap-2">
                         <CharacterIcon
                           character={event.character}
                           key={`${event.id}-badge`}
-                          className="p-2 size-12 rounded-full bg-muted"
+                          className="size-12 rounded-full bg-muted p-2"
                         >
                           {event.cause && (
                             <TokenBadge
                               token={event.cause}
-                              className="absolute bottom-0 right-0 border-background border size-5 "
+                              className="absolute bottom-0 right-0 size-5 border border-background"
                             />
                           )}
                         </CharacterIcon>

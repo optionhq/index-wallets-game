@@ -17,7 +17,7 @@ export const GameRoom = () => {
 
   if (!game) {
     return (
-      <div className="h-full flex flex-col justify-evenly items-center p-4 ">
+      <div className="flex h-full flex-col items-center justify-evenly p-4">
         <p>Loading...</p>
       </div>
     );

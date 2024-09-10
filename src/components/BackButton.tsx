@@ -10,7 +10,7 @@ export const BackButton: FC<BackButtonProps> = ({ className, ...props }) => {
     <Button
       variant="link"
       className={cn(
-        "absolute left-0 p-0 w-fit top-0 text-md no-underline text-primary",
+        "text-md absolute left-0 top-0 w-fit p-0 text-primary no-underline",
         className,
       )}
       {...props}

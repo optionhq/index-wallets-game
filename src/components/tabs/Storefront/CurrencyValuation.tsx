@@ -25,10 +25,10 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
   const networkValuations = useAtomValue(networkValuationsAtom);
 
   return (
-    <div {...props} className="flex pt-4 p-2 px-6 gap-6">
-      <div className="flex flex-col flex-grow gap-2">
+    <div {...props} className="flex gap-6 p-2 px-6 pt-4">
+      <div className="flex flex-grow flex-col gap-2">
         <div className="flex justify-between">
-          <div className="flex items-center h-fit gap-2">
+          <div className="flex h-fit items-center gap-2">
             <TokenBadge token={currency.symbol} className="size-8 shrink-0" />
             <p className="text-right font-medium">{currency.symbol}</p>
           </div>
@@ -36,7 +36,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
           <div className="flex gap-2">
             <div className="flex flex-col">
               <Input
-                className="w-20 h-8 text-right"
+                className="h-8 w-20 text-right"
                 maxLength={5}
                 type="number"
                 inputMode="decimal"
@@ -48,7 +48,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
               <Button
                 variant="secondary"
                 size="icon"
-                className="rounded-l-full size-8"
+                className="size-8 rounded-l-full"
                 onClick={() => {
                   setValuation(bnMath.subtract(valuation, 0.1) as BigNumber);
                 }}
@@ -58,7 +58,7 @@ export const CurrencyValuation: FC<CurrencyValuationProps> = ({
               <Button
                 variant="secondary"
                 size="icon"
-                className="rounded-r-full size-8"
+                className="size-8 rounded-r-full"
                 onClick={() => {
                   setValuation(bnMath.add(valuation, 0.1) as BigNumber);
                 }}

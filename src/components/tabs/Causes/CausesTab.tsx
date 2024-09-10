@@ -126,7 +126,7 @@ export const CausesTab = () => {
       {!selectedCause && (
         <>
           <div className="flex flex-col gap-2">
-            <p className="text-center p-2 text-sm text-muted-foreground/80 -mt-2">
+            <p className="-mt-2 p-2 text-center text-sm text-muted-foreground/80">
               Donate{" "}
               <strong>
                 {formatValue(donationPrice, {
@@ -148,7 +148,7 @@ export const CausesTab = () => {
                   onClick={() => setSelectedCause(cause)}
                   key={cause.symbol}
                   className={cn(
-                    "relative flex items-center border-2 cursor-pointer py-4 px-6 gap-4 shadow-sm rounded-lg hover:border-primary",
+                    "relative flex cursor-pointer items-center gap-4 rounded-lg border-2 px-6 py-4 shadow-sm hover:border-primary",
                   )}
                 >
                   <TokenBadge
@@ -156,7 +156,7 @@ export const CausesTab = () => {
                     token={cause.symbol as CauseSymbol}
                   />
                   <div className="flex flex-col gap-2">
-                    <p className="font-bold text-lg">{cause.name}</p>
+                    <p className="text-lg font-bold">{cause.name}</p>
                     <p className="text-sm text-muted-foreground">
                       <strong>
                         {formatBalance(tokensAcquired)} {cause.symbol}
@@ -164,7 +164,7 @@ export const CausesTab = () => {
                     </p>
                   </div>
                   {isPlayerCause && (
-                    <HeartHandshakeIcon className="absolute top-3 right-3 text-primary" />
+                    <HeartHandshakeIcon className="absolute right-3 top-3 text-primary" />
                   )}
                 </div>
               );
@@ -180,7 +180,7 @@ export const CausesTab = () => {
             layout
             className="flex flex-col items-center gap-1 self-center"
           >
-            <p className="font-bold text-lg">{selectedCause.name}</p>
+            <p className="text-lg font-bold">{selectedCause.name}</p>
 
             <TokenBadge
               token={selectedCause.symbol}
@@ -198,7 +198,7 @@ export const CausesTab = () => {
             >
               Their price
             </Label>
-            <p className="relative inline-block place-self-center w-32 h-12 mt-1 text-center  text-lg">
+            <p className="relative mt-1 inline-block h-12 w-32 place-self-center text-center text-lg">
               ⱡ{DONATION_PRICE}
             </p>
           </motion.div>
@@ -212,9 +212,9 @@ export const CausesTab = () => {
                 exit={{ opacity: 0 }}
                 className="grid grid-cols-3"
               >
-                <div className="flex items-center flex-col text-muted-foreground/60">
+                <div className="flex flex-col items-center text-muted-foreground/60">
                   <Label className="">You have</Label>
-                  <p className="mt-2 text-lg font-bold ">
+                  <p className="mt-2 text-lg font-bold">
                     {formatValue(portfolioValue, {
                       withIndexSign: true,
                     })}
@@ -222,14 +222,14 @@ export const CausesTab = () => {
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <div className="flex items-center flex-col">
-                      <Label className="flex flex-col items-center mt-2 text-md text-muted-foreground">
+                    <div className="flex flex-col items-center">
+                      <Label className="text-md mt-2 flex flex-col items-center text-muted-foreground">
                         <p className="font-bold">You pay</p>
-                        <p className=" text-xs text-muted-foreground/60">
+                        <p className="text-xs text-muted-foreground/60">
                           x{donationPrice.div(bn(DONATION_PRICE)).toFixed(1)}
                         </p>
                       </Label>
-                      <div className="flex gap-1 items-center">
+                      <div className="flex items-center gap-1">
                         <p className="text-xl font-bold text-muted-foreground">
                           {formatValue(donationPrice, { withIndexSign: true })}
                         </p>
@@ -237,12 +237,12 @@ export const CausesTab = () => {
                           balances={currentPlayer.balances}
                           className="relative"
                         >
-                          <div className="size-2 bg-background rounded-full" />
+                          <div className="size-2 rounded-full bg-background" />
                         </BalancesDonut>
                       </div>
                       <Button
                         variant="outline"
-                        className="rounded-sm w-fit h-fit px-3 py-1 font-bold text-primary border-primary tracking-wider text-xs"
+                        className="h-fit w-fit rounded-sm border-primary px-3 py-1 text-xs font-bold tracking-wider text-primary"
                       >
                         <BarChart3Icon className="mr-1 size-2.5 align-text-top" />
                         SHOW BREAKDOWN
@@ -254,7 +254,7 @@ export const CausesTab = () => {
                     className="max-h-64 w-72 overflow-auto p-1"
                   >
                     <ValueComparison
-                      className="w-full rounded-sm overflow-clip"
+                      className="w-full overflow-clip rounded-sm"
                       compositePayment={compositeDonationPrice}
                       buyerValuations={networkValuations}
                       vendorValuations={CAUSE_VALUATIONS}
@@ -262,7 +262,7 @@ export const CausesTab = () => {
                   </PopoverContent>
                 </Popover>
 
-                <div className="flex items-center flex-col text-muted-foreground/60">
+                <div className="flex flex-col items-center text-muted-foreground/60">
                   <Label className=" ">You'll have</Label>
                   <p
                     className={cn(
@@ -283,7 +283,7 @@ export const CausesTab = () => {
             {hasEnoughFunds === false && (
               <motion.p
                 key="not-enough-funds"
-                className="overlap text-destructive w-full leading-[3.5rem] align-middle text-center"
+                className="overlap w-full text-center align-middle leading-[3.5rem] text-destructive"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -298,7 +298,7 @@ export const CausesTab = () => {
                   key="pay-button"
                   asChild
                   onClick={makeDonation}
-                  className="relative overlap font-bold w-full text-lg h-14"
+                  className="overlap relative h-14 w-full text-lg font-bold"
                 >
                   <motion.div
                     className="relative"

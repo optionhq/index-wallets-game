@@ -6,15 +6,15 @@ import { TabsContent } from "@/components/ui/tabs";
 export const MarketTab = () => {
   return (
     <TabsContent value="market" className="gap-4">
-      <h2 className="text-lg font-bold text-muted-foreground leading-none mb-2">
+      <h2 className="mb-2 text-lg font-bold leading-none text-muted-foreground">
         Wallet Compositions
       </h2>
       <WalletCompositionsChart />
-      <h2 className="text-lg font-bold text-muted-foreground leading-none mb-2">
+      <h2 className="mb-2 text-lg font-bold leading-none text-muted-foreground">
         Token supplies
       </h2>
       <TokenSuppliesChart />
-      <h2 className="text-lg font-bold text-muted-foreground leading-none mb-2">
+      <h2 className="mb-2 text-lg font-bold leading-none text-muted-foreground">
         Network valuations
       </h2>
       <NetworkValuationsChart />

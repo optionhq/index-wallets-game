@@ -202,14 +202,14 @@ export const BuyTab = () => {
                   layoutId={player.deviceId}
                   onClick={() => setSelectedPayee(player.deviceId)}
                   key={player.deviceId}
-                  className="flex items-center border-2 cursor-pointer p-2 gap-2 shadow-sm rounded-lg hover:border-primary"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border-2 p-2 shadow-sm hover:border-primary"
                 >
                   <CharacterIcon
                     className="size-16"
                     character={player.character}
                   />
                   <div className="flex flex-col gap-0">
-                    <p className="font-bold text-lg">{player.name}</p>
+                    <p className="text-lg font-bold">{player.name}</p>
 
                     {prices[player.deviceId] && (
                       <p>
@@ -233,7 +233,7 @@ export const BuyTab = () => {
             layout
             className="flex flex-col items-center gap-1 self-center"
           >
-            <p className="font-bold text-lg">{payee.name}</p>
+            <p className="text-lg font-bold">{payee.name}</p>
             <CharacterIcon
               character={payee.character}
               className="size-24 xs:size-28"
@@ -253,7 +253,7 @@ export const BuyTab = () => {
                   Send
                 </Label>
                 <div className="relative inline-block">
-                  <span className="absolute text-2xl align-middle left-4  top-3 h-4">
+                  <span className="absolute left-4 top-3 h-4 align-middle text-2xl">
                     ⱡ
                   </span>
                   <Input
@@ -270,7 +270,7 @@ export const BuyTab = () => {
                     pattern="^\d+(\.\d{1,2})?$"
                     id="payee-value"
                     inputMode="decimal"
-                    className="place-self-center w-32 h-12 mt-1 text-center  text-lg"
+                    className="mt-1 h-12 w-32 place-self-center text-center text-lg"
                   />
                 </div>
               </>
@@ -283,7 +283,7 @@ export const BuyTab = () => {
                 >
                   Amount of products
                 </Label>
-                <div className="flex relative items-center gap-1 mt-1">
+                <div className="relative mt-1 flex items-center gap-1">
                   <Button
                     size="icon"
                     className="size-12 rounded-sm"
@@ -314,7 +314,7 @@ export const BuyTab = () => {
                     id="amount-of-products"
                     type="number"
                     min={1}
-                    className="place-self-center w-32 h-12 text-center  text-lg"
+                    className="h-12 w-32 place-self-center text-center text-lg"
                   />
                   <Button
                     size={"icon"}
@@ -340,9 +340,9 @@ export const BuyTab = () => {
                 exit={{ opacity: 0 }}
                 className="grid grid-cols-3"
               >
-                <div className="flex items-center flex-col text-muted-foreground/60">
+                <div className="flex flex-col items-center text-muted-foreground/60">
                   <Label className="">You have</Label>
-                  <p className="mt-2 text-lg font-bold ">
+                  <p className="mt-2 text-lg font-bold">
                     {formatValue(portfolioValue, {
                       withIndexSign: true,
                     })}
@@ -350,11 +350,11 @@ export const BuyTab = () => {
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <div className="flex items-center flex-col">
-                      <Label className="flex flex-col items-center mt-2 text-md text-muted-foreground">
+                    <div className="flex flex-col items-center">
+                      <Label className="text-md mt-2 flex flex-col items-center text-muted-foreground">
                         <p className="font-bold">You pay</p>
                       </Label>
-                      <div className="flex gap-1 items-center">
+                      <div className="flex items-center gap-1">
                         <p className="text-xl font-bold text-muted-foreground">
                           {!payerValue
                             ? "---"
@@ -363,7 +363,7 @@ export const BuyTab = () => {
                       </div>
                       <Button
                         variant="outline"
-                        className="rounded-sm w-fit h-fit px-3 py-1 font-bold text-primary border-primary tracking-wider text-xs"
+                        className="h-fit w-fit rounded-sm border-primary px-3 py-1 text-xs font-bold tracking-wider text-primary"
                       >
                         <BarChart3Icon className="mr-1 size-2.5 align-text-top" />
                         SHOW BREAKDOWN
@@ -375,7 +375,7 @@ export const BuyTab = () => {
                     className="max-h-64 w-72 overflow-auto p-1"
                   >
                     <ValueComparison
-                      className="w-full rounded-sm overflow-clip"
+                      className="w-full overflow-clip rounded-sm"
                       compositePayment={payeePrice!}
                       buyerValuations={networkValuations}
                       vendorValuations={payee.valuations}
@@ -383,7 +383,7 @@ export const BuyTab = () => {
                   </PopoverContent>
                 </Popover>
 
-                <div className="flex items-center flex-col text-muted-foreground/60">
+                <div className="flex flex-col items-center text-muted-foreground/60">
                   <Label className=" ">You'll have</Label>
                   <p
                     className={cn(
@@ -404,7 +404,7 @@ export const BuyTab = () => {
             {hasEnoughFunds === false && (
               <motion.p
                 key="not-enough-funds"
-                className="overlap text-destructive w-full leading-[3.5rem] align-middle text-center"
+                className="overlap w-full text-center align-middle leading-[3.5rem] text-destructive"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -419,7 +419,7 @@ export const BuyTab = () => {
                   key="pay-button"
                   asChild
                   onClick={makePayment}
-                  className="relative overlap font-bold w-full text-lg h-14"
+                  className="overlap relative h-14 w-full text-lg font-bold"
                 >
                   <motion.div
                     className="relative"

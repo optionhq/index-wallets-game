@@ -41,10 +41,10 @@ export const Game = () => {
         );
       }}
       defaultValue="wallet"
-      className="h-full overflow-clip w-full flex flex-col"
+      className="flex h-full w-full flex-col overflow-clip"
     >
-      <div className="w-full grid grid-cols-[36px_1fr_36px] shrink-0 items-center shadow-sm border-b justify-between h-10 bg-muted">
-        <h1 className="col-start-2 text-center font-bold text-lg text-muted-foreground">
+      <div className="grid h-10 w-full shrink-0 grid-cols-[36px_1fr_36px] items-center justify-between border-b bg-muted shadow-sm">
+        <h1 className="col-start-2 text-center text-lg font-bold text-muted-foreground">
           {activeTab === "wallet" && "Balances"}
           {activeTab === "buy" &&
             (currentPlayer.isDealer
@@ -65,7 +65,7 @@ export const Game = () => {
       {!currentPlayer.isDealer && <CausesTab />}
       {!currentPlayer.isDealer && <StorefrontTab />}
       <MarketTab />
-      <TabsList className="w-full shrink-0 rounded-none bg-muted m-0 p-2 justify-evenly gap-2 h-16 border-t overflow-clip">
+      <TabsList className="m-0 h-16 w-full shrink-0 justify-evenly gap-2 overflow-clip rounded-none border-t bg-muted p-2">
         {Object.entries(
           currentPlayer.isDealer
             ? { wallet: HomeIcon, buy: SendIcon, market: AreaChartIcon }
@@ -80,7 +80,7 @@ export const Game = () => {
           <TabsTrigger
             key={`${key}-trigger`}
             value={key}
-            className="flex-grow flex gap-2 h-full data-[state=active]:bg-foreground/5 data-[state=active]:shadow-inner"
+            className="flex h-full flex-grow gap-2 data-[state=active]:bg-foreground/5 data-[state=active]:shadow-inner"
             onClick={
               key === "buy"
                 ? () => {

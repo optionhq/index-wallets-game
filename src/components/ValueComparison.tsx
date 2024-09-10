@@ -70,15 +70,15 @@ export const ValueComparison = ({
   }, [currencies, buyerValuations, vendorValuations, compositePayment]);
 
   return (
-    <Table {...props} className={cn(" gap-4 text-xs text-center", className)}>
+    <Table {...props} className={cn("gap-4 text-center text-xs", className)}>
       <TableHeader>
         <TableRow>
-          <TableHead className="align-middle h-8 row-span-2">Token</TableHead>
-          <TableHead className="align-middle h-8 row-span-2">Amount</TableHead>
-          <TableHead className="text-right align-middle h-8">
+          <TableHead className="row-span-2 h-8 align-middle">Token</TableHead>
+          <TableHead className="row-span-2 h-8 align-middle">Amount</TableHead>
+          <TableHead className="h-8 text-right align-middle">
             Value to you
           </TableHead>
-          <TableHead className="text-right align-middle h-8">
+          <TableHead className="h-8 text-right align-middle">
             Value to them
           </TableHead>
         </TableRow>
@@ -90,7 +90,7 @@ export const ValueComparison = ({
               <TokenBadge
                 withoutIcon
                 token={currency}
-                className={`size-1.5 rounded-none rotate-45`}
+                className={`size-1.5 rotate-45 rounded-none`}
               />
               {currency}
             </TableCell>
@@ -119,7 +119,7 @@ export const ValueComparison = ({
       </TableBody>
       <TableFooter>
         <TableRow>
-          <TableCell colSpan={2} className="font-bold text-right">
+          <TableCell colSpan={2} className="text-right font-bold">
             Total
           </TableCell>
           <TableCell className={cn("text-right")}>

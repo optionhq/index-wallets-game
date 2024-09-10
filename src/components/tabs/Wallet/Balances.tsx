@@ -25,12 +25,12 @@ export const Balances = () => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="align-middle h-8">Token</TableHead>
-          <TableHead className="align-middle h-8">Balance</TableHead>
-          <TableHead className="text-right align-middle h-8">
+          <TableHead className="h-8 align-middle">Token</TableHead>
+          <TableHead className="h-8 align-middle">Balance</TableHead>
+          <TableHead className="h-8 text-right align-middle">
             Valuation
           </TableHead>
-          <TableHead className="text-right align-middle h-8">Value</TableHead>
+          <TableHead className="h-8 text-right align-middle">Value</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -40,7 +40,7 @@ export const Balances = () => {
               <TokenBadge
                 withoutIcon
                 token={currency.symbol as CauseSymbol}
-                className={`size-1.5 rounded-none rotate-45`}
+                className={`size-1.5 rotate-45 rounded-none`}
               />
               {currency.symbol}
             </TableCell>
