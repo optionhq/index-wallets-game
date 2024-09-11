@@ -65,7 +65,7 @@ export const StorefrontTab = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="mb-6 flex flex-grow flex-col gap-2 overflow-auto p-4">
+      <div className="flex flex-grow flex-col gap-2 overflow-auto p-4 pb-14">
         <Label htmlFor="price" className="text-center text-muted-foreground">
           Your price
         </Label>
