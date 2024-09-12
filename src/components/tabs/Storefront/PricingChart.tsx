@@ -1,6 +1,7 @@
 import { CharacterIcon } from "@/components/CharacterIcon";
 import {
   currentAgentAtom,
+  networkValuationsAtom,
   otherPlayersAtom,
   playerProvisionalPriceAtom,
   playerProvisionalValuationsAtom,
@@ -15,10 +16,13 @@ import { BigNumber } from "mathjs";
 import { FC } from "react";
 import {
   Bar,
-  BarChart,
   Cell,
+  ComposedChart,
+  Rectangle,
+  ReferenceLine,
   ResponsiveContainer,
   ResponsiveContainerProps,
+  Scatter,
   Tooltip,
   XAxis,
   YAxis,
@@ -32,6 +36,7 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
   const otherPlayers = useAtomValue(otherPlayersAtom);
   const currentPlayer = useAtomValue(currentAgentAtom);
   const currentPlayerValuations = useAtomValue(playerProvisionalValuationsAtom);
+  const currentPlayerNetworkValuations = useAtomValue(networkValuationsAtom);
   const currentPlayerPrice = useAtomValue(playerProvisionalPriceAtom);
 
   const playersValuationsSum = [
@@ -58,12 +63,20 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
       viewerValuations: buyerNetworkValuations,
     });
 
+    const priceToMe = price({
+      buyerBalances: buyer.balances,
+      vendorPrice: currentPlayerPrice,
+      vendorValuations: currentPlayerValuations,
+      viewerValuations: currentPlayerNetworkValuations,
+    });
+
     const pricesFromCompetitors = otherPlayers
       .filter((otherPlayer) => otherPlayer.deviceId !== buyer.deviceId)
       .map((competitor) => ({
         playerId: competitor.deviceId,
         playerName: competitor.name,
         playerCharacter: competitor.character,
+        isViewer: false,
         price: price({
           buyerBalances: buyer.balances,
           vendorPrice: bn(INITIAL_RETAIL_PRICE),
@@ -112,6 +125,7 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
       playerRanks,
       playersData,
       ...rankedPrices,
+      priceToMe: priceToMe.toNumber(),
     };
   });
 
@@ -121,18 +135,13 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
         Prices from each perspective
       </h2>
       <ResponsiveContainer width="100%" height={100}>
-        <BarChart
+        <ComposedChart
           data={data}
           stackOffset="sign"
           barGap={1}
           barSize={2}
           margin={{ top: 0, right: 0, left: 0 }}
         >
-          {/* <CartesianGrid
-            strokeDasharray="3 3"
-            vertical={false}
-            horizontal={false}
-          /> */}
           <XAxis
             height={26}
             interval={0}
@@ -157,30 +166,6 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
                     width={2 * (RADIUS - PADDING)}
                     height={2 * (RADIUS - PADDING)}
                   />
-                  {/* <text
-                  textAnchor="middle"
-                  x="50%"
-                  // fill={characterColor[data[index].character]}
-                  fill="gray"
-                  fontSize={9}
-                  y={2 * RADIUS + 10}
-                >
-                  {formatValue(data[index].priceToThem, {
-                    withIndexSign: true,
-                    decimalPlaces: 1,
-                  })}
-                </text> */}
-                  {/* {data[index].isBestPrice && (
-                  <text
-                    textAnchor="middle"
-                    x="50%"
-                    fill="green"
-                    fontSize={6}
-                    y={2 * RADIUS + 16}
-                  >
-                    BEST
-                  </text>
-                )} */}
                 </svg>
               );
             }}
@@ -220,41 +205,91 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
               );
             }}
             formatter={(value: number, _name, entry, i) => {
-              const playerData = entry.payload.playersData[i + 1];
-              return (
-                <>
-                  ⱡ{value.toFixed(1)} from{" "}
-                  <span
-                    className={cn(
-                      "inline-flex items-center gap-1 align-text-top",
-                      playerData.isViewer &&
-                        (i === 0 ? "text-[yellowgreen]" : "text-primary"),
-                      playerData.isViewer && "font-bold",
-                    )}
-                  >
-                    <CharacterIcon
-                      character={playerData.playerCharacter}
-                      className="inline size-4 border-none p-0 opacity-75"
-                    />
-                    {playerData.playerName}
-                  </span>
-                </>
-              );
+              const playerData = entry.payload.playersData[entry.dataKey!];
+              if (playerData)
+                return (
+                  <>
+                    ⱡ{value.toFixed(1)} from{" "}
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-1 align-text-top",
+                        playerData.isViewer &&
+                          (i === 0 ? "text-[yellowgreen]" : "text-primary"),
+                        playerData.isViewer && "font-bold",
+                      )}
+                    >
+                      <CharacterIcon
+                        character={playerData.playerCharacter}
+                        className="inline size-4 border-none p-0 opacity-75"
+                      />
+                      {playerData.playerName}
+                    </span>
+                  </>
+                );
+              return `ⱡ${value.toFixed(1)}`;
             }}
             wrapperClassName="text-xs !max-w-50 rounded-md shadow-sm opacity-95 bg-background border !p-6"
             itemStyle={{ padding: 1 }}
             offset={0}
             cursor={{
-              fill: "hsl(47.9 0% 73.1% / 0.1)",
+              fill: "hsl(47.9 0% 73.1% )",
             }}
           />
-          {/* <ReferenceArea
-          y1={1}
-          y2={-10000}
-          fill="gray"
-          fillOpacity={0.1}
-          ifOverflow="hidden"
-        /> */}
+
+          <ReferenceLine
+            key={"base-price"}
+            y={currentPlayerPrice.toNumber()}
+            stroke="hsl(47.9 95.8% 53.1%/0.5)"
+            strokeDasharray={3}
+          />
+
+          <Scatter
+            key="price-to-me"
+            // @ts-expect-error Props typed as unknown on the lib
+            shape={({
+              cx,
+              cy,
+              yAxis,
+            }: {
+              cx: number;
+              cy: number;
+              yAxis: { scale: (value: number) => number };
+              priceToMe: number;
+            }) => {
+              const basePriceY = yAxis.scale(currentPlayerPrice.toNumber());
+
+              const diff = basePriceY - cy;
+
+              const height = Math.abs(diff);
+
+              const barWidth = 23;
+              return (
+                <>
+                  <Rectangle
+                    width={barWidth}
+                    x={cx - barWidth / 2}
+                    height={1}
+                    y={cy}
+                    className={cn(diff >= 0 ? "fill-blue-500" : "fill-red-500")}
+                  />
+                  <Rectangle
+                    width={barWidth}
+                    x={cx - barWidth / 2}
+                    height={Math.max(1, height)}
+                    y={diff >= 0 ? cy : cy - height}
+                    className={cn(
+                      diff >= 0
+                        ? "border-blue-500 border-t-border fill-blue-500/10"
+                        : "border-b-[1px] border-red-500 fill-red-500/10",
+                    )}
+                  />
+                </>
+              );
+            }}
+            name="You receive"
+            dataKey="priceToMe"
+          />
+
           {range(1, otherPlayers.length + 1).map((rank) => (
             <Bar
               key={`rank-${rank}-bar`}
@@ -267,23 +302,22 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
               }
               dataKey={rank}
               minPointSize={3}
-              // fill={characterColor[player.character]}
             >
               {data.map((entry, cellIndex) => (
                 <Cell
                   key={`cell-${cellIndex}`}
-                  fill={
+                  className={cn(
                     entry.playerRanks[currentPlayer.deviceId] === rank
                       ? rank === 1
-                        ? "yellowgreen"
-                        : "hsl(47.9 95.8% 53.1%)"
-                      : "hsl(0 0% 90%)"
-                  }
+                        ? "fill-green-500"
+                        : "fill-primary"
+                      : "fill-muted-foreground/50",
+                  )}
                 />
               ))}
             </Bar>
           ))}
-        </BarChart>
+        </ComposedChart>
       </ResponsiveContainer>
       {children}
     </div>
