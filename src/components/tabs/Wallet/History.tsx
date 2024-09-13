@@ -215,9 +215,8 @@ export const History = () => {
 
             case "DONATION_MADE": {
               const isDonor = event.playerId === currentAgent.deviceId;
-              // @TODO: record the donor network valuations instead of his valuations as a reference for the values
               const donorValues = event.payment.map((amount, i) =>
-                (event.donorValuations[i] ?? bn(0)).mul(amount),
+                (event.donorNetworkValuations[i] ?? bn(0)).mul(amount),
               );
               return (
                 <AccordionItem value={event.id} key={event.id}>

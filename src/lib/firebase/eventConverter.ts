@@ -47,8 +47,8 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
         return {
           ...event,
           payment: event.payment.map<BigNumber>((value) => bn(value)),
-          donorValuations: event.donorValuations.map<BigNumber>((value) =>
-            bn(value),
+          donorNetworkValuations: event.donorNetworkValuations.map<BigNumber>(
+            (value) => bn(value),
           ),
           causeValuations: event.causeValuations.map<BigNumber>((value) =>
             bn(value),
@@ -92,7 +92,7 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
           ...event,
           payment: event.payment.map(bnStringify),
           tokensAcquired: event.tokensAcquired.toString(),
-          donorValuations: event.donorValuations.map(bnStringify),
+          donorNetworkValuations: event.donorNetworkValuations.map(bnStringify),
           causeValuations: event.causeValuations.map(bnStringify),
         };
       case "GAME_CREATED":

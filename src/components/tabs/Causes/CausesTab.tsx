@@ -93,7 +93,7 @@ export const CausesTab = () => {
         playerName: currentPlayer.name,
         payment: compositeDonationPrice,
         causeValuations: bnZeroPad([bn(1)], networkValuations.length),
-        donorValuations: networkValuations,
+        donorNetworkValuations: networkValuations,
       });
     });
   }, [
