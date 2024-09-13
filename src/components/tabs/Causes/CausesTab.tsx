@@ -20,7 +20,6 @@ import { ValueComparison } from "@/components/ValueComparison";
 import { CAUSE_VALUATIONS, DONATION_PRICE, DONATION_REWARD } from "@/config";
 import { bn, bnMath, bnZeroPad } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
-import { formatBalance } from "@/lib/game/formatBalance";
 import { formatValue } from "@/lib/game/formatValue";
 import { compositePrice } from "@/lib/indexWallets/compositePrice";
 import { valueOf } from "@/lib/indexWallets/valueOf";
@@ -118,8 +117,15 @@ export const CausesTab = () => {
 
   const balanceAfterPurchase = useMemo(() => {
     if (!donationPrice) return undefined;
-    return portfolioValue.sub(donationPrice);
-  }, [donationPrice, portfolioValue]);
+
+    const rewardValuation = selectedCause
+      ? networkValuations[selectedCause.index]
+      : bn(0);
+
+    const rewardValue = rewardValuation.mul(DONATION_REWARD);
+
+    return portfolioValue.sub(donationPrice).add(rewardValue);
+  }, [donationPrice, portfolioValue, selectedCause, networkValuations]);
 
   return (
     <TabsContent value="causes" className="justify-between xs:pt-10">
@@ -140,9 +146,10 @@ export const CausesTab = () => {
             {causes.map((cause, index) => {
               const currencyIndex = index + 1;
               const isPlayerCause = currentPlayer.cause === cause.symbol;
-              const tokensAcquired = bn(DONATION_REWARD).sub(
-                compositeDonationPrice[currencyIndex],
-              );
+
+              const rewardValue = (
+                networkValuations[currencyIndex] ?? bn(0)
+              ).mul(DONATION_REWARD);
               return (
                 <div
                   onClick={() => setSelectedCause(cause)}
@@ -159,7 +166,8 @@ export const CausesTab = () => {
                     <p className="text-lg font-bold">{cause.name}</p>
                     <p className="text-sm text-muted-foreground">
                       <strong>
-                        {formatBalance(tokensAcquired)} {cause.symbol}
+                        {DONATION_REWARD} {cause.symbol} (
+                        {formatValue(rewardValue, { withIndexSign: true })})
                       </strong>{" "}
                     </p>
                   </div>

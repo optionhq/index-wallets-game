@@ -6,6 +6,7 @@ import { getFirestore } from "@/lib/firebase/getFirestore";
 import { generateId } from "@/lib/generateId";
 import { generateUUID } from "@/lib/generateUUID";
 import { valueOf } from "@/lib/indexWallets/valueOf";
+import { padArray } from "@/lib/utils/padArray";
 import { Currency } from "@/types/Currency";
 import { Event, ValuationsUpdatedEvent } from "@/types/Events";
 import { GameData } from "@/types/GameData";
@@ -222,8 +223,10 @@ export const currenciesAtom = atom<Currency[]>((get) => {
   return game.currencies;
 });
 
-export const causesAtom = atom<Currency[]>((get) =>
-  get(currenciesAtom).filter((currency) => currency.symbol !== "USD"),
+export const causesAtom = atom<(Currency & { index: number })[]>((get) =>
+  get(currenciesAtom)
+    .filter((currency) => currency.symbol !== "USD")
+    .map((c, i) => ({ ...c, index: i + 1 })),
 );
 
 export const playerProvisionalValuationsAtom = atom<BigNumber[]>([]);
@@ -352,7 +355,9 @@ export const payeePaymentValueInputAtom = memoize(
 
 export const selectedPayeeAtom = atom<string | undefined>(undefined);
 
-export const selectedCauseAtom = atom<Currency | undefined>(undefined);
+export const selectedCauseAtom = atom<
+  (Currency & { index: number }) | undefined
+>(undefined);
 
 export const networkValuationsObservableAtom = atom((get) => {
   const currentAgent = get(currentAgentAtom);
@@ -389,7 +394,14 @@ export const networkValuationsObservableAtom = atom((get) => {
     .pipe(shareReplay());
 });
 
-export const networkValuationsAtom = unwrap(
+const unormalizedNetworkValuationsAtom = unwrap(
   atomWithObservable((get) => get(networkValuationsObservableAtom)),
   () => [bn(1)],
 );
+
+export const networkValuationsAtom = atom((get) => {
+  const unormalizedNetworkValuations = get(unormalizedNetworkValuationsAtom);
+  const currencies = get(currenciesAtom);
+
+  return padArray(unormalizedNetworkValuations, currencies.length, bn(0));
+});
