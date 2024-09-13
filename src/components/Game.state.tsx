@@ -3,10 +3,10 @@ import { bn } from "@/lib/bnMath";
 import { eventConverter } from "@/lib/firebase/eventConverter";
 import { gameConverter } from "@/lib/firebase/gameConverter";
 import { getFirestore } from "@/lib/firebase/getFirestore";
-import { generateId } from "@/lib/generateId";
 import { generateUUID } from "@/lib/generateUUID";
 import { valueOf } from "@/lib/indexWallets/valueOf";
 import { padArray } from "@/lib/utils/padArray";
+import { cause, CauseSymbol } from "@/types/Cause";
 import { Currency } from "@/types/Currency";
 import { Event, ValuationsUpdatedEvent } from "@/types/Events";
 import { GameData } from "@/types/GameData";
@@ -19,6 +19,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  runTransaction,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -30,7 +31,7 @@ import { withImmer } from "jotai-immer";
 import { atomWithObservable, unwrap } from "jotai/utils";
 import { BigNumber } from "mathjs";
 import memoize from "memoize";
-import { sortBy } from "remeda";
+import { isDeepEqual, sortBy, times } from "remeda";
 import { filter, Observable, scan, shareReplay, startWith } from "rxjs";
 
 export const gameIdAtom = atom<string>("");
@@ -59,12 +60,11 @@ const asyncGameAtom = atomWithObservable((get) => {
     });
   }
 
-  return new Observable<GameData | undefined>((subscriber) => {
+  return new Observable<GameData | undefined | null>((subscriber) => {
     const unsubscribe = onSnapshot(
       doc(getFirestore(), "games", gameId).withConverter(gameConverter),
       (doc) => {
-        const gameData = doc.data();
-        subscriber.next(gameData);
+        subscriber.next(doc.exists() ? doc.data() : null);
       },
     );
 
@@ -74,50 +74,83 @@ const asyncGameAtom = atomWithObservable((get) => {
 
 export const maybeGameAtom = unwrap(asyncGameAtom);
 
-export const initializeGameAtom = atom(null, async (get, _set) => {
-  const gameId = generateId();
-  const deviceId = get(deviceIdAtom);
-  const gameData = {
-    createdAt: serverTimestamp(),
-    players: {
-      [deviceId]: {
-        index: 0,
-        deviceId,
-        name: "Dealer",
-        balances: ["1000000000"],
-        valuations: ["1"],
-        character: "Dealer",
-        retailPrice: INITIAL_RETAIL_PRICE,
+export interface GameConfig {
+  id: string;
+  causes: CauseSymbol[];
+}
+
+export const initializeGameAtom = atom(
+  null,
+  async (get, _set, config: GameConfig) => {
+    const deviceId = get(deviceIdAtom);
+    const currencies = [
+      { name: "US Dollars", symbol: "USD", totalSupply: "0" },
+      ...config.causes.map((causeSymbol) => ({
+        ...cause[causeSymbol],
+        totalSupply: "0",
+      })),
+    ];
+    const gameData = {
+      createdAt: serverTimestamp(),
+      players: {
+        [deviceId]: {
+          index: 0,
+          deviceId,
+          name: "Dealer",
+          balances: ["1000000000", ...times(currencies.length - 1, () => "0")],
+          valuations: ["1", ...times(currencies.length - 1, () => "0")],
+          character: "Dealer",
+          retailPrice: INITIAL_RETAIL_PRICE,
+        },
       },
-    },
-    currencies: [{ name: "US Dollars", symbol: "USD", totalSupply: "0" }],
-  };
-  await Promise.all([
-    setDoc(doc(getFirestore(), "games", gameId), gameData),
-    addDoc(collection(getFirestore(), "games", gameId, "history"), gameData),
-  ]);
-  return gameId;
-});
+      currencies,
+    };
+    await Promise.all([
+      setDoc(doc(getFirestore(), "games", config.id), gameData),
+      addDoc(
+        collection(getFirestore(), "games", config.id, "history"),
+        gameData,
+      ),
+    ]);
+  },
+);
 
 export const gameAtom = withImmer(
   atom(
     (get) => get(defined(maybeGameAtom)),
     async (get, _set, gameData: GameData) => {
       const gameId = get(gameIdAtom);
+      const currentGameData = get(defined(maybeGameAtom));
 
-      await Promise.all([
-        setDoc(
+      await runTransaction(getFirestore(), async (transaction) => {
+        const latestGameData = await transaction
+          .get(
+            doc(getFirestore(), "games", gameId).withConverter(gameConverter),
+          )
+          .then((doc) => doc.data());
+
+        if (!latestGameData) {
+          throw new Error("Game not found.");
+        }
+
+        if (!isDeepEqual(currentGameData, latestGameData)) {
+          throw new Error(
+            "Game state has changed since this transaction started.",
+          );
+        }
+
+        transaction.set(
           doc(getFirestore(), "games", gameId).withConverter(gameConverter),
           gameData,
-        ),
+        );
 
-        addDoc(
-          collection(getFirestore(), "games", gameId, "history").withConverter(
-            gameConverter,
-          ),
+        transaction.set(
+          doc(
+            collection(getFirestore(), "games", gameId, "history"),
+          ).withConverter(gameConverter),
           { ...gameData, createdAt: serverTimestamp() },
-        ),
-      ]);
+        );
+      });
     },
   ),
 );
@@ -179,13 +212,17 @@ export interface PlayerOrDealer extends Player {
   isDealer?: boolean;
 }
 
-export const defined: <T>(innerAtom: Atom<T | undefined>) => Atom<T> = (
+export const defined: <T>(innerAtom: Atom<T | undefined | null>) => Atom<T> = (
   innerAtom,
 ) =>
   atom((get: Getter) => {
     const value = get(innerAtom);
     if (value === undefined) {
       throw new Error("Atom value is undefined");
+    }
+
+    if (value === null) {
+      throw new Error("Atom value is null");
     }
     return value;
   });

@@ -27,7 +27,7 @@ import { CauseSymbol } from "@/types/Cause";
 import { Popover } from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { BarChart3Icon, HeartHandshakeIcon } from "lucide-react";
+import { BarChart3Icon } from "lucide-react";
 import { BigNumber } from "mathjs";
 import { useCallback, useMemo } from "react";
 import { zip } from "remeda";
@@ -148,7 +148,6 @@ export const CausesTab = () => {
             </p>
             {causes.map((cause, index) => {
               const currencyIndex = index + 1;
-              const isPlayerCause = currentPlayer.cause === cause.symbol;
 
               const rewardValue = (
                 networkValuations[currencyIndex] ?? bn(0)
@@ -174,9 +173,6 @@ export const CausesTab = () => {
                       </strong>{" "}
                     </p>
                   </div>
-                  {isPlayerCause && (
-                    <HeartHandshakeIcon className="absolute right-3 top-3 text-primary" />
-                  )}
                 </div>
               );
             })}

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/cn";
 import { useFirestore } from "@/lib/firebase/useFirestore";
+import { generateId } from "@/lib/generateId";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { doc, getDoc } from "firebase/firestore";
@@ -18,9 +19,6 @@ export const Lobby = () => {
   const navigate = useNavigate();
   const [gameId, setGameId] = useState<string>("");
   const firestore = useFirestore();
-
-  const playerId = useAtomValue(deviceIdAtom);
-  const createGame = useSetAtom(initializeGameAtom);
 
   const { data: gameExists } = useQuery({
     queryKey: ["game", gameId.toUpperCase()],
@@ -77,12 +75,10 @@ export const Lobby = () => {
       <div className="flex flex-col items-center gap-2">
         <p className="text-sm text-foreground/50">or</p>
         <Button
-          onClick={() =>
-            createGame().then((gameId) => {
-              emitEvent(gameId, { type: "GAME_CREATED", dealerId: playerId });
-              navigate({ to: `/game/${gameId}`, params: { gameId } });
-            })
-          }
+          onClick={() => {
+            const gameId = generateId();
+            navigate({ to: `/game/${gameId}`, params: { gameId } });
+          }}
           variant="link"
           size="lg"
           className="h-fit"

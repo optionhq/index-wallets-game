@@ -44,9 +44,6 @@ const dataAtom = atomWithObservable((get) => {
                 ...latestPoint,
                 timestamp: event.timestamp.toMillis(),
                 USD: latestPoint.USD + INITIAL_USD_BALANCE,
-                ...(event.cause
-                  ? { [event.cause]: latestPoint[event.cause] ?? 0 }
-                  : {}),
                 event,
                 index: latestPoint.index + 1,
               },

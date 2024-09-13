@@ -5,30 +5,25 @@ import {
   gameAtom,
   otherPlayersAtom,
 } from "@/components/Game.state";
-import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { INITIAL_USD_BALANCE } from "@/config";
 import { bn } from "@/lib/bnMath";
-import { CauseSymbol, allCauses, cause } from "@/types/Cause";
+import { cn } from "@/lib/cn";
 import { Character, allPlayerCharacters } from "@/types/Character";
-import { useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useMemo, useState } from "react";
 import { times } from "remeda";
 import { toast } from "sonner";
 
+const chosenPlayerNameAtom = atom<string | undefined>(undefined);
+const playerCharacterAtom = atom<Character | undefined>(undefined);
+
 export const PlayerOnboarding = () => {
   const [playerName, setPlayerName] = useState<string>("");
-  const [chosenPlayerName, setChosenPlayerName] = useState<string | undefined>(
-    undefined,
-  );
-  const [playerCause, setPlayerCause] = useState<CauseSymbol | undefined>(
-    undefined,
-  );
+  const [chosenPlayerName, setChosenPlayerName] = useAtom(chosenPlayerNameAtom);
 
-  const [playerCharacter, setPlayerCharacter] = useState<Character | undefined>(
-    undefined,
-  );
+  const [playerCharacter, setPlayerCharacter] = useAtom(playerCharacterAtom);
   const updateGame = useSetAtom(gameAtom);
   const players = useAtomValue(otherPlayersAtom);
   const chosenCharacters = useMemo(
@@ -71,7 +66,7 @@ export const PlayerOnboarding = () => {
         </div>
       )}
 
-      {chosenPlayerName && !playerCharacter && (
+      {chosenPlayerName && (
         <div className="flex w-full flex-col items-center gap-2 p-2">
           <p>Hey {chosenPlayerName}!</p>
           <p>Pick your character</p>
@@ -83,7 +78,11 @@ export const PlayerOnboarding = () => {
                 key={character}
                 onClick={() => setPlayerCharacter(character)}
                 variant="outline"
-                className="flex h-32 w-full flex-col justify-around gap-1 text-wrap"
+                className={cn(
+                  "flex h-32 w-full flex-col justify-around gap-1 text-wrap",
+                  playerCharacter === character &&
+                    "border-primary bg-primary/20 hover:bg-primary/30",
+                )}
               >
                 <p className="flex-grow capitalize">{character}</p>
                 <CharacterIcon className="size-16" character={character} />
@@ -92,132 +91,48 @@ export const PlayerOnboarding = () => {
           </div>
 
           <Button
+            size="lg"
+            className="h-14 w-full text-lg font-bold"
+            disabled={!playerCharacter}
+            onClick={() =>
+              updateGame((game) => {
+                const amountOfCurrencies = game.currencies.length;
+
+                const newPlayer = {
+                  index: Object.values(game.players).length,
+                  deviceId,
+                  name: chosenPlayerName,
+                  balances: [
+                    bn(INITIAL_USD_BALANCE),
+                    ...times(amountOfCurrencies - 1, () => bn("0")),
+                  ],
+                  valuations: [
+                    bn("1"),
+                    ...times(amountOfCurrencies - 1, () => bn("0")),
+                  ],
+                  character: playerCharacter!,
+                  retailPrice: bn(10),
+                };
+
+                game.players[deviceId] = newPlayer;
+
+                game.currencies[0].totalSupply =
+                  game.currencies[0].totalSupply.add(INITIAL_USD_BALANCE);
+
+                emitEvent({ type: "PLAYER_JOINED", ...newPlayer });
+              })
+            }
+          >
+            {playerCharacter ? "Join game" : "Pick a character"}
+          </Button>
+
+          <Button
             variant="link"
             className="text-muted-foreground"
             onClick={() => setChosenPlayerName(undefined)}
           >
             Change name
           </Button>
-        </div>
-      )}
-
-      {chosenPlayerName && playerCharacter && !playerCause && (
-        <div className="flex w-full flex-col items-center gap-2 p-2">
-          <div className="flex flex-col items-center">
-            <p>{chosenPlayerName}</p>
-            <CharacterIcon className="size-16" character={playerCharacter} />
-          </div>
-          <p>Pick your cause</p>
-
-          <div className="grid grid-cols-3 gap-1">
-            {allCauses.map((cause) => (
-              <Button
-                key={cause.symbol}
-                onClick={() => setPlayerCause(cause.symbol)}
-                variant="outline"
-                className="flex h-40 w-full flex-col justify-between gap-1 text-wrap"
-              >
-                <p className="flex-grow">{cause.name}</p>
-                <TokenBadge className="size-16" token={cause.symbol} />
-                <p className="font-bold text-muted-foreground">
-                  ${cause.symbol}
-                </p>
-              </Button>
-            ))}
-          </div>
-
-          <Button
-            variant="link"
-            className="text-muted-foreground"
-            onClick={() => setPlayerCharacter(undefined)}
-          >
-            Change character
-          </Button>
-        </div>
-      )}
-
-      {chosenPlayerName && playerCharacter && playerCause && (
-        <div className="flex w-full flex-col items-center gap-10 p-2">
-          <div className="flex flex-col items-center">
-            <p className="text-muted-foreground">{chosenPlayerName}</p>
-            <CharacterIcon className="size-24" character={playerCharacter} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <p>You've decided to support</p>
-            <div className="flex flex-col items-center justify-between gap-3 text-wrap rounded-lg border p-4">
-              <p className="text-lg">{cause[playerCause].name}</p>
-              <TokenBadge className="size-16" token={playerCause} />
-              <p className="font-bold text-muted-foreground">
-                ${cause[playerCause].symbol}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex w-full flex-col gap-2 px-4">
-            <Button
-              variant="link"
-              className="h-fit p-0 text-muted-foreground"
-              onClick={() => setPlayerCause(undefined)}
-            >
-              Pick another cause
-            </Button>
-            <Button
-              size="lg"
-              className="h-14 w-full text-lg font-bold"
-              onClick={() =>
-                updateGame((game) => {
-                  if (
-                    !game.currencies.find(
-                      (currency) => currency.symbol === playerCause,
-                    )
-                  ) {
-                    game.currencies.push({
-                      ...cause[playerCause],
-                      totalSupply: bn("0"),
-                    });
-
-                    for (const player of Object.values(game.players)) {
-                      player.balances.push(bn("0"));
-                      player.valuations.push(bn("0"));
-                    }
-                  }
-
-                  const amountOfCurrencies = game.currencies.length;
-                  const playerCauseIndex = game.currencies.findIndex(
-                    (currency) => currency.symbol === playerCause,
-                  );
-
-                  const newPlayer = {
-                    index: Object.values(game.players).length,
-                    deviceId,
-                    name: chosenPlayerName,
-                    balances: [
-                      bn(INITIAL_USD_BALANCE),
-                      ...times(amountOfCurrencies - 1, () => bn("0")),
-                    ],
-                    valuations: [
-                      bn("1"),
-                      ...times(amountOfCurrencies - 1, (index) =>
-                        index + 1 === playerCauseIndex ? bn("1") : bn("0"),
-                      ),
-                    ],
-                    cause: playerCause,
-                    character: playerCharacter,
-                    retailPrice: bn(10),
-                  };
-
-                  game.players[deviceId] = newPlayer;
-
-                  game.currencies[0].totalSupply =
-                    game.currencies[0].totalSupply.add(INITIAL_USD_BALANCE);
-
-                  emitEvent({ type: "PLAYER_JOINED", ...newPlayer });
-                })
-              }
-            >
-              Join game
-            </Button>
-          </div>
         </div>
       )}
     </div>

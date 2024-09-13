@@ -26,7 +26,6 @@ import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
 import { formatValue } from "@/lib/game/formatValue";
 import { valueOf } from "@/lib/indexWallets/valueOf";
-import { cause } from "@/types/Cause";
 import { Event } from "@/types/Events";
 import { WithId } from "@/types/utils";
 import { useAtomValue } from "jotai";
@@ -425,8 +424,6 @@ export const History = () => {
             }
 
             case "PLAYER_JOINED": {
-              const isJoiner = event.id === currentAgent.deviceId;
-
               return (
                 <AccordionItem value={event.id} key={event.id}>
                   <AccordionTrigger disabled>
@@ -441,19 +438,10 @@ export const History = () => {
                           character={event.character}
                           key={`${event.id}-badge`}
                           className="size-12 rounded-full bg-muted p-2"
-                        >
-                          {event.cause && (
-                            <TokenBadge
-                              token={event.cause}
-                              className="absolute bottom-0 right-0 size-5 border border-background"
-                            />
-                          )}
-                        </CharacterIcon>
+                        />
+
                         <div className="flex flex-col text-left text-sm leading-none">
                           <strong>{event.name}</strong>
-                          {event.cause && (
-                            <span>{cause[event.cause].name} </span>
-                          )}
                         </div>
                       </div>
                     </div>

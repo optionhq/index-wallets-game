@@ -5,6 +5,7 @@ import {
   updateProvisionalPriceEffect,
   updateProvisionalValuationsEffect,
 } from "@/components/Game.state";
+import { GameSetup } from "@/components/GameSetup";
 import { PlayerOnboarding } from "@/components/PlayerOnboarding";
 
 import { useAtomValue } from "jotai";
@@ -15,12 +16,16 @@ export const GameRoom = () => {
   useAtomValue(updateProvisionalPriceEffect);
   const currentPlayer = useAtomValue(maybeCurrentAgentAtom);
 
-  if (!game) {
+  if (game === undefined) {
     return (
       <div className="flex h-full flex-col items-center justify-evenly p-4">
         <p>Loading...</p>
       </div>
     );
+  }
+
+  if (game === null) {
+    return <GameSetup />
   }
 
   if (!currentPlayer) {
