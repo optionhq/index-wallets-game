@@ -32,7 +32,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { BarChart3Icon, MinusIcon, PlusIcon } from "lucide-react";
 import { BigNumber } from "mathjs";
 import { useCallback, useMemo, useState } from "react";
-import { sort } from "remeda";
+import { sort, zip } from "remeda";
 
 export const BuyTab = () => {
   const [selectedPayee, setSelectedPayee] = useAtom(selectedPayeeAtom);
@@ -122,10 +122,10 @@ export const BuyTab = () => {
     isPurchaseOfGoods,
   ]);
 
-  const hasEnoughFunds = useMemo(() => {
-    if (!payerValue) return undefined;
-    return payerValue.lte(portfolioValue);
-  }, [payerValue, portfolioValue]);
+  // const hasEnoughFunds = useMemo(() => {
+  //   if (!payerValue) return undefined;
+  //   return payerValue.lte(portfolioValue);
+  // }, [payerValue, portfolioValue]);
 
   const balanceAfterPurchase = useMemo(() => {
     if (!payerValue) return undefined;
@@ -143,6 +143,13 @@ export const BuyTab = () => {
       vendorValuations: payee.valuations,
     });
   }, [currentPlayer, payee, payeeValue]);
+
+  const hasEnoughFunds = useMemo(() => {
+    if (!payeePrice) return undefined;
+    return !zip(currentPlayer.balances, payeePrice).some(([balance, price]) =>
+      balance.lt(price),
+    );
+  }, [payeePrice, currentPlayer.balances]);
 
   const makePayment = useCallback(async () => {
     if (

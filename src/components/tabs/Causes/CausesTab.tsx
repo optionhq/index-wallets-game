@@ -30,6 +30,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { BarChart3Icon, HeartHandshakeIcon } from "lucide-react";
 import { BigNumber } from "mathjs";
 import { useCallback, useMemo } from "react";
+import { zip } from "remeda";
 
 export const CausesTab = () => {
   const [selectedCause, setSelectedCause] = useAtom(selectedCauseAtom);
@@ -111,9 +112,11 @@ export const CausesTab = () => {
   const portfolioValue = useAtomValue(playerPortfolioValueAtom);
 
   const hasEnoughFunds = useMemo(() => {
-    if (!donationPrice) return undefined;
-    return donationPrice.lte(portfolioValue);
-  }, [donationPrice, portfolioValue]);
+    if (!compositeDonationPrice) return undefined;
+    return !zip(currentPlayer.balances, compositeDonationPrice).some(
+      ([balance, price]) => balance.lt(price),
+    );
+  }, [compositeDonationPrice, currentPlayer.balances]);
 
   const balanceAfterPurchase = useMemo(() => {
     if (!donationPrice) return undefined;
