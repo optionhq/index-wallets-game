@@ -16,8 +16,8 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
           vendorValuations: event.vendorValuations.map<BigNumber>((value) =>
             bn(value),
           ),
-          buyerValuations: event.buyerValuations.map<BigNumber>((value) =>
-            bn(value),
+          buyerNetworkValuations: event.buyerNetworkValuations.map<BigNumber>(
+            (value) => bn(value),
           ),
         };
       case "PLAYER_JOINED":
@@ -56,7 +56,13 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
           tokensAcquired: bn(event.tokensAcquired),
         };
       case "GAME_CREATED":
-        return event;
+        return {
+          ...event,
+          currencies: event.currencies.map((currency) => ({
+            ...currency,
+            totalSupply: bn(currency.totalSupply),
+          })),
+        };
     }
   },
   toFirestore: (event: Event) => {
@@ -66,7 +72,7 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
           ...event,
           payment: event.payment.map(bnStringify),
           vendorValuations: event.vendorValuations.map(bnStringify),
-          buyerValuations: event.buyerValuations.map(bnStringify),
+          buyerNetworkValuations: event.buyerNetworkValuations.map(bnStringify),
         };
       case "PLAYER_JOINED":
         return {
@@ -96,7 +102,13 @@ export const eventConverter: FirestoreDataConverter<Event, DbEvent> = {
           causeValuations: event.causeValuations.map(bnStringify),
         };
       case "GAME_CREATED":
-        return event;
+        return {
+          ...event,
+          currencies: event.currencies.map((currency) => ({
+            ...currency,
+            totalSupply: currency.totalSupply.toString(),
+          })),
+        };
     }
   },
 };

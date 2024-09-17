@@ -79,8 +79,8 @@ export const History = () => {
               const recipientValues = event.vendorValuations.map(
                 (valuation, i) => valuation.mul(event.payment[i]),
               );
-              const senderValues = event.buyerValuations.map((valuation, i) =>
-                valuation.mul(event.payment[i]),
+              const senderValues = event.buyerNetworkValuations.map(
+                (valuation, i) => valuation.mul(event.payment[i]),
               );
               return (
                 <AccordionItem value={event.id} key={event.id}>

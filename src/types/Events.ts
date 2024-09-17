@@ -1,4 +1,5 @@
 import { CauseSymbol } from "@/types/Cause";
+import { Currency, DbCurrency } from "@/types/Currency";
 import { DbPlayer, Player } from "@/types/Player";
 import { Timestamp } from "firebase/firestore";
 import { BigNumber } from "mathjs";
@@ -12,7 +13,7 @@ export type PaymentMadeEvent = {
   toName: string;
   payment: BigNumber[];
   vendorValuations: BigNumber[];
-  buyerValuations: BigNumber[];
+  buyerNetworkValuations: BigNumber[];
 };
 
 export type PlayerJoinedEvent = {
@@ -54,6 +55,7 @@ export type GameCreatedEvent = {
   type: "GAME_CREATED";
   timestamp: Timestamp;
   dealerId: string;
+  currencies: Currency[];
 };
 
 export type Event =
@@ -73,7 +75,7 @@ export type PaymentMadeDbEvent = {
   toName: string;
   payment: string[];
   vendorValuations: string[];
-  buyerValuations: string[];
+  buyerNetworkValuations: string[];
 };
 
 export type PlayerJoinedDbEvent = {
@@ -115,6 +117,7 @@ export type GameCreatedDbEvent = {
   type: "GAME_CREATED";
   timestamp: Timestamp;
   dealerId: string;
+  currencies: DbCurrency[];
 };
 
 export type DbEvent =

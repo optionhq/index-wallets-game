@@ -6,8 +6,13 @@ import {
 } from "@/components/Game.state";
 import { TokenBadge } from "@/components/TokenBadge";
 import { Button } from "@/components/ui/button";
+import { bn } from "@/lib/bnMath";
 import { cn } from "@/lib/cn";
-import { allCauses, CauseSymbol } from "@/types/Cause";
+import {
+  allCauses,
+  CauseSymbol,
+  cause as causeWithSymbol,
+} from "@/types/Cause";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 
@@ -57,6 +62,14 @@ export const GameSetup = () => {
           emitEvent({
             type: "GAME_CREATED",
             dealerId: deviceId,
+            currencies: [
+              { name: "USD", symbol: "USD", totalSupply: bn(0) },
+              ...selectedCauses.map((cause) => ({
+                name: causeWithSymbol[cause].name,
+                symbol: cause,
+                totalSupply: bn(0),
+              })),
+            ],
           });
         }}
       >

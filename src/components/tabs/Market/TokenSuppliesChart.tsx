@@ -23,6 +23,7 @@ import { scan } from "rxjs";
 const dataAtom = atomWithObservable((get) => {
   const dealer = get(dealerAtom);
   const currencies = get(currenciesAtom);
+
   return get(eventsObservableAtom).pipe(
     scan(
       (previousData, event) => {
@@ -32,7 +33,13 @@ const dataAtom = atomWithObservable((get) => {
             return [
               {
                 timestamp: event.timestamp.toMillis(),
-                USD: 0,
+                ...event.currencies.reduce(
+                  (currencies, currency) => ({
+                    ...currencies,
+                    [currency.symbol]: 0,
+                  }),
+                  {} as Partial<Record<CurrencySymbol, number>>,
+                ),
                 event,
                 index: 0,
               },
@@ -43,7 +50,7 @@ const dataAtom = atomWithObservable((get) => {
               {
                 ...latestPoint,
                 timestamp: event.timestamp.toMillis(),
-                USD: latestPoint.USD + INITIAL_USD_BALANCE,
+                USD: latestPoint.USD! + INITIAL_USD_BALANCE,
                 event,
                 index: latestPoint.index + 1,
               },
@@ -126,7 +133,6 @@ const dataAtom = atomWithObservable((get) => {
       },
       [] as ({
         timestamp: number;
-        USD: number;
         event: Event;
         index: number;
       } & Partial<Record<CurrencySymbol, number>>)[],
@@ -139,6 +145,8 @@ export const TokenSuppliesChart = () => {
   const currencies = useAtomValue(currenciesAtom);
   const players = useAtomValue(agentsAtom);
 
+  console.log(data);
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart data={data}>
@@ -148,10 +156,6 @@ export const TokenSuppliesChart = () => {
           type="number"
           scale="sequential"
           tick={false}
-          domain={[
-            data?.[0].timestamp ?? "auto",
-            data?.[data.length]?.timestamp ?? "auto",
-          ]}
           interval={0}
         />
         <YAxis width={30} className="text-xs" />

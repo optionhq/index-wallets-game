@@ -176,7 +176,7 @@ export const BuyTab = () => {
         toName: payee!.name,
         payment: payeePrice,
         vendorValuations: payee!.valuations,
-        buyerValuations: networkValuations,
+        buyerNetworkValuations: networkValuations,
       });
     });
 
