@@ -228,7 +228,7 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
                 );
               return `ⱡ${value.toFixed(1)}`;
             }}
-            wrapperClassName="flex flex-col text-xs min-w-60 items-center !max-w-64 rounded-md shadow-md  border !px-6 !py-4"
+            wrapperClassName="flex flex-col text-xs min-w-60 items-center !max-w-64 rounded-md shadow-md  border !p-6"
             wrapperStyle={{
               margin: "0 auto",
               inset: "auto 0 calc(100% + 40px) 0",
