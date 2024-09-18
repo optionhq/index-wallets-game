@@ -164,13 +164,17 @@ export const CausesTab = () => {
                     className="size-16"
                     token={cause.symbol as CauseSymbol}
                   />
-                  <div className="flex flex-col gap-2">
-                    <p className="text-lg font-bold">{cause.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="flex flex-col gap-0">
+                    <p className="text-lg font-semibold text-muted-foreground/75">
+                      {cause.name}
+                    </p>
+                    <p className="text-sm">
                       <strong>
-                        {DONATION_REWARD} {cause.symbol} (
-                        {formatValue(rewardValue, { withIndexSign: true })})
-                      </strong>{" "}
+                        {DONATION_REWARD} {cause.symbol}
+                      </strong>
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      worth {formatValue(rewardValue, { withIndexSign: true })}
                     </p>
                   </div>
                 </div>
