@@ -181,9 +181,9 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
 
           {/* @ts-expect-error Returning element on formatter */}
           <Tooltip
-            allowEscapeViewBox={{ y: true }}
-            position={{ y: -270 }}
-            labelClassName="text-wrap  text-center !mb-4"
+            // allowEscapeViewBox={{ y: true }}
+            // position={{ y: -270 }}
+            labelClassName="text-wrap text-center !mb-4"
             labelFormatter={(playerName: string, data) => {
               const character = data.find(
                 (entry) => entry.payload.name === playerName,
@@ -228,12 +228,16 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
                 );
               return `ⱡ${value.toFixed(1)}`;
             }}
-            wrapperClassName="text-xs !max-w-50 rounded-md shadow-sm opacity-95 bg-background border !p-6"
-            itemStyle={{ padding: 1 }}
-            offset={0}
-            cursor={{
-              fill: "hsl(47.9 0% 73.1% )",
+            wrapperClassName="flex flex-col text-xs min-w-60 items-center !max-w-64 rounded-md shadow-md  border !px-6 !py-4"
+            wrapperStyle={{
+              margin: "0 auto",
+              inset: "auto 0 calc(100% + 40px) 0",
+              width: "fit-content",
+              position: "absolute",
+              transform: "none",
             }}
+            itemStyle={{ padding: 0 }}
+            offset={0}
           />
 
           <ReferenceLine
@@ -293,13 +297,7 @@ export const PricingChart: FC<ResponsiveContainerProps> = ({
           {range(1, otherPlayers.length + 1).map((rank) => (
             <Bar
               key={`rank-${rank}-bar`}
-              name={
-                rank === 1
-                  ? "Best"
-                  : rank === otherPlayers.length
-                    ? "Worst"
-                    : `${formatOrdinal(rank)}`
-              }
+              name={rank === 1 ? "Best" : `${formatOrdinal(rank)}`}
               dataKey={rank}
               minPointSize={3}
             >
