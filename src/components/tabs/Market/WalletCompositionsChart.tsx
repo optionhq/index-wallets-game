@@ -31,7 +31,7 @@ export const WalletCompositionsChart: FC<Partial<ResponsiveContainerProps>> = ({
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={200} {...props}>
+    <ResponsiveContainer width="100%" height={140} {...props}>
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
