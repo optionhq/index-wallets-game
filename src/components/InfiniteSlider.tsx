@@ -82,6 +82,10 @@ export const InfiniteSlider = React.forwardRef<
           {referenceValuePositionPercent !== undefined && (
             <motion.div
               className="absolute h-full bg-purple-500/15"
+              initial={{
+                left: `${referenceValuePositionPercent}%`,
+                right: "0",
+              }}
               animate={{
                 left: `${referenceValuePositionPercent}%`,
                 right: "0",
@@ -95,6 +99,16 @@ export const InfiniteSlider = React.forwardRef<
           referenceValuePositionPercent !== undefined && (
             <>
               <motion.div
+                initial={{
+                  top: 2,
+                  left: `calc(${referenceValuePositionPercent}% - calc(${REFERENCE_POINT_SIZE}/2))`,
+                  scale: Math.max(
+                    VALUATION_AMPLITUDE /
+                      (VALUATION_AMPLITUDE + Math.abs(referenceDistance)),
+                    0.2,
+                  ),
+                  rotate: 45,
+                }}
                 animate={{
                   top: 2,
                   left: `calc(${referenceValuePositionPercent}% - calc(${REFERENCE_POINT_SIZE}/2))`,
@@ -121,6 +135,17 @@ export const InfiniteSlider = React.forwardRef<
                 }}
               />
               <motion.span
+                initial={{
+                  top: 1,
+                  left:
+                    referenceDistance > 0
+                      ? "auto"
+                      : `calc(${referenceValuePositionPercent}% + ${REFERENCE_POINT_SIZE})`,
+                  right:
+                    referenceDistance > 0
+                      ? `calc(${100 - referenceValuePositionPercent}% + ${REFERENCE_POINT_SIZE})`
+                      : "auto",
+                }}
                 animate={{
                   top: 1,
                   left:
